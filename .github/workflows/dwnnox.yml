@@ -1,0 +1,41 @@
+name: Download nox to Drive
+
+on:
+  workflow_dispatch:
+
+jobs:
+  upload-model:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install rclone
+        run: |
+          curl https://rclone.org/install.sh | sudo bash
+
+      - name: Setup rclone config
+        run: |
+          mkdir -p ~/.config/rclone
+          echo "${{ secrets.RCLONE_CONF_B64 }}" | base64 --decode > ~/.config/rclone/rclone.conf
+
+      - name: Test rclone connection
+        run: |
+          rclone lsd gdrive:
+
+      - name: Download nox model
+        run: |
+          wget -c -O nox.exe \
+          https://res06.bignox.com/full/20201121/7e00b14bd18746908269dd8e648e109e.exe?filename=nox_setup_v6.6.1.5_full_intl.exe
+
+      - name: Verify model file
+        run: ls -lh nox.exe
+
+      - name: Upload to Google Drive
+        run: |
+          rclone copy nox.exe gdrive:termux-test \
+            --progress \
+            --drive-chunk-size 64M \
+            --transfers 1 \
+            --tpslimit 10 \
+            --retries 10 \
+            --low-level-retries 20
+

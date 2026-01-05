@@ -1,0 +1,56 @@
+name: TinyLlama Local Agent
+
+on:
+  workflow_dispatch:
+    inputs:
+      question:
+        description: "Question for the agent"
+        required: true
+        type: string
+
+jobs:
+  run-agent:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install ctransformers gdown
+
+      - name: Cache TinyLlama model
+        id: cache-model
+        uses: actions/cache@v3
+        with:
+          path: model
+          key: tinyllama-gguf-v1
+
+      - name: Download TinyLlama GGUF from Google Drive
+        if: steps.cache-model.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p model
+          gdown --id 1gGqwYhJhQopiRt7ebmY6pgeuOki4EEmQ -O model/tinyllama.gguf
+
+      - name: Verify model file
+        run: |
+          ls -lh model
+          file model/tinyllama.gguf
+
+      - name: Run agent
+        run: |
+          python agent.py "${{ github.event.inputs.question }}"
+
+      - name: Upload result
+        uses: actions/upload-artifact@v4
+        with:
+          name: result-${{ github.run_id }}
+          path: result.json
+          if-no-files-found: error

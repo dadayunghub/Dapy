@@ -1,0 +1,41 @@
+name: Download model to Drive
+
+on:
+  workflow_dispatch:
+
+jobs:
+  upload-model:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install rclone
+        run: |
+          curl https://rclone.org/install.sh | sudo bash
+
+      - name: Setup rclone config
+        run: |
+          mkdir -p ~/.config/rclone
+          echo "${{ secrets.RCLONE_CONF_B64 }}" | base64 --decode > ~/.config/rclone/rclone.conf
+
+      - name: Test rclone connection
+        run: |
+          rclone lsd gdrive:
+
+      - name: Download GGUF model
+        run: |
+          wget -c -O mistral-7b-instruct-v0.2.Q6_K.gguf \
+          https://huggingface.co/TheBloke/Mistral-7B-Instruct-v0.2-GGUF/resolve/main/mistral-7b-instruct-v0.2.Q6_K.gguf
+
+      - name: Verify model file
+        run: ls -lh mistral-7b-instruct-v0.2.Q6_K.gguf
+
+      - name: Upload to Google Drive
+        run: |
+          rclone copy mistral-7b-instruct-v0.2.Q6_K.gguf gdrive:termux-test \
+            --progress \
+            --drive-chunk-size 64M \
+            --transfers 1 \
+            --tpslimit 10 \
+            --retries 10 \
+            --low-level-retries 20
+
