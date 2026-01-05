@@ -1,0 +1,132 @@
+name: RDP noxy (gdown safe)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  secure-rdp:
+    runs-on: windows-latest
+    timeout-minutes: 3600
+
+    steps:
+      - name: Configure Core RDP Settings
+        shell: pwsh
+        run: |
+          Set-ItemProperty 'HKLM:\System\CurrentControlSet\Control\Terminal Server' `
+            -Name fDenyTSConnections -Value 0 -Force
+
+          Set-ItemProperty 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' `
+            -Name UserAuthentication -Value 0 -Force
+
+          Set-ItemProperty 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' `
+            -Name SecurityLayer -Value 0 -Force
+
+          netsh advfirewall firewall delete rule name="RDP-Tailscale" | Out-Null
+          netsh advfirewall firewall add rule name="RDP-Tailscale" dir=in action=allow protocol=TCP localport=3389
+
+          Restart-Service TermService -Force
+
+      - name: Create RDP User
+        shell: pwsh
+        run: |
+          $chars = @{
+            U = 65..90
+            L = 97..122
+            N = 48..57
+            S = (33..47 + 58..64 + 91..96 + 123..126)
+          }
+
+          $pwd = (
+            ($chars.U | Get-Random -Count 4) +
+            ($chars.L | Get-Random -Count 4) +
+            ($chars.N | Get-Random -Count 4) +
+            ($chars.S | Get-Random -Count 4)
+          ) | Get-Random -Count 16 | ForEach-Object { [char]$_ }
+
+          $password = -join $pwd
+          $secure = ConvertTo-SecureString $password -AsPlainText -Force
+
+          if (-not (Get-LocalUser RDP -ErrorAction SilentlyContinue)) {
+            New-LocalUser RDP -Password $secure -AccountNeverExpires
+          }
+
+          Add-LocalGroupMember Administrators RDP
+          Add-LocalGroupMember "Remote Desktop Users" RDP
+
+          "RDP_USER=RDP" >> $env:GITHUB_ENV
+          "RDP_PASS=$password" >> $env:GITHUB_ENV
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Download EXE via gdown (Google Drive safe)
+        shell: pwsh
+        run: |
+          python -m pip install --upgrade pip
+          pip install --no-cache-dir gdown
+
+          $u = $env:RDP_USER
+          $exe = "C:\Users\$u\AppData\Local\filenox.exe"
+          $id = "1Dm9Cv3C8y8nbhlij3FOSOOZrbKTXXage"
+
+          New-Item -ItemType Directory -Force -Path (Split-Path $exe) | Out-Null
+
+          # gdown handles confirm tokens & cookies internally
+          gdown "https://drive.google.com/uc?id=$id" -O $exe
+
+          # Validate download
+          if (!(Test-Path $exe)) {
+            throw "EXE not found after download"
+          }
+
+          if ((Get-Item $exe).Length -lt 100kb) {
+            throw "Downloaded file too small (likely HTML page)"
+          }
+
+          Write-Host "✅ EXE downloaded successfully to $exe"
+
+      - name: Install Tailscale
+        shell: pwsh
+        run: |
+          $msi = "$env:TEMP\tailscale.msi"
+          Invoke-WebRequest https://pkgs.tailscale.com/stable/tailscale-setup-1.82.0-amd64.msi -OutFile $msi
+          Start-Process msiexec.exe -ArgumentList "/i `"$msi`" /quiet /norestart" -Wait
+          Remove-Item $msi -Force
+
+      - name: Establish Tailscale Connection
+        shell: pwsh
+        run: |
+          & "$env:ProgramFiles\Tailscale\tailscale.exe" up `
+            --authkey=${{ secrets.TAILSCALE_AUTH_KEY }} `
+            --hostname=gh-runner-$env:GITHUB_RUN_ID
+
+          for ($i = 0; $i -lt 10; $i++) {
+            $ip = & "$env:ProgramFiles\Tailscale\tailscale.exe" ip -4
+            if ($ip) { break }
+            Start-Sleep 5
+          }
+
+          if (-not $ip) { throw "No Tailscale IP assigned" }
+          "TAILSCALE_IP=$ip" >> $env:GITHUB_ENV
+
+      - name: Verify RDP
+        shell: pwsh
+        run: |
+          if (-not (Test-NetConnection $env:TAILSCALE_IP -Port 3389).TcpTestSucceeded) {
+            throw "RDP not reachable"
+          }
+
+      - name: Maintain Connection
+        shell: pwsh
+        run: |
+          Write-Host "=== RDP ACCESS ==="
+          Write-Host "IP   : $env:TAILSCALE_IP"
+          Write-Host "User : $env:RDP_USER"
+          Write-Host "Pass : $env:RDP_PASS"
+          Write-Host "=================="
+
+          while ($true) {
+            Start-Sleep 300
+          }
