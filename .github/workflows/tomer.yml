@@ -75,7 +75,7 @@ jobs:
 
       - name: Save memory to file
         run: |
-          echo '${{ github.event.inputs.memory || "{}" }}' > memory.json
+          echo "${{ github.event.inputs.memory }}" > memory.json || echo "{}" > memory.json
 
       - name: Run agent
         run: |
