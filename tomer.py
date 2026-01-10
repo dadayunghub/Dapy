@@ -92,6 +92,10 @@ PLATFORM_CONFIG = {
         "prompt": STUDENT_SYSTEM_PROMPT,
         "rag": None,
     },
+    "mediamarket": {
+        "prompt": STUDENT_SYSTEM_PROMPT,
+        "rag": None,
+    },
     "portfolio": {
         "prompt": PORTFOLIO_SYSTEM_PROMPT,
         "rag": "portfolio.txt",
