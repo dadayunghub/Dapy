@@ -111,6 +111,10 @@ EMAIL_CONFIG = {
         "subject": "Your Learning Assistant Reply",
         "sender": "David AI Tutor",
     },
+    "mediamarket": {
+        "subject": "MediaMarket",
+        "sender": "MediaMarket",
+    },
     "portfolio": {
         "subject": "Project Discussion Update",
         "sender": "David Portfolio Assistant",
