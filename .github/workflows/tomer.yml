@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       question:
-        description: "User message"
+        description: "Last 5 user messages with roles (flattened text)"
         required: true
         type: string
 
@@ -30,11 +30,6 @@ on:
       action:
         description: "Platform (support | student | portfolio)"
         required: true
-        type: string
-
-      memory:
-        description: "Conversation memory (BASE64 ENCODED JSON)"
-        required: false
         type: string
 
 jobs:
@@ -78,34 +73,27 @@ jobs:
           ls -lh model
           file model/mistral-7b.gguf
 
-      - name: Decode memory safely
-        shell: bash
+      # ---------- SAFE INPUT HANDLING ----------
+
+      - name: Write question safely
         run: |
-          MEMORY_INPUT='${{ github.event.inputs.memory }}'
+          printf "%s" '${{ github.event.inputs.question }}' > question.txt
 
-          if [ -z "$MEMORY_INPUT" ]; then
-            echo "[]" > memory.json
-            echo "No memory provided, using empty array"
-          else
-            # Try base64 decode; fallback to raw JSON
-            if echo "$MEMORY_INPUT" | base64 --decode > memory.json 2>/dev/null; then
-            echo "Memory decoded from base64"
-            else
-              echo "$MEMORY_INPUT" > memory.json
-              echo "Memory was raw JSON, saved directly"
-            fi
-          fi
-
+      # ---------- RUN AGENT ----------
 
       - name: Run agent
+        env:
+          EMAIL: ${{ github.event.inputs.email }}
+          ACTION: ${{ github.event.inputs.action }}
+          INCOMING_ID: ${{ github.event.inputs.incoming_id }}
+          OUTGOING_ID: ${{ github.event.inputs.outgoing_id }}
         run: |
           python tomer.py \
-            "${{ github.event.inputs.question }}" \
-            "${{ github.event.inputs.email }}" \
-            "${{ github.event.inputs.action }}" \
-            "${{ github.event.inputs.incoming_id }}" \
-            "${{ github.event.inputs.outgoing_id }}" \
-            memory.json
+            question.txt \
+            "$EMAIL" \
+            "$ACTION" \
+            "$INCOMING_ID" \
+            "$OUTGOING_ID"
 
       - name: Upload result
         uses: actions/upload-artifact@v4

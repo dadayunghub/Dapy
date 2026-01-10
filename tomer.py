@@ -24,6 +24,7 @@ EMAIL_PASSWORD = os.environ.get("EMAIL_APP_PASSWORD")
 
 memory = []
 
+# memory is no longer strictly needed for this run
 memory_file = sys.argv[6] if len(sys.argv) > 6 else None
 if memory_file and os.path.exists(memory_file):
     try:
@@ -142,7 +143,18 @@ def main():
     if len(sys.argv) < 6:
         raise ValueError("Usage: tomer.py <question> <email> <platform> <incoming_id> <outgoing_id> [memory_file]")
 
-    question, email, platform, incoming_id, outgoing_id = sys.argv[1:6]
+    question_file, email, platform, incoming_id, outgoing_id = sys.argv[1:6]
+
+    # --- SAFE HANDLING: read question.txt ---
+    if not os.path.exists(question_file):
+        question_text = ""
+    else:
+        with open(question_file, "r", encoding="utf-8") as f:
+            question_text = f.read().strip()
+
+    # If question is empty, mark it as a new conversation
+    if not question_text:
+        question_text = "Continue the conversation."  # default safe message
 
     model = AutoModelForCausalLM.from_pretrained(
         MODEL_PATH,
@@ -158,14 +170,14 @@ Conversation so far:
 {format_memory(memory)}
 """
 
-    if estimate_tokens(question) > MAX_SAFE_USER_TOKENS:
-        chunks = ai_refine_split(model, rule_based_split(question))
+    if estimate_tokens(question_text) > MAX_SAFE_USER_TOKENS:
+        chunks = ai_refine_split(model, rule_based_split(question_text))
         raw_answer = answer_chunks(model, base_prompt, chunks)
     else:
         prompt = f"""{base_prompt}
 
 <|user|>
-{question}
+{question_text}
 
 <|assistant|>
 """
@@ -174,6 +186,7 @@ Conversation so far:
     send_form = "[SEND_FORM]" in raw_answer
     answer = raw_answer.replace("[SEND_FORM]", "").strip()
 
+    # --- POST RESULTS ---
     requests.post(RESULT_API, json={
         "incoming_id": incoming_id,
         "outgoing_id": outgoing_id,
