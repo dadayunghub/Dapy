@@ -79,12 +79,23 @@ jobs:
           file model/mistral-7b.gguf
 
       - name: Decode memory safely
+        shell: bash
         run: |
-          if [ -z "${{ github.event.inputs.memory }}" ]; then
+          MEMORY_INPUT='${{ github.event.inputs.memory }}'
+
+          if [ -z "$MEMORY_INPUT" ]; then
             echo "[]" > memory.json
+            echo "No memory provided, using empty array"
           else
-            echo "${{ github.event.inputs.memory }}" | base64 --decode > memory.json || echo "[]" > memory.json
+            # Try base64 decode; fallback to raw JSON
+            if echo "$MEMORY_INPUT" | base64 --decode > memory.json 2>/dev/null; then
+            echo "Memory decoded from base64"
+            else
+              echo "$MEMORY_INPUT" > memory.json
+              echo "Memory was raw JSON, saved directly"
+            fi
           fi
+
 
       - name: Run agent
         run: |
