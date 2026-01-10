@@ -22,17 +22,27 @@ EMAIL_PASSWORD = os.environ.get("EMAIL_APP_PASSWORD")
 # MEMORY HANDLING
 # -------------------------
 
+# -------------------------
+# MEMORY HANDLING (SAFE)
+# -------------------------
+
 memory = []
+
 memory_file = sys.argv[6] if len(sys.argv) > 6 else None
+
 if memory_file and os.path.exists(memory_file):
     try:
-        with open(memory_file, "r") as f:
-            content = f.read().strip()
-            if content:
-                memory = json.load(f)
+        with open(memory_file, "r", encoding="utf-8") as f:
+            raw = f.read().strip()
+            if raw:
+                data = json.loads(raw)
+                if isinstance(data, list):
+                    memory = data
+                else:
+                    print("⚠️ Memory JSON is not a list, ignoring.")
     except Exception as e:
         print("⚠️ Invalid memory JSON, ignoring:", e)
-        memory = []
+
 
 def format_memory(messages, max_turns=5):
     formatted = []

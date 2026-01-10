@@ -11,24 +11,29 @@ on:
         description: "User message"
         required: true
         type: string
+
       email:
         description: "User email"
         required: true
         type: string
+
       incoming_id:
         description: "Chat incoming ID"
         required: true
         type: string
+
       outgoing_id:
         description: "Session outgoing ID"
         required: true
         type: string
+
       action:
         description: "Platform (support | student | portfolio)"
         required: true
         type: string
+
       memory:
-        description: "Optional conversation memory (JSON string)"
+        description: "Optional conversation memory (JSON array)"
         required: false
         type: string
 
@@ -56,31 +61,30 @@ jobs:
           pip install ctransformers gdown yagmail requests
 
       - name: Cache mistral model
-        id: cache-model
         uses: actions/cache@v3
         with:
           path: model
           key: mistral-gguf-v1
 
       - name: Download mistral GGUF
-        if: steps.cache-model.outputs.cache-hit != 'true'
         run: |
           mkdir -p model
-          gdown --id 1tDKohelhAiA6hSXIqm9inqKGNDxeaWf8 -O model/mistral-7b.gguf
+          if [ ! -f model/mistral-7b.gguf ]; then
+            gdown --id 1tDKohelhAiA6hSXIqm9inqKGNDxeaWf8 -O model/mistral-7b.gguf
+          fi
 
       - name: Verify model
         run: |
           ls -lh model
           file model/mistral-7b.gguf
 
-      - name: Save memory to file
+      - name: Save memory safely
         run: |
           if [ -z "${{ github.event.inputs.memory }}" ]; then
-            echo '{}' > memory.json
+            echo '[]' > memory.json
           else
             printf '%s' "${{ github.event.inputs.memory }}" > memory.json
           fi
-
 
       - name: Run agent
         run: |
