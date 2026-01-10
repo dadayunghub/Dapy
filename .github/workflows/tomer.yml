@@ -80,13 +80,13 @@ jobs:
 
       - name: Run agent
         run: |
-          python tomer.py 
-            "${{ github.event.inputs.question }}" 
-            "${{ github.event.inputs.email }}" 
-            "${{ github.event.inputs.action }}" 
-            "${{ github.event.inputs.incoming_id }}" 
-            "${{ github.event.inputs.outgoing_id }}" 
-            "$(echo '${{ github.event.inputs.memory }}' | tr -d '\n')"
+          python tomer.py \
+            "${{ github.event.inputs.question }}" \
+            "${{ github.event.inputs.email }}" \
+            "${{ github.event.inputs.action }}" \
+            "${{ github.event.inputs.incoming_id }}" \
+            "${{ github.event.inputs.outgoing_id }}" \
+            "${{ github.event.inputs.memory || '' }}"
 
       - name: Upload result
         uses: actions/upload-artifact@v4
