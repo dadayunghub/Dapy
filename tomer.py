@@ -27,7 +27,9 @@ memory_file = sys.argv[6] if len(sys.argv) > 6 else None
 if memory_file and os.path.exists(memory_file):
     try:
         with open(memory_file, "r") as f:
-            memory = json.load(f)
+            content = f.read().strip()
+            if content:
+                memory = json.load(f)
     except Exception as e:
         print("⚠️ Invalid memory JSON, ignoring:", e)
         memory = []
