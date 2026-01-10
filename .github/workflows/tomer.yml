@@ -33,7 +33,7 @@ on:
         type: string
 
       memory:
-        description: "Optional conversation memory (JSON array)"
+        description: "Conversation memory (BASE64 ENCODED JSON)"
         required: false
         type: string
 
@@ -61,29 +61,29 @@ jobs:
           pip install ctransformers gdown yagmail requests
 
       - name: Cache mistral model
+        id: cache-model
         uses: actions/cache@v3
         with:
           path: model
           key: mistral-gguf-v1
 
       - name: Download mistral GGUF
+        if: steps.cache-model.outputs.cache-hit != 'true'
         run: |
           mkdir -p model
-          if [ ! -f model/mistral-7b.gguf ]; then
-            gdown --id 1tDKohelhAiA6hSXIqm9inqKGNDxeaWf8 -O model/mistral-7b.gguf
-          fi
+          gdown --id 1tDKohelhAiA6hSXIqm9inqKGNDxeaWf8 -O model/mistral-7b.gguf
 
       - name: Verify model
         run: |
           ls -lh model
           file model/mistral-7b.gguf
 
-      - name: Save memory safely
+      - name: Decode memory safely
         run: |
           if [ -z "${{ github.event.inputs.memory }}" ]; then
-            echo '[]' > memory.json
+            echo "[]" > memory.json
           else
-            printf '%s' "${{ github.event.inputs.memory }}" > memory.json
+            echo "${{ github.event.inputs.memory }}" | base64 --decode > memory.json || echo "[]" > memory.json
           fi
 
       - name: Run agent

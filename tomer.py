@@ -11,7 +11,7 @@ from ctransformers import AutoModelForCausalLM
 # -------------------------
 
 MODEL_PATH = "model/mistral-7b.gguf"
-MAX_SAFE_USER_TOKENS = 350   # user message only
+MAX_SAFE_USER_TOKENS = 350
 MAX_CHUNK_TOKENS = 250
 
 RESULT_API = os.environ.get("RESULT_API_URL")
@@ -22,27 +22,18 @@ EMAIL_PASSWORD = os.environ.get("EMAIL_APP_PASSWORD")
 # MEMORY HANDLING
 # -------------------------
 
-# -------------------------
-# MEMORY HANDLING (SAFE)
-# -------------------------
-
 memory = []
 
 memory_file = sys.argv[6] if len(sys.argv) > 6 else None
-
 if memory_file and os.path.exists(memory_file):
     try:
         with open(memory_file, "r", encoding="utf-8") as f:
-            raw = f.read().strip()
-            if raw:
-                data = json.loads(raw)
-                if isinstance(data, list):
-                    memory = data
-                else:
-                    print("⚠️ Memory JSON is not a list, ignoring.")
+            memory = json.load(f)
+            if not isinstance(memory, list):
+                memory = []
     except Exception as e:
         print("⚠️ Invalid memory JSON, ignoring:", e)
-
+        memory = []
 
 def format_memory(messages, max_turns=5):
     formatted = []
@@ -65,42 +56,19 @@ def estimate_tokens(text: str) -> int:
     return int(len(text.split()) / 0.75)
 
 # -------------------------
-# RULE-BASED SPLITTER
+# SPLITTING
 # -------------------------
 
 def rule_based_split(text: str):
-    text = text.strip()
     parts = re.split(r"\n?\s*\d+\.\s+", text)
     if len(parts) > 1:
         return [p.strip() for p in parts if p.strip()]
-    keywords = ["how", "what", "why", "when", "where", "can you", "should i", "is it", "do i"]
-    lines = re.split(r"\n+", text)
-    chunks = []
-    buffer = ""
-    for line in lines:
-        if any(line.lower().startswith(k) for k in keywords):
-            if buffer:
-                chunks.append(buffer.strip())
-            buffer = line
-        else:
-            buffer += " " + line
-    if buffer.strip():
-        chunks.append(buffer.strip())
-    return chunks if chunks else [text]
-
-# -------------------------
-# AI REFINEMENT SPLITTER
-# -------------------------
+    return [text.strip()]
 
 SPLIT_SYSTEM_PROMPT = """
-You are a text analysis assistant.
-
-Task:
-- Analyze the provided text
-- Identify distinct questions or requests
-- Rewrite each as a short, clear standalone question
-- Return them as a numbered list
-- Do NOT answer the questions
+You analyze text and extract distinct questions.
+Return ONLY a numbered list.
+Do NOT answer anything.
 """
 
 def ai_refine_split(model, chunks):
@@ -109,6 +77,7 @@ def ai_refine_split(model, chunks):
         if estimate_tokens(chunk) > MAX_CHUNK_TOKENS:
             refined.append(chunk)
             continue
+
         prompt = f"""<|system|>
 {SPLIT_SYSTEM_PROMPT}
 
@@ -123,15 +92,10 @@ def ai_refine_split(model, chunks):
         refined.extend(items if items else [chunk])
     return refined
 
-# -------------------------
-# CHUNK ANSWERING
-# -------------------------
-
 def answer_chunks(model, base_prompt, questions):
     answers = []
     for i, q in enumerate(questions, 1):
-        prompt = f"""
-{base_prompt}
+        prompt = f"""{base_prompt}
 
 <|user|>
 Question {i}:
@@ -147,36 +111,16 @@ Question {i}:
 # SYSTEM PROMPTS
 # -------------------------
 
-SUPPORT_SYSTEM_PROMPT = """
-You are a professional customer support AI assistant for Dave Company.
-ONLY answer questions related to Dave Company.
-Ask clarifying questions if needed.
-When complete, append:
-[SEND_FORM]
-"""
-
-STUDENT_SYSTEM_PROMPT = """
-You are a student-focused AI assistant.
-Explain clearly and step-by-step.
-"""
-
-PORTFOLIO_SYSTEM_PROMPT = """
-You are a sales and portfolio assistant.
-Ask questions until requirements are complete.
-When ready, append:
-[SEND_FORM]
-"""
-
 PLATFORM_CONFIG = {
-    "support": SUPPORT_SYSTEM_PROMPT,
-    "student": STUDENT_SYSTEM_PROMPT,
-    "portfolio": PORTFOLIO_SYSTEM_PROMPT,
+    "support": "You are a professional support AI. Append [SEND_FORM] if appropriate.",
+    "student": "You are a student tutor. Explain clearly.",
+    "portfolio": "You are a portfolio assistant. Append [SEND_FORM] when ready."
 }
 
 EMAIL_CONFIG = {
-    "support": ("Dave Company Support Update", "Dave Company Support"),
-    "student": ("Your Learning Assistant Reply", "David AI Tutor"),
-    "portfolio": ("Project Discussion Update", "David Portfolio Assistant"),
+    "support": ("Support Update", "Support Bot"),
+    "student": ("Learning Assistant", "Tutor Bot"),
+    "portfolio": ("Project Discussion", "Portfolio Bot")
 }
 
 # -------------------------
@@ -184,7 +128,10 @@ EMAIL_CONFIG = {
 # -------------------------
 
 def send_email(to_email, subject, body, sender_name):
-    yag = yagmail.SMTP(user={"contactregteam@gmail.com": sender_name}, password=EMAIL_PASSWORD)
+    yag = yagmail.SMTP(
+        user={"contactregteam@gmail.com": sender_name},
+        password=EMAIL_PASSWORD,
+    )
     yag.send(to=to_email, subject=subject, contents=body)
 
 # -------------------------
@@ -196,26 +143,26 @@ def main():
         raise ValueError("Usage: tomer.py <question> <email> <platform> <incoming_id> <outgoing_id> [memory_file]")
 
     question, email, platform, incoming_id, outgoing_id = sys.argv[1:6]
-    system_prompt = PLATFORM_CONFIG[platform]
-    subject, sender = EMAIL_CONFIG[platform]
 
-    model = AutoModelForCausalLM.from_pretrained(MODEL_PATH, model_type="mistral", context_length=2048, gpu_layers=0)
-    memory_block = format_memory(memory)
+    model = AutoModelForCausalLM.from_pretrained(
+        MODEL_PATH,
+        model_type="mistral",
+        context_length=2048,
+        gpu_layers=0,
+    )
 
     base_prompt = f"""<|system|>
-{system_prompt}
+{PLATFORM_CONFIG[platform]}
 
 Conversation so far:
-{memory_block}
+{format_memory(memory)}
 """
 
     if estimate_tokens(question) > MAX_SAFE_USER_TOKENS:
-        chunks = rule_based_split(question)
-        chunks = ai_refine_split(model, chunks)
+        chunks = ai_refine_split(model, rule_based_split(question))
         raw_answer = answer_chunks(model, base_prompt, chunks)
     else:
-        prompt = f"""
-{base_prompt}
+        prompt = f"""{base_prompt}
 
 <|user|>
 {question}
@@ -227,26 +174,23 @@ Conversation so far:
     send_form = "[SEND_FORM]" in raw_answer
     answer = raw_answer.replace("[SEND_FORM]", "").strip()
 
-    requests.post(
-        RESULT_API,
-        json={
-            "incoming_id": incoming_id,
-            "outgoing_id": outgoing_id,
-            "message": answer,
-            "platform": platform,
-            "email": email,
-        },
-        timeout=10,
-    )
+    requests.post(RESULT_API, json={
+        "incoming_id": incoming_id,
+        "outgoing_id": outgoing_id,
+        "message": answer,
+        "platform": platform,
+        "email": email,
+    }, timeout=10)
 
+    subject, sender = EMAIL_CONFIG[platform]
     send_email(email, subject, answer, sender)
 
     if send_form:
-        requests.post(
-            SEND_FORM_API,
-            json={"incoming_id": incoming_id, "outgoing_id": outgoing_id, "platform": platform},
-            timeout=10,
-        )
+        requests.post(SEND_FORM_API, json={
+            "incoming_id": incoming_id,
+            "outgoing_id": outgoing_id,
+            "platform": platform,
+        }, timeout=10)
 
     print("✅ Completed safely with chunked reasoning.")
 
