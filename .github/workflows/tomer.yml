@@ -86,7 +86,7 @@ jobs:
             "${{ github.event.inputs.action }}" \
             "${{ github.event.inputs.incoming_id }}" \
             "${{ github.event.inputs.outgoing_id }}" \
-            "${{ github.event.inputs.memory || '' }}"
+            "$(echo "${{ github.event.inputs.memory || '' }}" | tr -d '\n')"
 
       - name: Upload result
         uses: actions/upload-artifact@v4
