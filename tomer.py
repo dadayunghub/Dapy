@@ -22,24 +22,15 @@ EMAIL_PASSWORD = os.environ.get("EMAIL_APP_PASSWORD")
 # MEMORY HANDLING
 # -------------------------
 
-
-
-# -------------------------
-# MEMORY HANDLING
-# -------------------------
-
 memory = []
-
-# Always safely get sys.argv[6] if provided
-memory_json = sys.argv[6] if len(sys.argv) > 6 else ""
-
-if memory_json:
+memory_file = sys.argv[6] if len(sys.argv) > 6 else None
+if memory_file and os.path.exists(memory_file):
     try:
-        memory = json.loads(memory_json)
+        with open(memory_file, "r") as f:
+            memory = json.load(f)
     except Exception as e:
         print("⚠️ Invalid memory JSON, ignoring:", e)
         memory = []
-
 
 def format_memory(messages, max_turns=5):
     formatted = []
@@ -48,12 +39,10 @@ def format_memory(messages, max_turns=5):
         content = msg.get("content", "").strip()
         if not content:
             continue
-
         if role == "user":
             formatted.append(f"<|user|>\n{content}")
         elif role == "assistant":
             formatted.append(f"<|assistant|>\n{content}")
-
     return "\n".join(formatted)
 
 # -------------------------
@@ -61,30 +50,20 @@ def format_memory(messages, max_turns=5):
 # -------------------------
 
 def estimate_tokens(text: str) -> int:
-    # Approximation safe for Mistral
     return int(len(text.split()) / 0.75)
 
 # -------------------------
-# RULE-BASED SPLITTER (SAFE)
+# RULE-BASED SPLITTER
 # -------------------------
 
 def rule_based_split(text: str):
     text = text.strip()
-
-    # Split numbered lists
     parts = re.split(r"\n?\s*\d+\.\s+", text)
     if len(parts) > 1:
         return [p.strip() for p in parts if p.strip()]
-
-    # Split by question-like keywords
-    keywords = [
-        "how", "what", "why", "when", "where",
-        "can you", "should i", "is it", "do i"
-    ]
-
+    keywords = ["how", "what", "why", "when", "where", "can you", "should i", "is it", "do i"]
     lines = re.split(r"\n+", text)
     chunks = []
-
     buffer = ""
     for line in lines:
         if any(line.lower().startswith(k) for k in keywords):
@@ -93,14 +72,12 @@ def rule_based_split(text: str):
             buffer = line
         else:
             buffer += " " + line
-
     if buffer.strip():
         chunks.append(buffer.strip())
-
     return chunks if chunks else [text]
 
 # -------------------------
-# AI REFINEMENT SPLITTER (OPTIONAL)
+# AI REFINEMENT SPLITTER
 # -------------------------
 
 SPLIT_SYSTEM_PROMPT = """
@@ -116,12 +93,10 @@ Task:
 
 def ai_refine_split(model, chunks):
     refined = []
-
     for chunk in chunks:
         if estimate_tokens(chunk) > MAX_CHUNK_TOKENS:
             refined.append(chunk)
             continue
-
         prompt = f"""<|system|>
 {SPLIT_SYSTEM_PROMPT}
 
@@ -130,20 +105,10 @@ def ai_refine_split(model, chunks):
 
 <|assistant|>
 """
-
-        output = model(
-            prompt,
-            max_new_tokens=200,
-            temperature=0.2,
-            top_p=0.9,
-        ).strip()
-
-        # Parse numbered list
+        output = model(prompt, max_new_tokens=200, temperature=0.2, top_p=0.9).strip()
         items = re.split(r"\n?\s*\d+\.\s+", output)
         items = [i.strip() for i in items if i.strip()]
-
         refined.extend(items if items else [chunk])
-
     return refined
 
 # -------------------------
@@ -152,7 +117,6 @@ def ai_refine_split(model, chunks):
 
 def answer_chunks(model, base_prompt, questions):
     answers = []
-
     for i, q in enumerate(questions, 1):
         prompt = f"""
 {base_prompt}
@@ -163,15 +127,8 @@ Question {i}:
 
 <|assistant|>
 """
-        response = model(
-            prompt,
-            max_new_tokens=300,
-            temperature=0.6,
-            top_p=0.85,
-        ).strip()
-
+        response = model(prompt, max_new_tokens=300, temperature=0.6, top_p=0.85).strip()
         answers.append(f"{i}. {response}")
-
     return "\n\n".join(answers)
 
 # -------------------------
@@ -180,25 +137,20 @@ Question {i}:
 
 SUPPORT_SYSTEM_PROMPT = """
 You are a professional customer support AI assistant for Dave Company.
-
 ONLY answer questions related to Dave Company.
 Ask clarifying questions if needed.
-
 When complete, append:
 [SEND_FORM]
 """
 
 STUDENT_SYSTEM_PROMPT = """
 You are a student-focused AI assistant.
-
 Explain clearly and step-by-step.
 """
 
 PORTFOLIO_SYSTEM_PROMPT = """
 You are a sales and portfolio assistant.
-
 Ask questions until requirements are complete.
-
 When ready, append:
 [SEND_FORM]
 """
@@ -220,10 +172,7 @@ EMAIL_CONFIG = {
 # -------------------------
 
 def send_email(to_email, subject, body, sender_name):
-    yag = yagmail.SMTP(
-        user={"contactregteam@gmail.com": sender_name},
-        password=EMAIL_PASSWORD,
-    )
+    yag = yagmail.SMTP(user={"contactregteam@gmail.com": sender_name}, password=EMAIL_PASSWORD)
     yag.send(to=to_email, subject=subject, contents=body)
 
 # -------------------------
@@ -232,20 +181,13 @@ def send_email(to_email, subject, body, sender_name):
 
 def main():
     if len(sys.argv) < 6:
-        raise ValueError("Usage: tomer.py <question> <email> <platform> <incoming_id> <outgoing_id> [memory_json]")
+        raise ValueError("Usage: tomer.py <question> <email> <platform> <incoming_id> <outgoing_id> [memory_file]")
 
     question, email, platform, incoming_id, outgoing_id = sys.argv[1:6]
-
     system_prompt = PLATFORM_CONFIG[platform]
     subject, sender = EMAIL_CONFIG[platform]
 
-    model = AutoModelForCausalLM.from_pretrained(
-        MODEL_PATH,
-        model_type="mistral",
-        context_length=2048,
-        gpu_layers=0,
-    )
-
+    model = AutoModelForCausalLM.from_pretrained(MODEL_PATH, model_type="mistral", context_length=2048, gpu_layers=0)
     memory_block = format_memory(memory)
 
     base_prompt = f"""<|system|>
@@ -268,12 +210,7 @@ Conversation so far:
 
 <|assistant|>
 """
-        raw_answer = model(
-            prompt,
-            max_new_tokens=650,
-            temperature=0.6,
-            top_p=0.85,
-        ).strip()
+        raw_answer = model(prompt, max_new_tokens=650, temperature=0.6, top_p=0.85).strip()
 
     send_form = "[SEND_FORM]" in raw_answer
     answer = raw_answer.replace("[SEND_FORM]", "").strip()
@@ -295,11 +232,7 @@ Conversation so far:
     if send_form:
         requests.post(
             SEND_FORM_API,
-            json={
-                "incoming_id": incoming_id,
-                "outgoing_id": outgoing_id,
-                "platform": platform,
-            },
+            json={"incoming_id": incoming_id, "outgoing_id": outgoing_id, "platform": platform},
             timeout=10,
         )
 

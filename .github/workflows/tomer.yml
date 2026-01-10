@@ -11,27 +11,22 @@ on:
         description: "User message"
         required: true
         type: string
-
       email:
         description: "User email"
         required: true
         type: string
-
       incoming_id:
         description: "Chat incoming ID"
         required: true
         type: string
-
       outgoing_id:
         description: "Session outgoing ID"
         required: true
         type: string
-
       action:
         description: "Platform (support | student | portfolio)"
         required: true
         type: string
-
       memory:
         description: "Optional conversation memory (JSON string)"
         required: false
@@ -78,6 +73,10 @@ jobs:
           ls -lh model
           file model/mistral-7b.gguf
 
+      - name: Save memory to file
+        run: |
+          echo '${{ github.event.inputs.memory || "{}" }}' > memory.json
+
       - name: Run agent
         run: |
           python tomer.py \
@@ -86,7 +85,7 @@ jobs:
             "${{ github.event.inputs.action }}" \
             "${{ github.event.inputs.incoming_id }}" \
             "${{ github.event.inputs.outgoing_id }}" \
-            "$(echo "${{ github.event.inputs.memory || '' }}" | tr -d '\n')"
+            memory.json
 
       - name: Upload result
         uses: actions/upload-artifact@v4
