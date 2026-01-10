@@ -27,7 +27,8 @@ memory = []
 if len(sys.argv) >= 7 and sys.argv[6]:
     try:
         memory = json.loads(sys.argv[6])
-    except Exception:
+    except Exception as e:
+        print("⚠️ Invalid memory JSON, ignoring:", e)
         memory = []
 
 def format_memory(messages, max_turns=5):
