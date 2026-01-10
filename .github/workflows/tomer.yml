@@ -39,6 +39,14 @@ on:
 jobs:
   run-agent:
     runs-on: ubuntu-latest
+    
+    
+    
+    env:
+      RESULT_API_URL: ${{ secrets.RESULT_API_URL }}
+      SEND_FORM_API_URL: ${{ secrets.SEND_FORM_API_URL }}
+      EMAIL_APP_PASSWORD: ${{ secrets.EMAIL_APP_PASSWORD }}
+
 
     steps:
       - name: Checkout repo
