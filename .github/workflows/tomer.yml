@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       question:
-        description: "Last 5 user messages with roles (flattened text)"
+        description: "Flattened conversation text (last messages including current)"
         required: true
         type: string
 
@@ -52,12 +52,14 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install --upgrade pip
+          python -m pip install --upgrade pip
           pip install ctransformers gdown yagmail requests
+
+      # ---------- MODEL CACHE (v4 – NOT DEPRECATED) ----------
 
       - name: Cache mistral model
         id: cache-model
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: model
           key: mistral-gguf-v1
@@ -73,11 +75,20 @@ jobs:
           ls -lh model
           file model/mistral-7b.gguf
 
-      # ---------- SAFE INPUT HANDLING ----------
+      # ---------- SAFE INPUT HANDLING (NO SHELL PARSING) ----------
 
-      - name: Write question safely
+      - name: Write question safely to file
+        shell: bash
         run: |
-          printf "%s" '${{ github.event.inputs.question }}' > question.txt
+          cat <<'EOF' > question.txt
+${{ github.event.inputs.question }}
+EOF
+
+      - name: Verify question file
+        run: |
+          echo "----- question.txt -----"
+          sed -n '1,200p' question.txt
+          echo "------------------------"
 
       # ---------- RUN AGENT ----------
 
@@ -94,9 +105,3 @@ jobs:
             "$ACTION" \
             "$INCOMING_ID" \
             "$OUTGOING_ID"
-
-      - name: Upload result
-        uses: actions/upload-artifact@v4
-        with:
-          name: result-${{ github.run_id }}
-          path: result.json
