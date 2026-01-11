@@ -81,8 +81,8 @@ jobs:
         shell: bash
         run: |
           cat <<'EOF' > question.txt
-${{ github.event.inputs.question }}
-EOF
+            ${{ github.event.inputs.question }}
+            EOF
 
       - name: Verify question file
         run: |
