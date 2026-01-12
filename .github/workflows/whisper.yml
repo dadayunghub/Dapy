@@ -86,7 +86,7 @@ jobs:
       # -------------------------
       - name: Run agent
         run: |
-          python whisper.py \
+          python whisperagent.py \
             "waudio/${{ github.event.inputs.audio_file }}" \
             "${{ github.event.inputs.emails }}"
 
