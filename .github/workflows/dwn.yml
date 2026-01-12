@@ -21,17 +21,17 @@ jobs:
         run: |
           rclone lsd gdrive:
 
-      - name: Download GGUF model
+      - name: Download whisper model
         run: |
-          wget -c -O mistral-7b-instruct-v0.2.Q6_K.gguf \
-          https://huggingface.co/TheBloke/Mistral-7B-Instruct-v0.2-GGUF/resolve/main/mistral-7b-instruct-v0.2.Q6_K.gguf
+          wget -c -O whispermodel.safetensors \
+          https://huggingface.co/openai/whisper-large-v3/resolve/main/model.safetensors
 
       - name: Verify model file
-        run: ls -lh mistral-7b-instruct-v0.2.Q6_K.gguf
+        run: ls -lh whispermodel.safetensors
 
       - name: Upload to Google Drive
         run: |
-          rclone copy mistral-7b-instruct-v0.2.Q6_K.gguf gdrive:termux-test \
+          rclone copy whispermodel.safetensors gdrive:termux-test \
             --progress \
             --drive-chunk-size 64M \
             --transfers 1 \
