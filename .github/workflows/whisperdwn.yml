@@ -52,5 +52,9 @@ jobs:
         run: |
           rclone sync ~/.cache/whisper gdrive:whisper-cache \
             --progress \
-            --checksum \
-            --transfers 1
+            --drive-chunk-size 64M \
+            --transfers 1 \
+            --tpslimit 10 \
+            --retries 10 \
+            --low-level-retries 20
+
