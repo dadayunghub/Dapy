@@ -11,6 +11,7 @@ on:
         description: "Audio file path or URL to transcribe"
         required: true
         type: string
+
       emails:
         description: "Email address(es) to send the transcript to"
         required: true
@@ -32,34 +33,34 @@ jobs:
       - name: Install dependencies
         run: |
           pip install --upgrade pip
-          pip install openai-whisper torch yagmail requests
+          pip install gdown yagmail openai-whisper torch
 
       # -------------------------
-      # Install rclone
+      # Cache Whisper Model
       # -------------------------
-      - name: Install rclone
-        run: |
-          curl -fsSL https://rclone.org/install.sh | sudo bash
-
-      - name: Setup rclone config
-        run: |
-          mkdir -p ~/.config/rclone
-          echo "${{ secrets.RCLONE_CONF_B64 }}" | base64 --decode > ~/.config/rclone/rclone.conf
+      - name: Cache Whisper Large Model
+        id: cache-model
+        uses: actions/cache@v4
+        with:
+          path: model
+          key: whisper-large-v1
 
       # -------------------------
-      # Restore Whisper cache from Drive
+      # Download Model if Not Cached
       # -------------------------
-      - name: Restore Whisper cache
+      - name: Download Whisper Large Model
+        if: steps.cache-model.outputs.cache-hit != 'true'
         run: |
-          mkdir -p ~/.cache/whisper
-          rclone sync gdrive:whisper-cache ~/.cache/whisper \
-            --progress \
-            --checksum \
-            --transfers 1 || true
+          mkdir -p model
+          gdown --id 1tDKohelhAiA6hSXIqm9inqKGNDxeaWf8 -O model/whisper-large.safesensor
 
-      - name: Verify Whisper cache
+      # -------------------------
+      # Verify Model
+      # -------------------------
+      - name: Verify model
         run: |
-          ls -lh ~/.cache/whisper || echo "No cache found"
+          ls -lh model
+          file model/whisper-large.safesensor
 
       # -------------------------
       # Run Whisper Agent
