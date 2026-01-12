@@ -14,7 +14,6 @@ from typing import List
 # CONFIG
 # =========================
 MODEL_SIZE = "large"
-MODEL_DIR = "model"
 OUTPUT_DIR = "output"
 DEVICE = "cpu"
 FP16 = False
@@ -183,7 +182,10 @@ def main():
         cleanup = False
 
     print("[INFO] Loading Whisper model...")
-    model = whisper.load_model(MODEL_SIZE, device=DEVICE, download_root=MODEL_DIR)
+    model = whisper.load_model(
+        MODEL_SIZE,
+        device=DEVICE
+        )
 
     print("[INFO] Chunking audio...")
     chunks = chunk_audio(audio_path, CHUNK_SECONDS)
