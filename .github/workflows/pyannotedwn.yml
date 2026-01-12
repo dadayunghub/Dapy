@@ -8,61 +8,41 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # -------------------------
-      # Setup Python
-      # -------------------------
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.10"
 
-      # -------------------------
-      # Install pyannote ONLY
-      # -------------------------
       - name: Install pyannote.audio
         run: |
           pip install --upgrade pip
-          pip install \
-            torch \
-            torchaudio \
-            pyannote.audio \
-            huggingface_hub
+          pip install torch torchaudio pyannote.audio huggingface_hub
 
-      # -------------------------
-      # Hugging Face Login (ONE TIME)
-      # -------------------------
+      # ✅ RELIABLE LOGIN METHOD
       - name: Hugging Face login
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          python - << 'EOF'
-          from huggingface_hub import login
-          login(token="${HF_TOKEN}")
-          print("Hugging Face login successful")
-          EOF
+          huggingface-cli login --token "$HF_TOKEN"
 
-      # -------------------------
-      # Download Pyannote Diarization Model
-      # -------------------------
-      - name: Download pyannote speaker diarization
+      - name: Download pyannote diarization model
         run: |
           python - << 'EOF'
           from pyannote.audio import Pipeline
-          pipeline = Pipeline.from_pretrained(
-              "pyannote/speaker-diarization",
-              use_auth_token=True
-          )
-          print("Pyannote diarization model downloaded")
+          Pipeline.from_pretrained("pyannote/speaker-diarization")
+          print("Pyannote models downloaded")
           EOF
+
+      - name: Verify cache
+        run: |
+          du -sh ~/.cache/huggingface || true
+          ls ~/.cache/huggingface/hub || true
+
 
       # -------------------------
       # Verify Hugging Face cache
       # -------------------------
-      - name: Verify Hugging Face cache
-        run: |
-          echo "Hugging Face cache contents:"
-          du -sh ~/.cache/huggingface || true
-          find ~/.cache/huggingface -maxdepth 3 -type d
+      
 
       # -------------------------
       # Install rclone
