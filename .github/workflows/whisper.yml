@@ -52,7 +52,7 @@ jobs:
         if: steps.cache-model.outputs.cache-hit != 'true'
         run: |
           mkdir -p model
-          gdown --id 1tDKohelhAiA6hSXIqm9inqKGNDxeaWf8 -O model/whisper-large.pt
+          gdown --id 1tDKohelhAiA6hSXIqm9inqKGNDxeaWf8 -O model/whisper-large.safesensor
 
       # -------------------------
       # Verify Model
@@ -60,7 +60,7 @@ jobs:
       - name: Verify model
         run: |
           ls -lh model
-          file model/whisper-large.pt
+          file model/whisper-large.safesensor
 
       # -------------------------
       # Run Whisper Agent

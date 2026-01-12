@@ -1,0 +1,56 @@
+name: Download Whisper Cache to Drive
+
+on:
+  workflow_dispatch:
+
+jobs:
+  download-and-upload:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install Whisper
+        run: |
+          pip install --upgrade pip
+          pip install openai-whisper torch
+
+      # -------------------------
+      # Trigger Whisper Download
+      # -------------------------
+      - name: Download Whisper Large model
+        run: |
+          python - << 'EOF'
+          import whisper
+          whisper.load_model("large")
+          print("Whisper model downloaded")
+          EOF
+
+      - name: Verify Whisper cache
+        run: |
+          ls -lh ~/.cache/whisper
+
+      # -------------------------
+      # Install rclone
+      # -------------------------
+      - name: Install rclone
+        run: |
+          curl -fsSL https://rclone.org/install.sh | sudo bash
+
+      - name: Setup rclone config
+        run: |
+          mkdir -p ~/.config/rclone
+          echo "${{ secrets.RCLONE_CONF_B64 }}" | base64 --decode > ~/.config/rclone/rclone.conf
+
+      # -------------------------
+      # Upload Whisper cache to Drive
+      # -------------------------
+      - name: Upload Whisper cache to Google Drive
+        run: |
+          rclone sync ~/.cache/whisper gdrive:whisper-cache \
+            --progress \
+            --checksum \
+            --transfers 1
