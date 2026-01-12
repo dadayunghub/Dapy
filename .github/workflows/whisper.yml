@@ -1,4 +1,4 @@
-name: whisper Agent
+name: Whisper Agent
 
 permissions:
   contents: read
@@ -8,23 +8,21 @@ on:
   workflow_dispatch:
     inputs:
       question:
-        description: "audio to transcribe"
+        description: "Audio file path or URL to transcribe"
         required: true
         type: string
 
       emails:
-        description: "email to send audio to"
+        description: "Email address(es) to send the transcript to"
         required: true
         type: string
-
-     
 
 jobs:
   run-agent:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Set up Python
@@ -35,33 +33,47 @@ jobs:
       - name: Install dependencies
         run: |
           pip install --upgrade pip
-          pip install ctransformers gdown yagmail
+          pip install gdown yagmail openai-whisper torch
 
-      - name: Cache whisper large model
+      # -------------------------
+      # Cache Whisper Model
+      # -------------------------
+      - name: Cache Whisper Large Model
         id: cache-model
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: model
-          key: whisper-large
+          key: whisper-large-v1
 
-      - name: Download whisper large
+      # -------------------------
+      # Download Model if Not Cached
+      # -------------------------
+      - name: Download Whisper Large Model
         if: steps.cache-model.outputs.cache-hit != 'true'
         run: |
           mkdir -p model
-          gdown --id 1tDKohelhAiA6hSXIqm9inqKGNDxeaWf8 -O model/whisper large
+          gdown --id 1tDKohelhAiA6hSXIqm9inqKGNDxeaWf8 -O model/whisper-large.pt
 
+      # -------------------------
+      # Verify Model
+      # -------------------------
       - name: Verify model
         run: |
           ls -lh model
-          file model/whisperlarge
+          file model/whisper-large.pt
 
+      # -------------------------
+      # Run Whisper Agent
+      # -------------------------
       - name: Run agent
         run: |
           python whisper.py \
             "${{ github.event.inputs.question }}" \
-            '${{ github.event.inputs.emails }}' \
-            
+            "${{ github.event.inputs.emails }}"
 
+      # -------------------------
+      # Upload Result
+      # -------------------------
       - name: Upload result
         uses: actions/upload-artifact@v4
         with:
