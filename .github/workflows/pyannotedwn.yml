@@ -18,14 +18,10 @@ jobs:
           pip install --upgrade pip
           pip install torch torchaudio pyannote.audio huggingface_hub
 
-      # ✅ FIXED LOGIN (NO PATH ISSUES)
-      - name: Hugging Face login
-        env:
-          HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        run: |
-          python -m huggingface_hub.cli login --token "$HF_TOKEN"
-
+      # ✅ NO LOGIN — TOKEN VIA ENV
       - name: Download pyannote diarization model
+        env:
+          HUGGINGFACE_HUB_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
           python - << 'EOF'
           from pyannote.audio import Pipeline
