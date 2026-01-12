@@ -18,12 +18,12 @@ jobs:
           pip install --upgrade pip
           pip install torch torchaudio pyannote.audio huggingface_hub
 
-      # ✅ RELIABLE LOGIN METHOD
+      # ✅ FIXED LOGIN (NO PATH ISSUES)
       - name: Hugging Face login
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          huggingface-cli login --token "$HF_TOKEN"
+          python -m huggingface_hub.cli login --token "$HF_TOKEN"
 
       - name: Download pyannote diarization model
         run: |
@@ -37,12 +37,6 @@ jobs:
         run: |
           du -sh ~/.cache/huggingface || true
           ls ~/.cache/huggingface/hub || true
-
-
-      # -------------------------
-      # Verify Hugging Face cache
-      # -------------------------
-      
 
       # -------------------------
       # Install rclone
