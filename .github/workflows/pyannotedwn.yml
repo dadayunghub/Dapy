@@ -1,0 +1,93 @@
+name: Download Pyannote Cache to Drive
+
+on:
+  workflow_dispatch:
+
+jobs:
+  download-and-upload:
+    runs-on: ubuntu-latest
+
+    steps:
+      # -------------------------
+      # Setup Python
+      # -------------------------
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      # -------------------------
+      # Install pyannote ONLY
+      # -------------------------
+      - name: Install pyannote.audio
+        run: |
+          pip install --upgrade pip
+          pip install \
+            torch \
+            torchaudio \
+            pyannote.audio \
+            huggingface_hub
+
+      # -------------------------
+      # Hugging Face Login (ONE TIME)
+      # -------------------------
+      - name: Hugging Face login
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          python - << 'EOF'
+          from huggingface_hub import login
+          login(token="${HF_TOKEN}")
+          print("Hugging Face login successful")
+          EOF
+
+      # -------------------------
+      # Download Pyannote Diarization Model
+      # -------------------------
+      - name: Download pyannote speaker diarization
+        run: |
+          python - << 'EOF'
+          from pyannote.audio import Pipeline
+          pipeline = Pipeline.from_pretrained(
+              "pyannote/speaker-diarization",
+              use_auth_token=True
+          )
+          print("Pyannote diarization model downloaded")
+          EOF
+
+      # -------------------------
+      # Verify Hugging Face cache
+      # -------------------------
+      - name: Verify Hugging Face cache
+        run: |
+          echo "Hugging Face cache contents:"
+          du -sh ~/.cache/huggingface || true
+          find ~/.cache/huggingface -maxdepth 3 -type d
+
+      # -------------------------
+      # Install rclone
+      # -------------------------
+      - name: Install rclone
+        run: |
+          curl -fsSL https://rclone.org/install.sh | sudo bash
+
+      # -------------------------
+      # Setup rclone
+      # -------------------------
+      - name: Setup rclone config
+        run: |
+          mkdir -p ~/.config/rclone
+          echo "${{ secrets.RCLONE_CONF_B64 }}" | base64 --decode > ~/.config/rclone/rclone.conf
+
+      # -------------------------
+      # Upload pyannote cache to Drive
+      # -------------------------
+      - name: Upload pyannote cache to Google Drive
+        run: |
+          rclone sync ~/.cache/huggingface gdrive:huggingface-cache \
+            --progress \
+            --drive-chunk-size 64M \
+            --transfers 1 \
+            --tpslimit 10 \
+            --retries 10 \
+            --low-level-retries 20
