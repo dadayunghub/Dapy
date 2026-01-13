@@ -8,13 +8,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # -------------------------
+      # Setup Python
+      # -------------------------
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.10"
 
       # -------------------------
-      # Install NeMo + Torch
+      # Install NeMo + Torch (CPU-safe)
       # -------------------------
       - name: Install NeMo ASR
         run: |
@@ -22,7 +25,7 @@ jobs:
           pip install torch torchaudio nemo_toolkit[asr]
 
       # -------------------------
-      # Download NeMo diarization models
+      # Preload NeMo diarization models (VALID CONFIG)
       # -------------------------
       - name: Preload NeMo diarization models
         run: |
@@ -31,10 +34,20 @@ jobs:
           from omegaconf import OmegaConf
           from nemo.collections.asr.models import ClusteringDiarizer
 
+          # Create dummy manifest (required by NeMo)
+          with open("dummy_manifest.json", "w") as f:
+              f.write(json.dumps({
+                  "audio_filepath": "dummy.wav",
+                  "offset": 0,
+                  "duration": 1.0,
+                  "label": "infer",
+                  "text": "-"
+              }) + "\n")
+
           cfg = OmegaConf.create({
               "diarizer": {
                   "manifest_filepath": "dummy_manifest.json",
-                  "out_dir": "nemo_cache",
+                  "out_dir": "nemo_out",
                   "vad": {
                       "model_path": "vad_mono"
                   },
@@ -49,28 +62,17 @@ jobs:
               }
           })
 
-          # Dummy manifest (required by NeMo)
-          with open("dummy_manifest.json", "w") as f:
-              json.dump({
-                  "audio_filepath": "dummy.wav",
-                  "offset": 0,
-                  "duration": 1,
-                  "label": "infer",
-                  "text": "-"
-              }, f)
-              f.write("\n")
-
-          diarizer = ClusteringDiarizer(cfg=cfg)
+          ClusteringDiarizer(cfg=cfg)
           print("✅ NeMo diarization models cached")
           EOF
 
       # -------------------------
-      # Verify cache
+      # Verify NeMo cache
       # -------------------------
-      - name: Verify cache
+      - name: Verify NeMo cache
         run: |
           du -sh ~/.cache/torch || true
-          ls ~/.cache/torch || true
+          find ~/.cache/torch -maxdepth 3 -type d || true
 
       # -------------------------
       # Install rclone
