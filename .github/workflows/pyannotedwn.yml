@@ -49,7 +49,7 @@ jobs:
                   "manifest_filepath": "dummy_manifest.json",
                   "out_dir": "nemo_out",
                   "vad": {
-                      "model_path": "vad_mono"
+                      "model_path": "vad_telephony_marblenet"
                   },
                   "speaker_embeddings": {
                       "model_path": "ecapa_tdnn"
