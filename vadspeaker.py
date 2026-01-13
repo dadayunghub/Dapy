@@ -23,6 +23,7 @@ cfg = OmegaConf.create({
     "diarizer": {
         "manifest_filepath": "manifest.json",
         "out_dir": "nemo_diar",
+        "oracle_vad": False,
         "vad": {
             "model_path": "vad_telephony_marblenet"
         },
