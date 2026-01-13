@@ -38,7 +38,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install --upgrade pip
-          pip install openai-whisper torch yagmail requests
+          pip install openai-whisper torch yagmail requests nemo_toolkit[asr]
 
       # -------------------------
       # Install rclone
@@ -62,10 +62,23 @@ jobs:
             --progress \
             --checksum \
             --transfers 1 || true
+            
+      - name: Restore Nemo cache
+        run: |
+          mkdir -p ~/.cache/torch
+          rclone sync gdrive:nemo-cache ~/.cache/torch \
+            --progress \
+            --checksum \
+            --transfers 1 || true
+
 
       - name: Verify Whisper cache
         run: |
           ls -lh ~/.cache/whisper || echo "No cache found"
+          
+      - name: Verify Nemo cache
+        run: |
+          ls -lh ~/.cache/torch || echo "No cache found"
           
 
       - name: Restore audio files
