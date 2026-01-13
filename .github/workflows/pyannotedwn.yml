@@ -1,4 +1,4 @@
-name: Download Pyannote Cache to Drive
+name: Download NeMo Cache to Drive
 
 on:
   workflow_dispatch:
@@ -13,26 +13,38 @@ jobs:
         with:
           python-version: "3.10"
 
-      - name: Install pyannote.audio
+      # -------------------------
+      # Install NeMo + Torch
+      # -------------------------
+      - name: Install NeMo
         run: |
           pip install --upgrade pip
-          pip install torch torchaudio pyannote.audio huggingface_hub
+          pip install torch torchaudio nemo_toolkit[all]
 
-      # ✅ NO LOGIN — TOKEN VIA ENV
-      - name: Download pyannote diarization model
-        env:
-          HUGGINGFACE_HUB_TOKEN: ${{ secrets.HF_TOKEN }}
+      # -------------------------
+      # Download NeMo diarization models
+      # -------------------------
+      - name: Download NeMo diarization models
         run: |
           python - << 'EOF'
-          from pyannote.audio import Pipeline
-          Pipeline.from_pretrained("pyannote/speaker-diarization")
-          print("Pyannote models downloaded")
+          from nemo.collections.asr.models import ClusteringDiarizer
+
+          # Initialize pipeline - downloads only required models
+          diarizer = ClusteringDiarizer(
+              vad_model="vad_mono",
+              embedding_model="ecapa_tdnn",
+              clustering_model="agglomerative"
+          )
+          print("✅ NeMo diarization models downloaded")
           EOF
 
+      # -------------------------
+      # Verify cache
+      # -------------------------
       - name: Verify cache
         run: |
-          du -sh ~/.cache/huggingface || true
-          ls ~/.cache/huggingface/hub || true
+          du -sh ~/.cache/torch || true
+          ls ~/.cache/torch/ || true
 
       # -------------------------
       # Install rclone
@@ -42,7 +54,7 @@ jobs:
           curl -fsSL https://rclone.org/install.sh | sudo bash
 
       # -------------------------
-      # Setup rclone
+      # Setup rclone config
       # -------------------------
       - name: Setup rclone config
         run: |
@@ -50,11 +62,11 @@ jobs:
           echo "${{ secrets.RCLONE_CONF_B64 }}" | base64 --decode > ~/.config/rclone/rclone.conf
 
       # -------------------------
-      # Upload pyannote cache to Drive
+      # Upload NeMo cache to Google Drive
       # -------------------------
-      - name: Upload pyannote cache to Google Drive
+      - name: Upload NeMo cache to Google Drive
         run: |
-          rclone sync ~/.cache/huggingface gdrive:huggingface-cache \
+          rclone sync ~/.cache/torch gdrive:nemo-cache \
             --progress \
             --drive-chunk-size 64M \
             --transfers 1 \
