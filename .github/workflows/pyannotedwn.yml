@@ -16,7 +16,7 @@ jobs:
       # -------------------------
       # Install NeMo + Torch
       # -------------------------
-      - name: Install NeMo asr
+      - name: Install NeMo ASR
         run: |
           pip install --upgrade pip
           pip install torch torchaudio nemo_toolkit[asr]
@@ -24,18 +24,44 @@ jobs:
       # -------------------------
       # Download NeMo diarization models
       # -------------------------
-      - name: Download NeMo diarization models
+      - name: Preload NeMo diarization models
         run: |
           python - << 'EOF'
+          import json
+          from omegaconf import OmegaConf
           from nemo.collections.asr.models import ClusteringDiarizer
 
-          # Initialize pipeline - downloads only required models
-          diarizer = ClusteringDiarizer(
-              vad_model="vad_mono",
-              embedding_model="ecapa_tdnn",
-              clustering_model="agglomerative"
-          )
-          print("✅ NeMo diarization models downloaded")
+          cfg = OmegaConf.create({
+              "diarizer": {
+                  "manifest_filepath": "dummy_manifest.json",
+                  "out_dir": "nemo_cache",
+                  "vad": {
+                      "model_path": "vad_mono"
+                  },
+                  "speaker_embeddings": {
+                      "model_path": "ecapa_tdnn"
+                  },
+                  "clustering": {
+                      "parameters": {
+                          "oracle_num_speakers": False
+                      }
+                  }
+              }
+          })
+
+          # Dummy manifest (required by NeMo)
+          with open("dummy_manifest.json", "w") as f:
+              json.dump({
+                  "audio_filepath": "dummy.wav",
+                  "offset": 0,
+                  "duration": 1,
+                  "label": "infer",
+                  "text": "-"
+              }, f)
+              f.write("\n")
+
+          diarizer = ClusteringDiarizer(cfg=cfg)
+          print("✅ NeMo diarization models cached")
           EOF
 
       # -------------------------
@@ -44,7 +70,7 @@ jobs:
       - name: Verify cache
         run: |
           du -sh ~/.cache/torch || true
-          ls ~/.cache/torch/ || true
+          ls ~/.cache/torch || true
 
       # -------------------------
       # Install rclone
