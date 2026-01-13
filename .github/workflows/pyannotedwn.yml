@@ -27,44 +27,24 @@ jobs:
       # -------------------------
       # Preload NeMo diarization models (VALID CONFIG)
       # -------------------------
-      - name: Preload NeMo diarization models
+      - name: Preload NeMo diarization models (safe preload)
         run: |
           python - << 'EOF'
-          import json
-          from omegaconf import OmegaConf
-          from nemo.collections.asr.models import ClusteringDiarizer
+          import nemo.collections.asr as nemo_asr
 
-          # Create dummy manifest (required by NeMo)
-          with open("dummy_manifest.json", "w") as f:
-              f.write(json.dumps({
-                  "audio_filepath": "dummy.wav",
-                  "offset": 0,
-                  "duration": 1.0,
-                  "label": "infer",
-                  "text": "-"
-              }) + "\n")
+          # VAD (MarbleNet – Telephony)
+          nemo_asr.models.EncDecClassificationModel.from_pretrained(
+              model_name="vad_telephony_marblenet"
+          )
 
-          cfg = OmegaConf.create({
-              "diarizer": {
-                  "manifest_filepath": "dummy_manifest.json",
-                  "out_dir": "nemo_out",
-                  "vad": {
-                      "model_path": "vad_telephony_marblenet"
-                  },
-                  "speaker_embeddings": {
-                      "model_path": "ecapa_tdnn"
-                  },
-                  "clustering": {
-                      "parameters": {
-                          "oracle_num_speakers": False
-                      }
-                  }
-              }
-          })
+          # Speaker embedding (ECAPA)
+          nemo_asr.models.EncDecSpeakerLabelModel.from_pretrained(
+              model_name="ecapa_tdnn"
+          )
 
-          ClusteringDiarizer(cfg=cfg)
-          print("✅ NeMo diarization models cached")
+          print("✅ NeMo VAD + Speaker models cached successfully")
           EOF
+
 
       # -------------------------
       # Verify NeMo cache
