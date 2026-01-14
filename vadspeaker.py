@@ -23,6 +23,7 @@ with open("manifest.json", "w") as f:
 # REQUIRED NeMo config
 # -------------------------
 cfg = OmegaConf.create({
+    "device": "cpu",
     "diarizer": {
         "manifest_filepath": "manifest.json",
         "out_dir": "nemo_diar",
