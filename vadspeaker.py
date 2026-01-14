@@ -8,7 +8,7 @@ audio_path = sys.argv[1]
 output_json = "speakers.json"
 
 # -------------------------
-# Create manifest
+# Manifest
 # -------------------------
 with open("manifest.json", "w") as f:
     f.write(json.dumps({
@@ -20,21 +20,19 @@ with open("manifest.json", "w") as f:
     }) + "\n")
 
 # -------------------------
-# REQUIRED NeMo config
+# STRICT NeMo config
 # -------------------------
 cfg = OmegaConf.create({
     "device": "cpu",
+
     "diarizer": {
         "manifest_filepath": "manifest.json",
         "out_dir": "nemo_diar",
 
-        # REQUIRED
         "oracle_vad": False,
 
         "vad": {
             "model_path": "vad_telephony_marblenet",
-
-            # REQUIRED EVEN IF DEFAULT
             "parameters": {
                 "window_length_in_sec": 0.15,
                 "shift_length_in_sec": 0.01,
@@ -48,7 +46,11 @@ cfg = OmegaConf.create({
         },
 
         "speaker_embeddings": {
-            "model_path": "ecapa_tdnn"
+            "model_path": "ecapa_tdnn",
+            "parameters": {
+                "window_length_in_sec": 1.5,
+                "shift_length_in_sec": 0.75
+            }
         },
 
         "clustering": {
@@ -65,7 +67,7 @@ diarizer = ClusteringDiarizer(cfg=cfg)
 diarizer.diarize()
 
 # -------------------------
-# Parse RTTM
+# RTTM → JSON
 # -------------------------
 rttm = "nemo_diar/pred_rttms/manifest.rttm"
 segments = []
