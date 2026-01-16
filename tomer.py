@@ -100,7 +100,7 @@ Question {i}:
 # -------------------------
 
 PLATFORM_CONFIG = {
-    "support": "You are a professional support AI. Append [SEND_FORM] if appropriate.",
+    "support": "You are a professional support AI for spanish users so replies should be in Spanish. Append [SEND_FORM] if appropriate.",
     "student": "You are a student tutor. Explain clearly.",
     "portfolio": "You are a portfolio assistant. Append [SEND_FORM] when ready.",
 }
