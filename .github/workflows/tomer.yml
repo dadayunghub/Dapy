@@ -16,6 +16,11 @@ on:
         description: "User email"
         required: true
         type: string
+        
+      link:
+        description: "link"
+        required: true
+        type: string
 
       incoming_id:
         description: "Chat incoming ID"
@@ -95,6 +100,7 @@ jobs:
       - name: Run agent
         env:
           EMAIL: ${{ github.event.inputs.email }}
+          LINK: ${{ github.event.inputs.link }}
           ACTION: ${{ github.event.inputs.action }}
           INCOMING_ID: ${{ github.event.inputs.incoming_id }}
           OUTGOING_ID: ${{ github.event.inputs.outgoing_id }}
@@ -102,6 +108,7 @@ jobs:
           python tomer.py \
             question.txt \
             "$EMAIL" \
+            "$LINK" \
             "$ACTION" \
             "$INCOMING_ID" \
             "$OUTGOING_ID"

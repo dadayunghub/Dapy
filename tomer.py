@@ -18,6 +18,79 @@ RESULT_API = os.environ.get("RESULT_API_URL")
 SEND_FORM_API = os.environ.get("SEND_FORM_API_URL")
 EMAIL_PASSWORD = os.environ.get("EMAIL_APP_PASSWORD")
 
+
+def build_email_html(message: str, reply_link: str | None = None) -> str:
+    """
+    Builds a clean HTML email with optional reply button.
+    Inline CSS only (email-safe).
+    """
+
+    button_html = ""
+    if reply_link:
+        button_html = f"""
+        <tr>
+          <td align="center" style="padding-top:20px;">
+            <a href="{reply_link}"
+               style="
+                 display:inline-block;
+                 padding:12px 20px;
+                 background-color:#2563eb;
+                 color:#ffffff;
+                 text-decoration:none;
+                 font-weight:600;
+                 border-radius:4px;
+                 font-family:Arial, sans-serif;
+               ">
+               📨 
+            </a>
+          </td>
+        </tr>
+        """
+
+    return f"""
+<!DOCTYPE html>
+<html>
+  <body style="margin:0;padding:0;background-color:#f4f4f5;">
+    <table width="100%" cellpadding="0" cellspacing="0">
+      <tr>
+        <td align="center" style="padding:20px;">
+          <table width="100%" max-width="600" cellpadding="0" cellspacing="0"
+                 style="background:#ffffff;border-radius:6px;padding:20px;">
+
+            <tr>
+              <td style="
+                font-family:Arial, sans-serif;
+                font-size:15px;
+                line-height:1.6;
+                color:#111827;
+              ">
+                {message}
+              </td>
+            </tr>
+
+            {button_html}
+
+            <tr>
+              <td style="
+                padding-top:30px;
+                font-size:12px;
+                color:#6b7280;
+                font-family:Arial, sans-serif;
+                text-align:center;
+              ">
+                This message was sent automatically. Please do not reply directly.
+              </td>
+            </tr>
+
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
+"""
+
+
 # -------------------------
 # TOKEN ESTIMATION
 # -------------------------
@@ -184,7 +257,7 @@ Set "send_form" to true if the user shows interest in collaboration or contact.
 
 EMAIL_CONFIG = {
     "support": ("Support Update", "Support Bot"),
-    "student": ("Learning Assistant", "Tutor Bot"),
+    "media": ("Mediamarket", "MediaMkt"),
     "portfolio": ("Project Discussion", "Portfolio Bot"),
 }
 
@@ -197,7 +270,7 @@ def send_email(to_email, subject, body, sender_name):
         user={"contactregteam@gmail.com": sender_name},
         password=EMAIL_PASSWORD,
     )
-    yag.send(to=to_email, subject=subject, contents=body)
+    yag.send(to=to_email, subject=subject, contents=yagmail.raw(body))
 
 # -------------------------
 # QUESTION FILE PARSING
@@ -230,10 +303,10 @@ def parse_question_file(path: str):
 def main():
     if len(sys.argv) < 6:
         raise ValueError(
-            "Usage: tomer.py <question.txt> <email> <platform> <incoming_id> <outgoing_id>"
+            "Usage: tomer.py <question.txt> <email> <link> <platform> <incoming_id> <outgoing_id>"
         )
 
-    question_file, email, platform, incoming_id, outgoing_id = sys.argv[1:6]
+    question_file, email, link, platform, incoming_id, outgoing_id = sys.argv[1:6]
 
     conversation_so_far, current_question = parse_question_file(question_file)
 
@@ -291,7 +364,11 @@ Conversation so far:
     )
 
     subject, sender = EMAIL_CONFIG[platform]
-    send_email(email, subject, answer, sender)
+    body = build_email_html(
+    message=answer.replace("\n", "<br>"),
+    reply_link=link
+    )
+    send_email(email, subject, body, sender)
 
     if send_form:
         requests.post(
