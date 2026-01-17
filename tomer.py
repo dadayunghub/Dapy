@@ -3,6 +3,7 @@ import os
 import re
 import requests
 import yagmail
+import html
 import json
 from ctransformers import AutoModelForCausalLM
 
