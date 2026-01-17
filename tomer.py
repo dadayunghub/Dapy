@@ -301,12 +301,12 @@ def parse_question_file(path: str):
 # -------------------------
 
 def main():
-    if len(sys.argv) < 6:
+    if len(sys.argv) < 7:
         raise ValueError(
             "Usage: tomer.py <question.txt> <email> <link> <platform> <incoming_id> <outgoing_id>"
         )
 
-    question_file, email, link, platform, incoming_id, outgoing_id = sys.argv[1:6]
+    question_file, email, link, platform, incoming_id, outgoing_id = sys.argv[1:7]
 
     conversation_so_far, current_question = parse_question_file(question_file)
 
