@@ -144,7 +144,7 @@ JSON SCHEMA:
   }
 }
 
-Set "send_form" to true ONLY if the user needs to submit a form or be contacted.
+Set "send_form" to true ONLY if the user ask for the form.
 """,
 
     "student": """
