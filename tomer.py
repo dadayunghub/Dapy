@@ -220,7 +220,7 @@ JSON SCHEMA:
 Set "send_form" to true ONLY if the user ask for the form.
 """,
 
-    "student": """
+    "media": """
 You are a student tutor.
 
 IMPORTANT RULES:
@@ -364,8 +364,10 @@ Conversation so far:
     )
 
     subject, sender = EMAIL_CONFIG[platform]
+    safe_message = html.escape(answer).replace("\n", "<br>")
+
     body = build_email_html(
-    message=answer.replace("\n", "<br>"),
+    message=safe_message,
     reply_link=link
     )
     send_email(email, subject, body, sender)
