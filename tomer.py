@@ -271,7 +271,7 @@ def send_email(to_email, subject, body, sender_name):
         user={"contactregteam@gmail.com": sender_name},
         password=EMAIL_PASSWORD,
     )
-    yag.send(to=to_email, subject=subject, contents=body)
+    yag.send(to=to_email, subject=subject, contents=[yagmail.raw(body)])
 
 # -------------------------
 # QUESTION FILE PARSING
