@@ -3,7 +3,6 @@ import os
 import re
 import requests
 import yagmail
-import json
 from ctransformers import AutoModelForCausalLM
 
 # -------------------------
@@ -21,32 +20,6 @@ EMAIL_PASSWORD = os.environ.get("EMAIL_APP_PASSWORD")
 # -------------------------
 # TOKEN ESTIMATION
 # -------------------------
-
-
-def parse_model_output(raw: str):
-    """
-    Strict JSON parser with safe fallback.
-    """
-    try:
-        parsed = json.loads(raw)
-
-        message = parsed.get("message", "").strip()
-        actions = parsed.get("actions", {})
-
-        send_form = bool(actions.get("send_form", False))
-
-        if not message:
-            raise ValueError("Empty message")
-
-        return message, send_form
-
-    except Exception as e:
-        # HARD FAILSAFE — never block user
-        print("⚠️ JSON parse failed:", e)
-        print("⚠️ Raw model output:", raw)
-
-        return raw.strip(), False
-
 
 def estimate_tokens(text: str) -> int:
     if not text:
@@ -127,60 +100,10 @@ Question {i}:
 # -------------------------
 
 PLATFORM_CONFIG = {
-    "support": """
-You are a professional Spanish-speaking support assistant.
-
-IMPORTANT RULES:
-- Respond ONLY with valid JSON
-- Do NOT include markdown
-- Do NOT include explanations
-- Do NOT include extra keys
-
-JSON SCHEMA:
-{
-  "message": string,
-  "actions": {
-    "send_form": boolean
-  }
+    "support": "You are a professional support AI for spanish users so replies should be in Spanish. Append [SEND_FORM] if appropriate.",
+    "student": "You are a student tutor. Explain clearly.",
+    "portfolio": "You are a portfolio assistant. Append [SEND_FORM] when ready.",
 }
-
-Set "send_form" to true ONLY if the user needs to submit a form or be contacted.
-""",
-
-    "student": """
-You are a student tutor.
-
-IMPORTANT RULES:
-- Respond ONLY with valid JSON
-- No markdown, no extra text
-
-JSON SCHEMA:
-{
-  "message": string,
-  "actions": {
-    "send_form": false
-  }
-}
-""",
-
-    "portfolio": """
-You are a portfolio assistant.
-
-IMPORTANT RULES:
-- Respond ONLY with valid JSON
-
-JSON SCHEMA:
-{
-  "message": string,
-  "actions": {
-    "send_form": boolean
-  }
-}
-
-Set "send_form" to true if the user shows interest in collaboration or contact.
-"""
-}
-
 
 EMAIL_CONFIG = {
     "support": ("Support Update", "Support Bot"),
@@ -274,8 +197,8 @@ Conversation so far:
             top_p=0.85,
         ).strip()
 
-    answer, send_form = parse_model_output(raw_answer)
-
+    send_form = "[SEND_FORM]" in raw_answer
+    answer = raw_answer.replace("[SEND_FORM]", "").strip()
 
     # ---------- SEND RESULT ----------
     requests.post(
