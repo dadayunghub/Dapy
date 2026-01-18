@@ -50,7 +50,6 @@ def build_email_html(message: str, reply_link: str | None = None) -> str:
         """
 
     return f"""
-<!DOCTYPE html>
 <html>
   <body style='margin:0;padding:0;background-color:#f4f4f5;'>
   <table width='100%' cellpadding='0' cellspacing='0'>
@@ -70,7 +69,7 @@ def build_email_html(message: str, reply_link: str | None = None) -> str:
             </td>
           </tr>
 
-          
+          {button_html}
 
           <tr>
             <td style='
