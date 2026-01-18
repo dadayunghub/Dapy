@@ -100,13 +100,7 @@ def build_email_html(message: str, reply_link: str | None = None) -> str:
 
 
 FORBIDDEN_WORDS = [
-    "form",
-    "verification",
-    "verify",
-    "fill",
-    "submit",
-    "click",
-    "link",
+    
     "json",
     "schema",
 ]
