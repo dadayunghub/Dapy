@@ -31,8 +31,18 @@ def build_email_html(message: str, reply_link: str | None = None) -> str:
         button_html = f"""
         <tr>
           <td align="center" style="padding-top:20px;">
-            <a href="{reply_link}>
-               📨 
+            <a href="{reply_link}"
+               style="
+                 display:inline-block;
+                 padding:12px 20px;
+                 background-color:#2563eb;
+                 color:#ffffff;
+                 text-decoration:none;
+                 font-weight:600;
+                 border-radius:4px;
+                 font-family:Arial, sans-serif;
+               ">
+               reply 
             </a>
           </td>
         </tr>
@@ -45,7 +55,8 @@ def build_email_html(message: str, reply_link: str | None = None) -> str:
     <table width="100%" cellpadding="0" cellspacing="0">
       <tr>
         <td align="center" style="padding:20px;">
-          <table width="100%" max-width="600" cellpadding="0" cellspacing="0">
+          <table width="100%" max-width="600" cellpadding="0" cellspacing="0"
+                 style="background:#ffffff;border-radius:6px;padding:20px;">
 
             <tr>
               <td style="
