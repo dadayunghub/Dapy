@@ -2,7 +2,6 @@ import sys
 import os
 import re
 import requests
-import yagmail
 import smtplib
 from email.message import EmailMessage
 import html
@@ -305,14 +304,6 @@ def send_email_html(to_email, subject, html_body, sender_name):
     with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
         server.login("contactregteam@gmail.com", EMAIL_PASSWORD)
         server.send_message(msg)
-
-def send_email(to_email, subject, body, sender_name):
-    yag = yagmail.SMTP(
-        user={"contactregteam@gmail.com": sender_name},
-        password=EMAIL_PASSWORD,
-    )
-    yag.send(to=to_email, subject=subject, contents=body)
-
 # -------------------------
 # QUESTION FILE PARSING
 # -------------------------
