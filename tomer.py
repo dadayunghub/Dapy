@@ -112,8 +112,8 @@ FORBIDDEN_WORDS = [
 ]
 
 SAFE_FALLBACK_MESSAGE = (
-    "Thank you for contacting Mediamarket support. "
-    "We have received your message and are reviewing your issue."
+    "What!!. "
+    " OK."
 )
 
 def parse_model_output(raw: str):
