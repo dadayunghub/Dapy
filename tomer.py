@@ -30,64 +30,66 @@ def build_email_html(message: str, reply_link: str | None = None) -> str:
     if reply_link:
         button_html = f"""
         <tr>
-          <td align="center" style="padding-top:20px;">
-            <a href="{reply_link}"
-               style="
-                 display:inline-block;
-                 padding:12px 20px;
-                 background-color:#2563eb;
-                 color:#ffffff;
-                 text-decoration:none;
-                 font-weight:600;
-                 border-radius:4px;
-                 font-family:Arial, sans-serif;
-               ">
-               reply 
-            </a>
-          </td>
-        </tr>
+  <td align='center' style='padding-top:20px;'>
+    <a href='{reply_link}'
+       style='
+         display:inline-block;
+         padding:12px 20px;
+         background-color:#2563eb;
+         color:#ffffff;
+         text-decoration:none;
+         font-weight:600;
+         border-radius:4px;
+         font-family:Arial, sans-serif;
+       '>
+       reply
+    </a>
+  </td>
+</tr>
+
         """
 
     return f"""
 <!DOCTYPE html>
 <html>
-  <body style="margin:0;padding:0;background-color:#f4f4f5;">
-    <table width="100%" cellpadding="0" cellspacing="0">
-      <tr>
-        <td align="center" style="padding:20px;">
-          <table width="100%" max-width="600" cellpadding="0" cellspacing="0"
-                 style="background:#ffffff;border-radius:6px;padding:20px;">
+  <body style='margin:0;padding:0;background-color:#f4f4f5;'>
+  <table width='100%' cellpadding='0' cellspacing='0'>
+    <tr>
+      <td align='center' style='padding:20px;'>
+        <table width='100%' max-width='600' cellpadding='0' cellspacing='0'
+               style='background:#ffffff;border-radius:6px;padding:20px;'>
 
-            <tr>
-              <td style="
-                font-family:Arial, sans-serif;
-                font-size:15px;
-                line-height:1.6;
-                color:#111827;
-              ">
-                {message}
-              </td>
-            </tr>
+          <tr>
+            <td style='
+              font-family:Arial, sans-serif;
+              font-size:15px;
+              line-height:1.6;
+              color:#111827;
+            '>
+              {message}
+            </td>
+          </tr>
 
-            {button_html}
+          {button_html}
 
-            <tr>
-              <td style="
-                padding-top:30px;
-                font-size:12px;
-                color:#6b7280;
-                font-family:Arial, sans-serif;
-                text-align:center;
-              ">
-                This message was sent automatically. Please do not reply directly.
-              </td>
-            </tr>
+          <tr>
+            <td style='
+              padding-top:30px;
+              font-size:12px;
+              color:#6b7280;
+              font-family:Arial, sans-serif;
+              text-align:center;
+            '>
+              This message was sent automatically. Please do not reply directly.
+            </td>
+          </tr>
 
-          </table>
-        </td>
-      </tr>
-    </table>
-  </body>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+
 </html>
 """
 
@@ -222,19 +224,40 @@ Set "send_form" to true ONLY if the user ask for the form.
 """,
 
     "media": """
-You are a student tutor.
+You are MDEA Customer Support, a professional customer service assistant for the MDEA platform.
 
-IMPORTANT RULES:
+MDEA is a global marketplace where users buy and sell goods and services across multiple countries.
+
+Your goal is to:
+- Understand the user’s problem clearly
+- Acknowledge receipt of the complaint in a calm and reassuring tone
+- Briefly confirm the type of issue based on the user’s description (login, transaction, delay, or other)
+- Inform the user that the issue will be resolved after account verification
+
+IMPORTANT BEHAVIOR RULES:
+- Reply in the SAME language used by the user
+- Be polite, professional, and supportive
+- Do NOT ask for sensitive information directly
+- Do NOT send the verification form until the user has clearly explained their issue
+
+FORM TRIGGER RULE:
+- Set "send_form" to true ONLY when the user has provided a clear and complete explanation of their problem
+- If the problem is unclear or incomplete, ask the user for more details and keep "send_form" false
+
+STRICT RESPONSE FORMAT RULES:
 - Respond ONLY with valid JSON
-- No markdown, no extra text
+- Do NOT include markdown
+- Do NOT include explanations
+- Do NOT include extra keys
 
 JSON SCHEMA:
 {
   "message": string,
   "actions": {
-    "send_form": false
+    "send_form": boolean
   }
 }
+
 """,
 
     "portfolio": """
