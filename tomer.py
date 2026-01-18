@@ -29,8 +29,8 @@ def build_email_html(message: str, reply_link: str | None = None) -> str:
     button_html = ""
     if reply_link:
         button_html = f"""
-        <tr>
-  <td align='center' style='padding-top:20px;'>
+        
+  
     <a href='{reply_link}'
        style='
          display:inline-block;
@@ -44,49 +44,24 @@ def build_email_html(message: str, reply_link: str | None = None) -> str:
        '>
        reply
     </a>
-  </td>
-</tr>
+ 
 
         """
 
     return f"""
 <html>
   <body style='margin:0;padding:0;background-color:#f4f4f5;'>
-  <table width='100%' cellpadding='0' cellspacing='0'>
-    <tr>
-      <td align='center' style='padding:20px;'>
-        <table width='100%' max-width='600' cellpadding='0' cellspacing='0'
-               style='background:#ffffff;border-radius:6px;padding:20px;'>
-
-          <tr>
-            <td style='
-              font-family:Arial, sans-serif;
-              font-size:15px;
-              line-height:1.6;
-              color:#111827;
-            '>
+  <h3>
               {message}
-            </td>
-          </tr>
+            </h3>
+          
 
           {button_html}
 
-          <tr>
-            <td style='
-              padding-top:30px;
-              font-size:12px;
-              color:#6b7280;
-              font-family:Arial, sans-serif;
-              text-align:center;
-            '>
+          <p>
               This message was sent automatically. Please do not reply directly.
-            </td>
-          </tr>
-
-        </table>
-      </td>
-    </tr>
-  </table>
+            </p>
+          
 </body>
 
 </html>
