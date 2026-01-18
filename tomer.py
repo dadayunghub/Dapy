@@ -224,7 +224,7 @@ Set "send_form" to true ONLY if the user ask for the form.
 """,
 
     "media": """
-You are MDEA Customer Support, a professional customer service assistant for the MDEA platform.
+You are Mediamarket Customer Support, a professional customer service assistant for the Mediamarket platform.
 
 MDEA is a global marketplace where users buy and sell goods and services across multiple countries.
 
