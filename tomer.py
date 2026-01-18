@@ -31,8 +31,8 @@ def build_email_html(message: str, reply_link: str | None = None) -> str:
         button_html = f"""
         
   
-    <a href='{reply_link}'
-       style='
+    <a href=\'{reply_link}\'
+       style=\'
          display:inline-block;
          padding:12px 20px;
          background-color:#2563eb;
@@ -41,7 +41,7 @@ def build_email_html(message: str, reply_link: str | None = None) -> str:
          font-weight:600;
          border-radius:4px;
          font-family:Arial, sans-serif;
-       '>
+       \'>
        reply
     </a>
  
