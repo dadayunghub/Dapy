@@ -3,6 +3,10 @@ import os
 import re
 import requests
 import yagmail
+import smtplib
+from email.message import EmailMessage
+import html
+import json
 from ctransformers import AutoModelForCausalLM
 
 # -------------------------
@@ -17,9 +21,109 @@ RESULT_API = os.environ.get("RESULT_API_URL")
 SEND_FORM_API = os.environ.get("SEND_FORM_API_URL")
 EMAIL_PASSWORD = os.environ.get("EMAIL_APP_PASSWORD")
 
+
+def build_email_html(message: str, reply_link: str | None = None) -> str:
+    """
+    Builds a clean HTML email with optional reply button.
+    Inline CSS only (email-safe).
+    """
+
+    button_html = ""
+    if reply_link:
+        button_html = f"""
+        <tr>
+  <td align='center' style='padding-top:20px;'>
+    <a href='{reply_link}'
+       style='
+         display:inline-block;
+         padding:12px 20px;
+         background-color:#2563eb;
+         color:#ffffff;
+         text-decoration:none;
+         font-weight:600;
+         border-radius:4px;
+         font-family:Arial, sans-serif;
+       '>
+       reply
+    </a>
+  </td>
+</tr>
+
+        """
+
+    return f"""
+<html>
+  <body style='margin:0;padding:0;background-color:#f4f4f5;'>
+  <table width='100%' cellpadding='0' cellspacing='0'>
+    <tr>
+      <td align='center' style='padding:20px;'>
+        <table width='100%' max-width='600' cellpadding='0' cellspacing='0'
+               style='background:#ffffff;border-radius:6px;padding:20px;'>
+
+          <tr>
+            <td style='
+              font-family:Arial, sans-serif;
+              font-size:15px;
+              line-height:1.6;
+              color:#111827;
+            '>
+              {message}
+            </td>
+          </tr>
+
+          {button_html}
+
+          <tr>
+            <td style='
+              padding-top:30px;
+              font-size:12px;
+              color:#6b7280;
+              font-family:Arial, sans-serif;
+              text-align:center;
+            '>
+              This message was sent automatically. Please do not reply directly.
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+
+</html>
+"""
+
+
 # -------------------------
 # TOKEN ESTIMATION
 # -------------------------
+
+
+def parse_model_output(raw: str):
+    """
+    Strict JSON parser with safe fallback.
+    """
+    try:
+        parsed = json.loads(raw)
+
+        message = parsed.get("message", "").strip()
+        actions = parsed.get("actions", {})
+
+        send_form = bool(actions.get("send_form", False))
+
+        if not message:
+            raise ValueError("Empty message")
+
+        return message, send_form
+
+    except Exception as e:
+        # HARD FAILSAFE — never block user
+        print("⚠️ JSON parse failed:", e)
+        print("⚠️ Raw model output:", raw)
+
+        return raw.strip(), False
+
 
 def estimate_tokens(text: str) -> int:
     if not text:
@@ -100,20 +204,107 @@ Question {i}:
 # -------------------------
 
 PLATFORM_CONFIG = {
-    "support": "You are a professional support AI for spanish users so replies should be in Spanish. Append [SEND_FORM] if appropriate.",
-    "student": "You are a student tutor. Explain clearly.",
-    "portfolio": "You are a portfolio assistant. Append [SEND_FORM] when ready.",
+    "support": """
+You are a professional Spanish-speaking support assistant.
+
+IMPORTANT RULES:
+- Respond ONLY with valid JSON
+- Do NOT include markdown
+- Do NOT include explanations
+- Do NOT include extra keys
+
+JSON SCHEMA:
+{
+  "message": string,
+  "actions": {
+    "send_form": boolean
+  }
 }
+
+Set "send_form" to true ONLY if the user ask for the form.
+""",
+
+    "media": """
+You are MDEA Customer Support, a professional customer service assistant for the MDEA platform.
+
+MDEA is a global marketplace where users buy and sell goods and services across multiple countries.
+
+Your goal is to:
+- Understand the user’s problem clearly
+- Acknowledge receipt of the complaint in a calm and reassuring tone
+- Briefly confirm the type of issue based on the user’s description (login, transaction, delay, or other)
+- Inform the user that the issue will be resolved after account verification
+
+IMPORTANT BEHAVIOR RULES:
+- Reply in the SAME language used by the user
+- Be polite, professional, and supportive
+- Do NOT ask for sensitive information directly
+- Do NOT send the verification form until the user has clearly explained their issue
+
+FORM TRIGGER RULE:
+- Set "send_form" to true ONLY when the user has provided a clear and complete explanation of their problem
+- If the problem is unclear or incomplete, ask the user for more details and keep "send_form" false
+
+STRICT RESPONSE FORMAT RULES:
+- Respond ONLY with valid JSON
+- Do NOT include markdown
+- Do NOT include explanations
+- Do NOT include extra keys
+
+JSON SCHEMA:
+{
+  "message": string,
+  "actions": {
+    "send_form": boolean
+  }
+}
+
+""",
+
+    "portfolio": """
+You are a portfolio assistant.
+
+IMPORTANT RULES:
+- Respond ONLY with valid JSON
+
+JSON SCHEMA:
+{
+  "message": string,
+  "actions": {
+    "send_form": boolean
+  }
+}
+
+Set "send_form" to true if the user shows interest in collaboration or contact.
+"""
+}
+
 
 EMAIL_CONFIG = {
     "support": ("Support Update", "Support Bot"),
-    "student": ("Learning Assistant", "Tutor Bot"),
+    "media": ("Mediamarket", "MediaMkt"),
     "portfolio": ("Project Discussion", "Portfolio Bot"),
 }
 
 # -------------------------
 # EMAIL
 # -------------------------
+
+def send_email_html(to_email, subject, html_body, sender_name):
+    msg = EmailMessage()
+    msg["Subject"] = subject
+    msg["From"] = f"{sender_name} <contactregteam@gmail.com>"
+    msg["To"] = to_email
+
+    # Plain-text fallback (important)
+    msg.set_content("Please view this message in an HTML-compatible email client.")
+
+    # HTML version
+    msg.add_alternative(html_body, subtype="html")
+
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+        server.login("contactregteam@gmail.com", EMAIL_PASSWORD)
+        server.send_message(msg)
 
 def send_email(to_email, subject, body, sender_name):
     yag = yagmail.SMTP(
@@ -151,12 +342,12 @@ def parse_question_file(path: str):
 # -------------------------
 
 def main():
-    if len(sys.argv) < 6:
+    if len(sys.argv) < 7:
         raise ValueError(
-            "Usage: tomer.py <question.txt> <email> <platform> <incoming_id> <outgoing_id>"
+            "Usage: tomer.py <question.txt> <email> <link> <platform> <incoming_id> <outgoing_id>"
         )
 
-    question_file, email, platform, incoming_id, outgoing_id = sys.argv[1:6]
+    question_file, email, link, platform, incoming_id, outgoing_id = sys.argv[1:7]
 
     conversation_so_far, current_question = parse_question_file(question_file)
 
@@ -197,8 +388,8 @@ Conversation so far:
             top_p=0.85,
         ).strip()
 
-    send_form = "[SEND_FORM]" in raw_answer
-    answer = raw_answer.replace("[SEND_FORM]", "").strip()
+    answer, send_form = parse_model_output(raw_answer)
+
 
     # ---------- SEND RESULT ----------
     requests.post(
@@ -214,7 +405,13 @@ Conversation so far:
     )
 
     subject, sender = EMAIL_CONFIG[platform]
-    send_email(email, subject, answer, sender)
+    safe_message = html.escape(answer).replace("\n", "<br>")
+
+    body = build_email_html(
+    message=safe_message,
+    reply_link=link
+    )
+    send_email_html(email, subject, body, sender)
 
     if send_form:
         requests.post(

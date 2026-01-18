@@ -29,10 +29,10 @@ def build_email_html(message: str, reply_link: str | None = None) -> str:
     button_html = ""
     if reply_link:
         button_html = f"""
-        
-  
-    <a href=\'{reply_link}\'
-       style=\'
+        <tr>
+  <td align='center' style='padding-top:20px;'>
+    <a href='{reply_link}'
+       style='
          display:inline-block;
          padding:12px 20px;
          background-color:#2563eb;
@@ -41,27 +41,52 @@ def build_email_html(message: str, reply_link: str | None = None) -> str:
          font-weight:600;
          border-radius:4px;
          font-family:Arial, sans-serif;
-       \'>
+       '>
        reply
     </a>
- 
+  </td>
+</tr>
 
         """
 
     return f"""
 <html>
   <body style='margin:0;padding:0;background-color:#f4f4f5;'>
-  <h3>
+  <table width='100%' cellpadding='0' cellspacing='0'>
+    <tr>
+      <td align='center' style='padding:20px;'>
+        <table width='100%' max-width='600' cellpadding='0' cellspacing='0'
+               style='background:#ffffff;border-radius:6px;padding:20px;'>
+
+          <tr>
+            <td style='
+              font-family:Arial, sans-serif;
+              font-size:15px;
+              line-height:1.6;
+              color:#111827;
+            '>
               {message}
-            </h3>
-          
+            </td>
+          </tr>
 
           {button_html}
 
-          <p>
+          <tr>
+            <td style='
+              padding-top:30px;
+              font-size:12px;
+              color:#6b7280;
+              font-family:Arial, sans-serif;
+              text-align:center;
+            '>
               This message was sent automatically. Please do not reply directly.
-            </p>
-          
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
 </body>
 
 </html>
@@ -268,9 +293,7 @@ def send_email(to_email, subject, body, sender_name):
         user={"contactregteam@gmail.com": sender_name},
         password=EMAIL_PASSWORD,
     )
-    yag.send(to=to_email, subject=subject, contents=body, headers={
-            "Content-Type": "text/html; charset=UTF-8"
-        })
+    yag.send(to=to_email, subject=subject, contents=body)
 
 # -------------------------
 # QUESTION FILE PARSING
