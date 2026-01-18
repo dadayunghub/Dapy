@@ -2,8 +2,7 @@ import sys
 import os
 import re
 import requests
-import smtplib
-from email.message import EmailMessage
+import yagmail
 import html
 import json
 from ctransformers import AutoModelForCausalLM
@@ -289,21 +288,13 @@ EMAIL_CONFIG = {
 # EMAIL
 # -------------------------
 
-def send_email_html(to_email, subject, html_body, sender_name):
-    msg = EmailMessage()
-    msg["Subject"] = subject
-    msg["From"] = f"{sender_name} <contactregteam@gmail.com>"
-    msg["To"] = to_email
+def send_email(to_email, subject, body, sender_name):
+    yag = yagmail.SMTP(
+        user={"contactregteam@gmail.com": sender_name},
+        password=EMAIL_PASSWORD,
+    )
+    yag.send(to=to_email, subject=subject, contents=body)
 
-    # Plain-text fallback (important)
-    msg.set_content("Please view this message in an HTML-compatible email client.")
-
-    # HTML version
-    msg.add_alternative(html_body, subtype="html")
-
-    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
-        server.login("contactregteam@gmail.com", EMAIL_PASSWORD)
-        server.send_message(msg)
 # -------------------------
 # QUESTION FILE PARSING
 # -------------------------
@@ -402,7 +393,7 @@ Conversation so far:
     message=safe_message,
     reply_link=link
     )
-    send_email_html(email, subject, body, sender)
+    send_email(email, subject, body, sender)
 
     if send_form:
         requests.post(

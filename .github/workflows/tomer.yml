@@ -58,7 +58,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install ctransformers gdown yagmail requests
+          pip install ctransformers gdown requests
 
       # ---------- MODEL CACHE (v4 – NOT DEPRECATED) ----------
 
