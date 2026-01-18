@@ -293,7 +293,9 @@ def send_email(to_email, subject, body, sender_name):
         user={"contactregteam@gmail.com": sender_name},
         password=EMAIL_PASSWORD,
     )
-    yag.send(to=to_email, subject=subject, contents=body)
+    yag.send(to=to_email, subject=subject, contents=body, headers={
+            "Content-Type": "text/html; charset=UTF-8"
+        })
 
 # -------------------------
 # QUESTION FILE PARSING
