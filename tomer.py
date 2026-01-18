@@ -99,29 +99,48 @@ def build_email_html(message: str, reply_link: str | None = None) -> str:
 # -------------------------
 
 
+FORBIDDEN_WORDS = [
+    "form",
+    "verification",
+    "verify",
+    "fill",
+    "submit",
+    "click",
+    "link",
+    "json",
+    "schema",
+]
+
+SAFE_FALLBACK_MESSAGE = (
+    "Thank you for contacting Mediamarket support. "
+    "We have received your message and are reviewing your issue."
+)
+
 def parse_model_output(raw: str):
-    """
-    Strict JSON parser with safe fallback.
-    """
     try:
         parsed = json.loads(raw)
 
         message = parsed.get("message", "").strip()
         actions = parsed.get("actions", {})
-
         send_form = bool(actions.get("send_form", False))
 
         if not message:
             raise ValueError("Empty message")
 
+        # 🚨 POLICY ENFORCEMENT
+        lowered = message.lower()
+        if any(word in lowered for word in FORBIDDEN_WORDS):
+            print("⚠️ Policy violation detected. Message sanitized.")
+            message = SAFE_FALLBACK_MESSAGE
+
         return message, send_form
 
     except Exception as e:
-        # HARD FAILSAFE — never block user
         print("⚠️ JSON parse failed:", e)
         print("⚠️ Raw model output:", raw)
 
-        return raw.strip(), False
+        # Never leak raw output
+        return SAFE_FALLBACK_MESSAGE, False
 
 
 def estimate_tokens(text: str) -> int:
@@ -224,39 +243,33 @@ Set "send_form" to true ONLY if the user ask for the form.
 """,
 
     "media": """
-You are Mediamarket Customer Support, a professional customer service assistant for the Mediamarket platform.
+You are Mediamarket Customer Support and Mediamarket is a platform where users buy Goods and services.
 
-MDEA is a global marketplace where users buy and sell goods and services across multiple countries.
+ROLE:
+You ONLY acknowledge user issues and assure them their issues will be rectified immediately .
 
-Your goal is to:
-- Understand the user’s problem clearly
-- Acknowledge receipt of the complaint in a calm and reassuring tone
-- Briefly confirm the type of issue based on the user’s description (login, transaction, delay, or other)
-- Inform the user that the issue will be resolved after account verification
-
-IMPORTANT BEHAVIOR RULES:
-- Reply in the SAME language used by the user
-- Be polite, professional, and supportive
-- Do NOT ask for sensitive information directly
-- Do NOT send the verification form until the user has clearly explained their issue
-
-FORM TRIGGER RULE:
-- Set "send_form" to true ONLY when the user has provided a clear and complete explanation of their problem
-- If the problem is unclear or incomplete, ask the user for more details and keep "send_form" false
-
-STRICT RESPONSE FORMAT RULES:
+ABSOLUTE RULES (MUST FOLLOW):
 - Respond ONLY with valid JSON
-- Do NOT include markdown
-- Do NOT include explanations
-- Do NOT include extra keys
 
-JSON SCHEMA:
+
+
+MESSAGE RULES:
+- The message must be a short, polite acknowledgement
+
+- The message must only confirm the issue type (e.g. delivery delay, login issue)
+
+FORM TRIGGER LOGIC:
+- Set "send_form" to true ONLY if the user has clearly explained their problem
+- Otherwise set it to false
+
+JSON SCHEMA (EXACT):
 {
   "message": string,
   "actions": {
     "send_form": boolean
   }
 }
+
 
 """,
 
