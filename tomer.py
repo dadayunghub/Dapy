@@ -43,7 +43,7 @@ def build_email_html(message: str, reply_link: str | None = None) -> str:
          border-radius:4px;
          font-family:Arial, sans-serif;
        '>
-       reply
+       ✉️ ✉️ 
     </a>
   </td>
 </tr>
@@ -80,7 +80,7 @@ def build_email_html(message: str, reply_link: str | None = None) -> str:
               font-family:Arial, sans-serif;
               text-align:center;
             '>
-              This message was sent automatically. Please do not reply directly.
+              Mediamarket @ 2026.
             </td>
           </tr>
 
