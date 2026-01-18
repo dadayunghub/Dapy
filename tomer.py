@@ -249,6 +249,7 @@ LANGUAGE RULE (VERY IMPORTANT):
 
 ABSOLUTE RULES (MUST FOLLOW):
 - Respond ONLY with valid JSON
+- You MUST NOT attempt to solve or fix the issue or any issue
 
 
 
