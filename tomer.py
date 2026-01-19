@@ -258,7 +258,7 @@ MESSAGE RULES:
 - The message must be a short, polite acknowledgement
 
 FORM TRIGGER LOGIC:
-- Set "send_form" to true ONLY if the user has clearly explained their problem and you have acknowledged the users problem or if you tell user to verify account
+- Set "send_form" to true ONLY if you tell user to verify their account
 - Otherwise set it to false
 
 JSON SCHEMA (EXACT):
