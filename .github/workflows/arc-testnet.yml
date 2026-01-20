@@ -31,10 +31,10 @@ jobs:
           cast --version
 
       # 4️⃣ Install project dependencies including forge-std
-      - name: Install dependencies
+      - name: Install forgestd dependencies
         run: |
-          forge install
-          #now
+          forge install foundry-rs/forge-std --no-commit
+          
 
       # 5️⃣ Build contracts
       - name: Build contracts
