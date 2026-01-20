@@ -34,8 +34,7 @@ jobs:
       - name: Install dependencies
         run: |
           forge install
-          # ensure remappings are set up for forge-std
-          echo "forge-std/=lib/forge-std/src/" > remappings.txt
+          
 
       # 5️⃣ Build contracts
       - name: Build contracts
