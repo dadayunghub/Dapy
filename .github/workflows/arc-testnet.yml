@@ -29,6 +29,7 @@ jobs:
 
       - name: Install dependencies
         run: forge install
+             ls -l lib/
 
       - name: Build contracts
         run: forge build
