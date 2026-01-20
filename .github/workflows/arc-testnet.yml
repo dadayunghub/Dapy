@@ -33,7 +33,7 @@ jobs:
       # 4️⃣ Install project dependencies including forge-std
       - name: Install forgestd dependencies
         run: |
-          forge install foundry-rs/forge-std --no-commit
+          forge install foundry-rs/forge-std
           
 
       # 5️⃣ Build contracts
