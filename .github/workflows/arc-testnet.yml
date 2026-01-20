@@ -14,31 +14,39 @@ jobs:
       PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
 
     steps:
+      # 1️⃣ Checkout your repository
       - name: Checkout repo
         uses: actions/checkout@v4
 
+      # 2️⃣ Install Foundry (stable version)
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
         with:
           version: stable
 
+      # 3️⃣ Verify Foundry installation
       - name: Verify Foundry installation
         run: |
           forge --version
           cast --version
 
+      # 4️⃣ Install project dependencies including forge-std
       - name: Install dependencies
         run: |
           forge install
-          ls -l lib/    # verify
+          # ensure remappings are set up for forge-std
+          echo "forge-std/=lib/forge-std/src/" > remappings.txt
 
+      # 5️⃣ Build contracts
       - name: Build contracts
         run: forge build
 
+      # 6️⃣ Run tests with verbose output
       - name: Run tests
         run: forge test -vvv
 
-      - name: Deploy HelloArchitect to Arc Testnet
+      # 7️⃣ Deploy HelloArchitect to Arc Testnet
+      - name: Deploy HelloArchitect
         id: deploy
         run: |
           DEPLOY_OUTPUT=$(forge create src/HelloArchitect.sol:HelloArchitect \
@@ -51,6 +59,7 @@ jobs:
           CONTRACT_ADDRESS=$(echo "$DEPLOY_OUTPUT" | grep "Deployed to:" | awk '{print $3}')
           echo "HELLOARCHITECT_ADDRESS=$CONTRACT_ADDRESS" >> $GITHUB_ENV
 
+      # 8️⃣ Verify deployment by calling getGreeting()
       - name: Verify deployment
         run: |
           cast call $HELLOARCHITECT_ADDRESS \

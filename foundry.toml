@@ -17,3 +17,6 @@ arc_testnet = "https://rpc.testnet.arc.network"
 
 [etherscan]
 arc_testnet = { key = "DUMMY" }
+
+[dependencies]
+forge-std = { git = "https://github.com/foundry-rs/forge-std.git" }
