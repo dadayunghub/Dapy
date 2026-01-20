@@ -34,7 +34,7 @@ jobs:
       - name: Install dependencies
         run: |
           forge install
-          
+          #now
 
       # 5️⃣ Build contracts
       - name: Build contracts
