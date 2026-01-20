@@ -28,8 +28,9 @@ jobs:
           cast --version
 
       - name: Install dependencies
-        run: forge install
-             ls -l lib/
+        run: |
+          forge install
+          ls -l lib/    # verify
 
       - name: Build contracts
         run: forge build
