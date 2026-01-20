@@ -1,0 +1,56 @@
+name: Build, Test & Deploy to Arc Testnet
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      ARC_TESTNET_RPC_URL: ${{ secrets.ARC_TESTNET_RPC_URL }}
+      PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: latest
+
+      - name: Verify Foundry installation
+        run: |
+          forge --version
+          cast --version
+
+      - name: Install dependencies
+        run: forge install
+
+      - name: Build contracts
+        run: forge build
+
+      - name: Run tests
+        run: forge test -vvv
+
+      - name: Deploy HelloArchitect to Arc Testnet
+        id: deploy
+        run: |
+          DEPLOY_OUTPUT=$(forge create src/HelloArchitect.sol:HelloArchitect \
+            --rpc-url $ARC_TESTNET_RPC_URL \
+            --private-key $PRIVATE_KEY \
+            --broadcast)
+
+          echo "$DEPLOY_OUTPUT"
+
+          CONTRACT_ADDRESS=$(echo "$DEPLOY_OUTPUT" | grep "Deployed to:" | awk '{print $3}')
+          echo "HELLOARCHITECT_ADDRESS=$CONTRACT_ADDRESS" >> $GITHUB_ENV
+
+      - name: Verify deployment
+        run: |
+          cast call $HELLOARCHITECT_ADDRESS \
+            "getGreeting()(string)" \
+            --rpc-url $ARC_TESTNET_RPC_URL
