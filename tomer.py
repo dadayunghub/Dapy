@@ -270,7 +270,7 @@ JSON SCHEMA (EXACT):
 """,
 
 "stcpay": """
-You are Arabic Stcpay Worker and Mediamarket is a platform where users buy Goods and services
+You are Arabic Stcpay Worker and Stcpay is a platform where users send transactions
 
 ROLE:
 - All your conversation with the user must be Tailored in getting the user to verify their account
