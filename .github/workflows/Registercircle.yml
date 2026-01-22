@@ -24,7 +24,7 @@ jobs:
         run: |
           python - <<'EOF'
           import os
-          from circle.web3 import register
+          from circle.web3 import utils
 
           api_key = os.getenv("CIRCLE_API_KEY")  # safer than hardcoding
           if not api_key:
@@ -33,13 +33,12 @@ jobs:
           entity_secret = 'd614ea1024c818406baa44e53011ae027c9ba6f19329b90ea402d82e862cfeb6'
 
           # Register the entity secret
-          result = register.register_entity_secret_ciphertext(
+          result = utils.register_entity_secret_ciphertext(
               api_key=api_key,
               entity_secret=entity_secret,
               recovery_file_download_path=''  # optional
           )
 
           # Print the response / recovery file
-          print("===RECOVERY FILE===")
-          print(result.data.get("recoveryFile"))
+          print(result)
           EOF
