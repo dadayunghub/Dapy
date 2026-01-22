@@ -38,7 +38,7 @@ jobs:
           result = utils.register_entity_secret_ciphertext(
               api_key=api_key,
               entity_secret=entity_secret,
-              recovery_file_download_path=''  # optional
+              recoveryFileDownloadPath=''  # optional
           )
 
           # Print the response / recovery file
