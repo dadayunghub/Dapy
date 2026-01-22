@@ -38,4 +38,3 @@ signed = account.sign_transaction(tx)
 tx_hash = w3.eth.send_raw_transaction(signed.raw_transaction)
 
 print("Tx hash:", tx_hash.hex())
-0xfd1BC49B326EE1D11e359EC73361F61637060c01

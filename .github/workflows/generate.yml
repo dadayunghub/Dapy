@@ -1,0 +1,30 @@
+name: Generate Circle Entity Secret
+
+on:
+  workflow_dispatch:
+
+jobs:
+  generate_secret:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install circle-developer-controlled-wallets
+
+      - name: Generate entity secret
+        run: |
+          python - <<'EOF'
+          from circle.web3 import utils
+          secret = utils.generate_entity_secret()
+          print("===ENTITY SECRET===")
+          print(secret)
+          EOF
