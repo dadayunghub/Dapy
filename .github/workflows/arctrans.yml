@@ -30,4 +30,4 @@ jobs:
       - name: Run interaction script
         run: |
           cd scripts
-          python interact.py
+          python arctrans.py
