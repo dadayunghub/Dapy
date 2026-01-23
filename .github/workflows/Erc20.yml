@@ -20,11 +20,15 @@ jobs:
           python -m pip install --upgrade pip
           pip install circle-smart-contract-platform circle-developer-controlled-wallets
 
-      - name: Erc20 contract
+      - name: Erc20 contract deploy
         env:
           CIRCLE_API_KEY: ${{ secrets.CIRCLE_API_KEY }}
-          ST_API_KEY: ${{ secrets.ST_API_KEY }}
+          CIRCLE_ENTITY_SECRET: ${{ secrets.CIRCLE_ENTITY_SECRET }}
+          WALLET_ID: ${{ secrets.WALLET_ID }}
+          WALLET_ADDRESS: ${{ secrets.WALLET_ADDRESS }}
         run: |
           python erc20.py \
             "$CIRCLE_API_KEY" \
-            "$ST_API_KEY" \
+            "$WALLET_ID" \
+            "$WALLET_ADDRESS" \
+            "$CIRCLE_ENTITY_SECRET" \
