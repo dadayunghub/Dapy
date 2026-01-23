@@ -1,0 +1,30 @@
+name: Erc20 Smart contract
+
+on:
+  workflow_dispatch:
+
+jobs:
+  generate_secret:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install circle-smart-contract-platform circle-developer-controlled-wallets
+
+      - name: Erc20 contract
+        env:
+          CIRCLE_API_KEY: ${{ secrets.CIRCLE_API_KEY }}
+          ST_API_KEY: ${{ secrets.ST_API_KEY }}
+        run: |
+          python erc20.py \
+            "$CIRCLE_API_KEY" \
+            "$ST_API_KEY" \
