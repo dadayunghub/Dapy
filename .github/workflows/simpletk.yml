@@ -1,4 +1,4 @@
-name: Build, Test & Deploy Token to Arc Testnet
+name: Build, simple Test & Deploy Token to Arc Testnet
 
 on:
   push:
