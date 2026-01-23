@@ -1,0 +1,65 @@
+name: Build, Test & Deploy Token to Arc Testnet
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      ARC_TESTNET_RPC_URL: ${{ secrets.ARC_TESTNET_RPC_URL }}
+      PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+
+    steps:
+      # 1️⃣ Checkout your repository
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      # 2️⃣ Install Foundry
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: stable
+
+      # 3️⃣ Verify Foundry installation
+      - name: Verify Foundry installation
+        run: |
+          forge --version
+          cast --version
+
+      # 4️⃣ Install forge-std dependency
+      - name: Install forgestd dependencies
+        run: |
+          forge install foundry-rs/forge-std
+
+      # 5️⃣ Build contracts
+      - name: Build contracts
+        run: forge build
+
+      # 6️⃣ Run tests (optional)
+      - name: Run tests
+        run: forge test -vvv
+
+      # 7️⃣ Deploy SimpleToken to Arc Testnet
+      - name: Deploy SimpleToken
+        id: deploy
+        run: |
+          DEPLOY_OUTPUT=$(forge create src/SimpleToken.sol:SimpleToken \
+            --rpc-url $ARC_TESTNET_RPC_URL \
+            --private-key $PRIVATE_KEY \
+            --broadcast)
+
+          echo "$DEPLOY_OUTPUT"
+
+          CONTRACT_ADDRESS=$(echo "$DEPLOY_OUTPUT" | grep "Deployed to:" | awk '{print $3}')
+          echo "SIMPLETOKEN_ADDRESS=$CONTRACT_ADDRESS" >> $GITHUB_ENV
+
+      # 8️⃣ Verify deployment by checking totalSupply (should be 0 initially)
+      - name: Verify deployment
+        run: |
+          cast call $SIMPLETOKEN_ADDRESS \
+            "totalSupply()(uint256)" \
+            --rpc-url $ARC_TESTNET_RPC_URL
