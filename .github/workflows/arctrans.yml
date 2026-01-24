@@ -31,6 +31,6 @@ jobs:
       - name: Run interaction script
         run: |
           cd scripts
-          python interact.py transfer \
+          python interact.py mint \
             --to 0x9F5D4A3a8aBC0E4E76b60b91cd769f9cFE69Dcf4 \
             --amount 10000
