@@ -48,7 +48,7 @@ def transfer(args):
     tx = contract.functions.transfer(
         Web3.to_checksum_address(args.to),
         to_wei(args.amount)
-    ).build_transaction({})
+    ).build_transaction({"from": account.address})
 
     send_tx(tx)
 
