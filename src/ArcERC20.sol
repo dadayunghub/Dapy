@@ -111,9 +111,10 @@ contract ArcERC20 is
     function nonces(address owner)
         public
         view
-        override(ERC20PermitUpgradeable)
+        override(ERC20PermitUpgradeable, NoncesUpgradeable)
         returns (uint256)
     {
         return super.nonces(owner);
     }
+
 }
