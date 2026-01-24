@@ -22,8 +22,12 @@ request = smart_contract_platform.TemplateContractDeploymentRequest.from_dict({
         "symbol": "MTK",
         "defaultAdmin": os.getenv("WALLET_ADDRESS"),
         "primarySaleRecipient": os.getenv("WALLET_ADDRESS"),
+        "royaltyRecipient": os.getenv("WALLET_ADDRESS"),
+        "royaltyPercent": "0.01",
     },
     "feeLevel": "MEDIUM"
 })
 
-response = api_instance.deploy_contract_template("a1b74add-23e0-4712-88d1-6b3009e85a86", request)
+request.template_parameters["royaltyPercent"] = 0.01
+
+response = api_instance.deploy_contract_template("76b83278-50e2-4006-8b63-5b1a2a814533", request)
