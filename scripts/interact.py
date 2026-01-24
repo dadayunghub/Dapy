@@ -31,7 +31,7 @@ def to_wei(amount):
 def send_tx(tx, gas=300_000):
     tx["nonce"] = w3.eth.get_transaction_count(account.address)
     tx["chainId"] = w3.eth.chain_id
-    tx["gasPrice"] = w3.eth.gas_price
+    # tx["gasPrice"] = w3.eth.gas_price
     tx["from"] = account.address
     tx["gas"] = gas
 
