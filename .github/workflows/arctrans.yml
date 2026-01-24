@@ -12,6 +12,7 @@ jobs:
     env:
       ARC_TESTNET_RPC_URL: ${{ secrets.ARC_TESTNET_RPC_URL }}
       PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+      ARC_ERC20_ADDRESS: ${{ secrets.NCA }}
 
     steps:
       - name: Checkout repo
