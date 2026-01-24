@@ -27,10 +27,6 @@ contract ArcERC20 is
     address public platformFeeRecipient;
     uint96 public platformFeeBps;
 
-    /// @custom:oz-upgrades-unsafe-allow constructor
-    constructor() {
-        _disableInitializers();
-    }
 
     function initialize(
         string memory name_,
