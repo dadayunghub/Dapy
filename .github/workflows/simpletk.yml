@@ -47,7 +47,9 @@ jobs:
           DEPLOY_OUTPUT=$(forge create src/ArcERC20.sol:ArcERC20 \
             --rpc-url $ARC_TESTNET_RPC_URL \
             --private-key $PRIVATE_KEY \
-            --broadcast)
+            --broadcast \
+            --legacy \
+            --gas-limit 6000000)
 
           echo "$DEPLOY_OUTPUT"
 
