@@ -27,7 +27,7 @@ jobs:
           WALLET_ID: ${{ secrets.WALLET_ID }}
           WALLET_ADDRESS: ${{ secrets.WALLET_ADDRESS }}
         run: |
-          python erc1155.py \
+          python airdrop.py \
             "$CIRCLE_API_KEY" \
             "$WALLET_ID" \
             "$WALLET_ADDRESS" \
