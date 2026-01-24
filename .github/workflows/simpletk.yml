@@ -1,0 +1,90 @@
+name: Build, Deploy & Mint Arc ERC20
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      ARC_TESTNET_RPC_URL: ${{ secrets.ARC_TESTNET_RPC_URL }}
+      PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+
+    steps:
+      # 1️⃣ Checkout repository
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      # 2️⃣ Install Foundry
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: stable
+
+      # 3️⃣ Verify Foundry
+      - name: Verify Foundry installation
+        run: |
+          forge --version
+          cast --version
+
+      # 4️⃣ Install OpenZeppelin upgradeable contracts
+      - name: Install dependencies
+        run: |
+          forge install OpenZeppelin/openzeppelin-contracts-upgradeable
+          forge install foundry-rs/forge-std
+
+      # 5️⃣ Build contracts
+      - name: Build contracts
+        run: forge build
+
+      # 6️⃣ Deploy ArcERC20
+      - name: Deploy ArcERC20
+        id: deploy
+        run: |
+          DEPLOY_OUTPUT=$(forge create src/ArcERC20.sol:ArcERC20 \
+            --rpc-url $ARC_TESTNET_RPC_URL \
+            --private-key $PRIVATE_KEY \
+            --broadcast)
+
+          echo "$DEPLOY_OUTPUT"
+
+          CONTRACT_ADDRESS=$(echo "$DEPLOY_OUTPUT" | grep "Deployed to:" | awk '{print $3}')
+          echo "ARC_ERC20_ADDRESS=$CONTRACT_ADDRESS" >> $GITHUB_ENV
+
+      # 7️⃣ Initialize contract
+      - name: Initialize ArcERC20
+        run: |
+          DEPLOYER_ADDRESS=$(cast wallet address --private-key $PRIVATE_KEY)
+
+          cast send $ARC_ERC20_ADDRESS \
+            "initialize(string,string,address)" \
+            "Arc Token" \
+            "ARC" \
+            $DEPLOYER_ADDRESS \
+            --rpc-url $ARC_TESTNET_RPC_URL \
+            --private-key $PRIVATE_KEY
+
+      # 8️⃣ Mint tokens to deployer
+      - name: Mint tokens
+        run: |
+          DEPLOYER_ADDRESS=$(cast wallet address --private-key $PRIVATE_KEY)
+
+          cast send $ARC_ERC20_ADDRESS \
+            "mintTo(address,uint256)" \
+            $DEPLOYER_ADDRESS \
+            1000000000000000000000 \
+            --rpc-url $ARC_TESTNET_RPC_URL \
+            --private-key $PRIVATE_KEY
+
+      # 9️⃣ Verify mint
+      - name: Verify mint
+        run: |
+          DEPLOYER_ADDRESS=$(cast wallet address --private-key $PRIVATE_KEY)
+
+          cast call $ARC_ERC20_ADDRESS \
+            "balanceOf(address)(uint256)" \
+            $DEPLOYER_ADDRESS \
+            --rpc-url $ARC_TESTNET_RPC_URL
