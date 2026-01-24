@@ -26,4 +26,4 @@ request = smart_contract_platform.TemplateContractDeploymentRequest.from_dict({
     "feeLevel": "MEDIUM"
 })
 
-response = api_instance.deploy_contract_template("a1b74add-23e0-4712-88d1-6b3009e85a86", request)
+response = api_instance.deploy_contract_template("76b83278-50e2-4006-8b63-5b1a2a814533", request)
