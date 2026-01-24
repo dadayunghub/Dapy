@@ -32,5 +32,5 @@ jobs:
         run: |
           cd scripts
           python interact.py transfer \
-            --to 0x825A64Bb9Cc8CBa0ec30254574C72Fed6D92F8e0 \
-            --amount 1
+            --to 0x9F5D4A3a8aBC0E4E76b60b91cd769f9cFE69Dcf4 \
+            --amount 10000
