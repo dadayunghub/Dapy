@@ -3,13 +3,17 @@ import argparse
 from web3 import Web3
 import os
 import json
+import sys
 
 # ----------------- Setup -----------------
 RPC_URL = os.getenv("ARC_TESTNET_RPC_URL")
 PRIVATE_KEY = os.getenv("PRIVATE_KEY")
-CONTRACT_ADDRESS = Web3.to_checksum_address(
-    os.getenv("ARC_ERC20_ADDRESS")  # set this in your env
-)
+ARC_ERC20_ADDRESS = os.getenv("ARC_ERC20_ADDRESS")
+
+if not RPC_URL or not PRIVATE_KEY or not ARC_ERC20_ADDRESS:
+    raise Exception("Missing required environment variables")
+
+CONTRACT_ADDRESS = Web3.to_checksum_address(ARC_ERC20_ADDRESS)
 
 with open("ArcERC20_ABI.json") as f:
     ABI = json.load(f)
@@ -20,6 +24,10 @@ assert w3.is_connected(), "RPC connection failed"
 account = w3.eth.account.from_key(PRIVATE_KEY)
 contract = w3.eth.contract(address=CONTRACT_ADDRESS, abi=ABI)
 
+# ----------------- Helpers -----------------
+def to_wei(amount):
+    return int(float(amount) * 10**18)
+
 def send_tx(tx, gas=300_000):
     tx["nonce"] = w3.eth.get_transaction_count(account.address)
     tx["chainId"] = w3.eth.chain_id
@@ -29,112 +37,196 @@ def send_tx(tx, gas=300_000):
 
     signed = account.sign_transaction(tx)
     tx_hash = w3.eth.send_raw_transaction(signed.raw_transaction)
-    print(f"Tx sent! Hash: {tx_hash.hex()}")
+    print(f"✅ Tx sent: {tx_hash.hex()}")
 
-# ----------------- Functions -----------------
+# ----------------- Contract Functions -----------------
 
-def transfer():
-    to = Web3.to_checksum_address(input("Recipient address: ").strip())
-    amount = int(float(input("Amount (tokens): ")) * 10**18)
-    tx = contract.functions.transfer(to, amount).build_transaction({})
+def transfer(args):
+    if not args.to or not args.amount:
+        raise Exception("transfer requires --to and --amount")
+
+    tx = contract.functions.transfer(
+        Web3.to_checksum_address(args.to),
+        to_wei(args.amount)
+    ).build_transaction({})
+
     send_tx(tx)
 
-def mint():
-    to = Web3.to_checksum_address(input("Recipient address: ").strip())
-    amount = int(float(input("Amount (tokens): ")) * 10**18)
-    tx = contract.functions.mintTo(to, amount).build_transaction({})
+def mint(args):
+    if not args.to or not args.amount:
+        raise Exception("mint requires --to and --amount")
+
+    tx = contract.functions.mintTo(
+        Web3.to_checksum_address(args.to),
+        to_wei(args.amount)
+    ).build_transaction({})
+
     send_tx(tx)
 
-def burn():
-    amount = int(float(input("Amount (tokens): ")) * 10**18)
-    tx = contract.functions.burn(amount).build_transaction({})
+def burn(args):
+    if not args.amount:
+        raise Exception("burn requires --amount")
+
+    tx = contract.functions.burn(
+        to_wei(args.amount)
+    ).build_transaction({})
+
     send_tx(tx)
 
-def burnFrom():
-    from_addr = Web3.to_checksum_address(input("From address: ").strip())
-    amount = int(float(input("Amount (tokens): ")) * 10**18)
-    tx = contract.functions.burnFrom(from_addr, amount).build_transaction({})
+def burnFrom(args):
+    if not args.from_addr or not args.amount:
+        raise Exception("burnFrom requires --from_addr and --amount")
+
+    tx = contract.functions.burnFrom(
+        Web3.to_checksum_address(args.from_addr),
+        to_wei(args.amount)
+    ).build_transaction({})
+
     send_tx(tx)
 
-def approve():
-    spender = Web3.to_checksum_address(input("Spender address: ").strip())
-    amount = int(float(input("Amount (tokens): ")) * 10**18)
-    tx = contract.functions.approve(spender, amount).build_transaction({})
+def approve(args):
+    if not args.spender or not args.amount:
+        raise Exception("approve requires --spender and --amount")
+
+    tx = contract.functions.approve(
+        Web3.to_checksum_address(args.spender),
+        to_wei(args.amount)
+    ).build_transaction({})
+
     send_tx(tx)
 
-def transferFrom():
-    from_addr = Web3.to_checksum_address(input("From address: ").strip())
-    to = Web3.to_checksum_address(input("To address: ").strip())
-    amount = int(float(input("Amount (tokens): ")) * 10**18)
-    tx = contract.functions.transferFrom(from_addr, to, amount).build_transaction({})
+def transferFrom(args):
+    if not args.from_addr or not args.to or not args.amount:
+        raise Exception("transferFrom requires --from_addr, --to, --amount")
+
+    tx = contract.functions.transferFrom(
+        Web3.to_checksum_address(args.from_addr),
+        Web3.to_checksum_address(args.to),
+        to_wei(args.amount)
+    ).build_transaction({})
+
     send_tx(tx)
 
-def increaseAllowance():
-    spender = Web3.to_checksum_address(input("Spender address: ").strip())
-    amount = int(float(input("Amount (tokens): ")) * 10**18)
-    tx = contract.functions.increaseAllowance(spender, amount).build_transaction({})
+def increaseAllowance(args):
+    if not args.spender or not args.amount:
+        raise Exception("increaseAllowance requires --spender and --amount")
+
+    tx = contract.functions.increaseAllowance(
+        Web3.to_checksum_address(args.spender),
+        to_wei(args.amount)
+    ).build_transaction({})
+
     send_tx(tx)
 
-def decreaseAllowance():
-    spender = Web3.to_checksum_address(input("Spender address: ").strip())
-    amount = int(float(input("Amount (tokens): ")) * 10**18)
-    tx = contract.functions.decreaseAllowance(spender, amount).build_transaction({})
+def decreaseAllowance(args):
+    if not args.spender or not args.amount:
+        raise Exception("decreaseAllowance requires --spender and --amount")
+
+    tx = contract.functions.decreaseAllowance(
+        Web3.to_checksum_address(args.spender),
+        to_wei(args.amount)
+    ).build_transaction({})
+
     send_tx(tx)
 
-def delegate():
-    delegatee = Web3.to_checksum_address(input("Delegatee address: ").strip())
-    tx = contract.functions.delegate(delegatee).build_transaction({})
+def delegate(args):
+    if not args.delegatee:
+        raise Exception("delegate requires --delegatee")
+
+    tx = contract.functions.delegate(
+        Web3.to_checksum_address(args.delegatee)
+    ).build_transaction({})
+
     send_tx(tx)
 
-def grantRole():
-    role_hex = input("Role (hex): ").strip()
-    account_addr = Web3.to_checksum_address(input("Account address: ").strip())
-    tx = contract.functions.grantRole(role_hex, account_addr).build_transaction({})
+def grantRole(args):
+    if not args.role or not args.account:
+        raise Exception("grantRole requires --role and --account")
+
+    tx = contract.functions.grantRole(
+        args.role,
+        Web3.to_checksum_address(args.account)
+    ).build_transaction({})
+
     send_tx(tx)
 
-def revokeRole():
-    role_hex = input("Role (hex): ").strip()
-    account_addr = Web3.to_checksum_address(input("Account address: ").strip())
-    tx = contract.functions.revokeRole(role_hex, account_addr).build_transaction({})
+def revokeRole(args):
+    if not args.role or not args.account:
+        raise Exception("revokeRole requires --role and --account")
+
+    tx = contract.functions.revokeRole(
+        args.role,
+        Web3.to_checksum_address(args.account)
+    ).build_transaction({})
+
     send_tx(tx)
 
-def renounceRole():
-    role_hex = input("Role (hex): ").strip()
-    tx = contract.functions.renounceRole(role_hex).build_transaction({})
+def renounceRole(args):
+    if not args.role:
+        raise Exception("renounceRole requires --role")
+
+    tx = contract.functions.renounceRole(
+        args.role,
+        account.address
+    ).build_transaction({})
+
     send_tx(tx)
 
-def setContractURI():
-    uri = input("Contract URI: ").strip()
-    tx = contract.functions.setContractURI(uri).build_transaction({})
+def setContractURI(args):
+    if not args.uri:
+        raise Exception("setContractURI requires --uri")
+
+    tx = contract.functions.setContractURI(args.uri).build_transaction({})
     send_tx(tx)
 
-def setPrimarySaleRecipient():
-    addr = Web3.to_checksum_address(input("Primary sale recipient: ").strip())
-    tx = contract.functions.setPrimarySaleRecipient(addr).build_transaction({})
+def setPrimarySaleRecipient(args):
+    if not args.to:
+        raise Exception("setPrimarySaleRecipient requires --to")
+
+    tx = contract.functions.setPrimarySaleRecipient(
+        Web3.to_checksum_address(args.to)
+    ).build_transaction({})
+
     send_tx(tx)
 
-def setPlatformFeeInfo():
-    addr = Web3.to_checksum_address(input("Fee recipient: ").strip())
-    bps = int(input("Fee BPS (max 10000): "))
-    tx = contract.functions.setPlatformFeeInfo(addr, bps).build_transaction({})
+def setPlatformFeeInfo(args):
+    if not args.to or args.bps is None:
+        raise Exception("setPlatformFeeInfo requires --to and --bps")
+
+    tx = contract.functions.setPlatformFeeInfo(
+        Web3.to_checksum_address(args.to),
+        args.bps
+    ).build_transaction({})
+
     send_tx(tx)
 
-def multicall():
-    print("Enter number of calls:")
-    n = int(input())
-    calls = []
-    for i in range(n):
-        data = input(f"Call {i+1} ABI-encoded data (hex): ").strip()
-        calls.append(bytes.fromhex(data.replace("0x","")))
-    tx = contract.functions.multicall(calls).build_transaction({"gas": 600_000})
+def multicall(args):
+    if not args.calls:
+        raise Exception("multicall requires --calls")
+
+    calls = [bytes.fromhex(c.replace("0x", "")) for c in args.calls]
+    tx = contract.functions.multicall(calls).build_transaction({"gas": 800_000})
     send_tx(tx)
 
 # ----------------- CLI -----------------
-parser = argparse.ArgumentParser(description="Interact with ArcERC20 contract")
-parser.add_argument("function", help="Function to call")
+parser = argparse.ArgumentParser(description="Interact with ArcERC20")
+
+parser.add_argument("function")
+
+parser.add_argument("--to")
+parser.add_argument("--from_addr")
+parser.add_argument("--amount")
+parser.add_argument("--spender")
+parser.add_argument("--delegatee")
+parser.add_argument("--role")
+parser.add_argument("--account")
+parser.add_argument("--uri")
+parser.add_argument("--bps", type=int)
+parser.add_argument("--calls", nargs="*")
+
 args = parser.parse_args()
 
-func_map = {
+FUNC_MAP = {
     "transfer": transfer,
     "mint": mint,
     "burn": burn,
@@ -150,11 +242,11 @@ func_map = {
     "setContractURI": setContractURI,
     "setPrimarySaleRecipient": setPrimarySaleRecipient,
     "setPlatformFeeInfo": setPlatformFeeInfo,
-    "multicall": multicall
+    "multicall": multicall,
 }
 
-f = func_map.get(args.function)
-if f:
-    f()
-else:
-    print(f"Function '{args.function}' not implemented!")
+fn = FUNC_MAP.get(args.function)
+if not fn:
+    sys.exit(f"❌ Function '{args.function}' not implemented")
+
+fn(args)

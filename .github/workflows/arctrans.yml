@@ -30,4 +30,6 @@ jobs:
       - name: Run interaction script
         run: |
           cd scripts
-          python arctrans.py
+          python interact.py transfer \
+            --to 0x825A64Bb9Cc8CBa0ec30254574C72Fed6D92F8e0 \
+            --amount 1
