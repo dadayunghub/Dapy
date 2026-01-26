@@ -189,6 +189,7 @@ def send_tx(tx, gas=300_000):
     )
 
     print(f"✅ Tx sent: {tx_hash.hex()}")
+    return result
     
     
 def send_batch_tx_email(results, failed=None):
