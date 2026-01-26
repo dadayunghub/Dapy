@@ -51,7 +51,7 @@ jobs:
         run: |
           pip install --upgrade pip
           pip install web3 requests
-          pip install circle-developer-controlled-wallets
+          
 
       - name: Run interaction script
         run: |

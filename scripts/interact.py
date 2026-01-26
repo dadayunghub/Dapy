@@ -1,4 +1,3 @@
-from circle.web3 import utils, developer_controlled_wallets
 import argparse
 from web3 import Web3
 import os
@@ -9,6 +8,7 @@ import smtplib
 from email.message import EmailMessage
 import html
 import time
+import uuid
 # ----------------- Setup -----------------
 RPC_URL = os.getenv("ARC_TESTNET_RPC_URL")
 PRIVATE_KEY = os.getenv("PRIVATE_KEY")
@@ -18,12 +18,6 @@ EMAIL_PASSWORD = os.environ.get("EMAIL_APP_PASSWORD")
 CIRCLE_API_KEY = os.getenv("CIRCLE_API_KEY")
 CIRCLE_ENTITY_SECRET = os.getenv("CIRCLE_ENTITY_SECRET")
 
-circle_client = utils.init_smart_contract_platform_client(
-    api_key=CIRCLE_API_KEY,
-    entity_secret=CIRCLE_ENTITY_SECRET
-)
-
-circle_tx_api = developer_controlled_wallets.TransactionsApi(circle_client)
 
 DECIMAL_FACTOR = 10**18
 
@@ -472,79 +466,42 @@ def multicall(args):
     send_tx(tx)
     
 def transferusdc(args):
-    """
-    Transfer USDC via Circle Developer Controlled Wallets
-    Supports single & multi-wallet transfer
-    """
+    
 
-    if not args.amount:
-        raise Exception("transferusdc requires --amount")
+    url = "https://api.circle.com/v1/w3s/developer/transactions/transfer"
 
-    token_address = "0x3600000000000000000000000000000000000000"  # USDC ARC
-    sender = account.address
+    headers = {
+        "Authorization": f"Bearer {CIRCLE_API_KEY}",
+        "Content-Type": "application/json",
+    }
 
-    # MULTI
+    def send(to_addr):
+        payload = {
+            "idempotencyKey": str(uuid.uuid4()),
+            "entitySecretCiphertext": os.getenv("CIRCLE_ENTITY_SECRET"),
+            "amounts": [str(args.amount)],
+            "destinationAddress": to_addr,
+            "tokenAddress": "0x3600000000000000000000000000000000000000",
+            "blockchain": "ARC-TESTNET",
+            "walletAddress": account.address,
+            "feeLevel": "MEDIUM",
+        }
+
+        r = requests.post(url, headers=headers, json=payload, timeout=20)
+        r.raise_for_status()
+        return r.json()
+
     if args.to_list:
-        targets = json.loads(args.to_list)
-        failed = []
-
-        for to_addr in targets:
-            try:
-                req = developer_controlled_wallets.CreateTransferTransactionForDeveloperRequest.from_dict({
-                    "amounts": [str(args.amount)],
-                    "destinationAddress": to_addr,
-                    "tokenAddress": token_address,
-                    "blockchain": "ARC-TESTNET",
-                    "walletAddress": sender,
-                    "feeLevel": "MEDIUM",
-                })
-
-                res = circle_tx_api.create_developer_transaction_transfer(req)
-                print("✅ USDC sent:", to_addr)
-
-            except Exception as e:
-                print(f"❌ USDC failed (1st pass) {to_addr}: {e}")
-                failed.append(to_addr)
-
+        for addr in json.loads(args.to_list):
+            print("✅", send(addr))
             time.sleep(2)
-
-        # 🔁 retry once
-        for to_addr in failed:
-            try:
-                req = developer_controlled_wallets.CreateTransferTransactionForDeveloperRequest.from_dict({
-                    "amounts": [str(args.amount)],
-                    "destinationAddress": to_addr,
-                    "tokenAddress": token_address,
-                    "blockchain": "ARC-TESTNET",
-                    "walletAddress": sender,
-                    "feeLevel": "MEDIUM",
-                })
-
-                circle_tx_api.create_developer_transaction_transfer(req)
-                print("🔁 Retry success:", to_addr)
-
-            except Exception as e:
-                print(f"⛔ Final failure {to_addr}: {e}")
-
-            time.sleep(2)
-
         return
 
-    # SINGLE
     if not args.to:
         raise Exception("transferusdc requires --to")
 
-    req = developer_controlled_wallets.CreateTransferTransactionForDeveloperRequest.from_dict({
-        "amounts": [str(args.amount)],
-        "destinationAddress": args.to,
-        "tokenAddress": token_address,
-        "blockchain": "ARC-TESTNET",
-        "walletAddress": sender,
-        "feeLevel": "MEDIUM",
-    })
+    print("✅", send(args.to))
 
-    res = circle_tx_api.create_developer_transaction_transfer(req)
-    print("✅ USDC transfer submitted")
 
 
 # ----------------- CLI -----------------
