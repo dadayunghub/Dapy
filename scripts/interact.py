@@ -269,6 +269,8 @@ def run_many(tx_builder, targets, sleep_seconds=20):
         time.sleep(sleep_seconds)
 
     print("✅ Batch completed")
+    
+    return results, failed
 
 
 
@@ -292,7 +294,8 @@ def transfer(args):
                 "nonce": nonce
             })
 
-        run_many(tx_builder, targets, sleep_seconds=10)
+        results, failed = run_many(tx_builder, targets, sleep_seconds=10)
+        send_batch_tx_email(results, failed)
         return
 
     # SINGLE
@@ -304,7 +307,10 @@ def transfer(args):
         to_wei(args.amount)
     ).build_transaction({"from": account.address})
 
-    send_tx(tx)
+    #send_tx(tx)
+    result = send_tx(tx)
+    send_batch_tx_email([result])
+
 
 
 
