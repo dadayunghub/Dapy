@@ -57,6 +57,6 @@ jobs:
       - name: Run interaction script
         run: |
           cd scripts
-          python interact.py transfer \
+          python interact.py transferusdc \
             --to_list "$wallets" \
             --amount "$Amount"
