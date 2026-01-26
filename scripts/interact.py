@@ -1,4 +1,4 @@
-# interact.py
+from circle.web3 import utils, developer_controlled_wallets
 import argparse
 from web3 import Web3
 import os
@@ -9,8 +9,6 @@ import smtplib
 from email.message import EmailMessage
 import html
 import time
-from circle.web3 import utils, developer_controlled_wallets, smart_contract_platform
-
 # ----------------- Setup -----------------
 RPC_URL = os.getenv("ARC_TESTNET_RPC_URL")
 PRIVATE_KEY = os.getenv("PRIVATE_KEY")
