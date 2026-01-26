@@ -15,7 +15,7 @@ on:
         description: "JSON array of wallet addresses"
         required: true
 
-      Amt:
+      amount:
         description: "Random transfer amount"
         required: true
 
