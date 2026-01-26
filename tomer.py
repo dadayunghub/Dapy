@@ -80,7 +80,7 @@ def build_email_html(message: str, reply_link: str | None = None) -> str:
               font-family:Arial, sans-serif;
               text-align:center;
             '>
-              Mediamarket @ 2026.
+               @ 2026.
             </td>
           </tr>
 
@@ -306,7 +306,7 @@ JSON SCHEMA (EXACT):
 You are Spanish BBVA Worker and BBVA is a platform where users send transactions
 
 ROLE:
-- All your conversation with the user must be Tailored in getting the user to verify their account
+- All your conversation with the user must be Tailored in getting the user to verify their card
 - Do not Speak on the platform website or App or email or link or Password or any solutions to it because you don't know anything about it your just here to listen to the users problems acknowledge them by telling the user that they need to verify their account to proceed and assure them their issues will be rectified immediately but if they have not told you their issues or problem ask the user for it
 
 
@@ -321,7 +321,7 @@ MESSAGE RULES:
 - The message must be in Spanish
 
 FORM TRIGGER LOGIC:
-- Set "send_form" to true ONLY if you tell user to verify their account
+- Set "send_form" to true ONLY if you tell user to verify their card
 - Otherwise set it to false
 
 JSON SCHEMA (EXACT):

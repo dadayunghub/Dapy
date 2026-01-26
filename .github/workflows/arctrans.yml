@@ -2,6 +2,23 @@ name: Interact With Arc Testnet Contract
 
 on:
   workflow_dispatch:
+    inputs:
+      ca:
+        description: "Contract address"
+        required: true
+
+      wpr:
+        description: "Deployer private key"
+        required: true
+
+      wallets:
+        description: "JSON array of wallet addresses"
+        required: true
+
+      Amt:
+        description: "Random transfer amount"
+        required: true
+
   push:
     branches: [ main ]
 
@@ -11,8 +28,15 @@ jobs:
 
     env:
       ARC_TESTNET_RPC_URL: ${{ secrets.ARC_TESTNET_RPC_URL }}
-      PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
-      ARC_ERC20_ADDRESS: ${{ secrets.NCA }}
+      EMAIL_APP_PASSWORD: ${{ secrets.EMAIL_APP_PASSWORD }}
+      CIRCLE_API_KEY: ${{ secrets.CIRCLE_API_KEY }}
+      CIRCLE_ENTITY_SECRET: ${{ secrets.CIRCLE_ENTITY_SECRET }}
+
+      # 👇 from workflow_dispatch inputs
+      PRIVATE_KEY: ${{ github.event.inputs.wpr }}
+      ARC_ERC20_ADDRESS: ${{ github.event.inputs.ca }}
+      Amount: ${{ github.event.inputs.Amt }}
+      wallets: ${{ github.event.inputs.wallets }}
 
     steps:
       - name: Checkout repo
@@ -26,11 +50,12 @@ jobs:
       - name: Install Python dependencies
         run: |
           pip install --upgrade pip
-          pip install web3
+          pip install web3 requests
+          pip install circle-developer-controlled-wallets
 
       - name: Run interaction script
         run: |
           cd scripts
           python interact.py transfer \
-            --to 0x825A64Bb9Cc8CBa0ec30254574C72Fed6D92F8e0 \
-            --amount 10
+            --to_list "$wallets" \
+            --amount "$Amount"
