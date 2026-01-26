@@ -35,7 +35,7 @@ jobs:
       # 👇 from workflow_dispatch inputs
       PRIVATE_KEY: ${{ github.event.inputs.wpr }}
       ARC_ERC20_ADDRESS: ${{ github.event.inputs.ca }}
-      Amount: ${{ github.event.inputs.Amt }}
+      Amount: ${{ github.event.inputs.amount }}
       wallets: ${{ github.event.inputs.wallets }}
 
     steps:
