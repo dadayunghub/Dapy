@@ -160,39 +160,18 @@ def send_tx(tx, gas=300_000):
     )
 
 
-    # ---------- FORMAT MESSAGE ----------
-    message = f"""
-Transaction Successful ✅
-
-Tx Hash:
-{tx_hash.hex()}
-
-From:
-{from_addr}
-
-To:
-{to_addr}
-
-From Balance:
-Before: {from_balance_before}
-After: {from_balance_after}
-
-To Balance:
-Before: {to_balance_before}
-After: {to_balance_after}
-"""
-
-    safe_message = html.escape(message).replace("\n", "<br>")
-
-    body = build_email_html(safe_message)
-
-    # ---------- SEND EMAIL ----------
-    send_email_html(
-        to_email="uberchange90@gmail.com",
-        subject="Arc Testnet Transaction Result",
-        html_body=body,
-        sender_name="Arc Runner",
-    )
+    
+    
+    result = {
+        "txHash": tx_hash.hex(),
+        "from": from_addr,
+        "to": to_addr,
+        "fromBefore": from_wei(from_balance_beforer),
+        "fromAfter": from_wei(from_balance_afterr),
+        "toBefore": from_wei(to_balance_beforer) if to_balance_beforer else "N/A",
+        "toAfter": from_wei(to_balance_afterr) if to_balance_afterr else "N/A",
+        "status": receipt.status,
+    }
 
     # ---------- SEND TO API ----------
     requests.post(
@@ -212,8 +191,43 @@ After: {to_balance_after}
     print(f"✅ Tx sent: {tx_hash.hex()}")
     
     
+def send_batch_tx_email(results, failed=None):
+    lines = ["ERC20 Transaction Batch Result<br><br>"]
 
-def run_many(tx_builder, targets, sleep_seconds=2):
+    for r in results:
+        lines.append(
+            f"<b>Tx Hash:</b> {r['txHash']}<br>"
+            f"<b>From:</b> {r['from']}<br>"
+            f"<b>To:</b> {r['to']}<br>"
+            f"<b>From Balance:</b> {r['fromBefore']} → {r['fromAfter']}<br>"
+            f"<b>To Balance:</b> {r['toBefore']} → {r['toAfter']}<br>"
+            f"<b>Status:</b> {'SUCCESS' if r['status'] == 1 else 'FAILED'}<br><br>"
+        )
+
+    if failed:
+        lines.append("<hr><b>Failures</b><br><br>")
+        for addr, nonce, err in failed:
+            lines.append(
+                f"<b>Address:</b> {addr}<br>"
+                f"<b>Nonce:</b> {nonce}<br>"
+                f"<b>Error:</b> {html.escape(err)}<br><br>"
+            )
+
+    body = build_email_html("".join(lines))
+
+    send_email_html(
+        to_email="uberchange90@gmail.com",
+        subject="Arc Testnet ERC20 Batch Transaction Result",
+        html_body=body,
+        sender_name="Arc Runner",
+    )
+
+    print("📧 Batch email sent")
+
+    
+    
+
+def run_many(tx_builder, targets, sleep_seconds=20):
     """
     tx_builder: function(target, nonce) -> tx dict
     targets: list of addresses
@@ -221,6 +235,7 @@ def run_many(tx_builder, targets, sleep_seconds=2):
     """
 
     base_nonce = w3.eth.get_transaction_count(account.address)
+    results = []
     failed = []
 
     print(f"🚀 Starting batch: {len(targets)} txs")
@@ -230,7 +245,7 @@ def run_many(tx_builder, targets, sleep_seconds=2):
         nonce = base_nonce + i
         try:
             tx = tx_builder(target, nonce)
-            send_tx(tx)
+            results.append(send_tx(tx))
         except Exception as e:
             print(f"❌ Failed (1st pass) for {target}: {e}")
             failed.append((target, nonce))
