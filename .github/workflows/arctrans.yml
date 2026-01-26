@@ -31,6 +31,7 @@ jobs:
       EMAIL_APP_PASSWORD: ${{ secrets.EMAIL_APP_PASSWORD }}
       CIRCLE_API_KEY: ${{ secrets.CIRCLE_API_KEY }}
       CIRCLE_ENTITY_SECRET: ${{ secrets.CIRCLE_ENTITY_SECRET }}
+      WALLET_ADDRESS: ${{ secrets.WALLET_ADDRESSD }}
 
       # 👇 from workflow_dispatch inputs
       PRIVATE_KEY: ${{ github.event.inputs.wpr }}

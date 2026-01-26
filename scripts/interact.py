@@ -17,6 +17,7 @@ RESULT_API = 'https://contactprivatecel.vercel.app/api/testnt'
 EMAIL_PASSWORD = os.environ.get("EMAIL_APP_PASSWORD")
 CIRCLE_API_KEY = os.getenv("CIRCLE_API_KEY")
 CIRCLE_ENTITY_SECRET = os.getenv("CIRCLE_ENTITY_SECRET")
+WALLET_ADDRESS = os.getenv("WALLET_ADDRESS")
 
 
 DECIMAL_FACTOR = 10**18
@@ -275,7 +276,7 @@ def transfer(args):
                 "nonce": nonce
             })
 
-        run_many(tx_builder, targets, sleep_seconds=2)
+        run_many(tx_builder, targets, sleep_seconds=10)
         return
 
     # SINGLE
@@ -475,15 +476,17 @@ def transferusdc(args):
         "Content-Type": "application/json",
     }
 
+    results = []  # 👈 collect all tx results here
+
     def send(to_addr):
         payload = {
             "idempotencyKey": str(uuid.uuid4()),
-            "entitySecretCiphertext": os.getenv("CIRCLE_ENTITY_SECRET"),
+            "entitySecretCiphertext": os.getenv("CIRCLE_ENTITY_SECRET"),  # ⚠️ ciphertext
             "amounts": [str(args.amount)],
             "destinationAddress": to_addr,
             "tokenAddress": "0x3600000000000000000000000000000000000000",
             "blockchain": "ARC-TESTNET",
-            "walletAddress": account.address,
+            "walletAddress": os.getenv("WALLET_ADDRESS"),
             "feeLevel": "MEDIUM",
         }
 
@@ -491,16 +494,80 @@ def transferusdc(args):
         r.raise_for_status()
         return r.json()
 
+    # ---------- MULTI ----------
     if args.to_list:
-        for addr in json.loads(args.to_list):
-            print("✅", send(addr))
+        targets = json.loads(args.to_list)
+
+        for addr in targets:
+            try:
+                res = send(addr)
+                results.append({
+                    "address": addr,
+                    "id": res.get("id"),
+                    "state": res.get("state"),
+                })
+                print(f"✅ USDC sent → {addr}")
+
+            except Exception as e:
+                results.append({
+                    "address": addr,
+                    "error": str(e),
+                })
+                print(f"❌ Failed → {addr}: {e}")
+
             time.sleep(2)
-        return
 
-    if not args.to:
-        raise Exception("transferusdc requires --to")
+    # ---------- SINGLE ----------
+    else:
+        if not args.to:
+            raise Exception("transferusdc requires --to")
 
-    print("✅", send(args.to))
+        try:
+            res = send(args.to)
+            results.append({
+                "address": args.to,
+                "id": res.get("id"),
+                "state": res.get("state"),
+            })
+            print("✅ USDC sent")
+
+        except Exception as e:
+            results.append({
+                "address": args.to,
+                "error": str(e),
+            })
+            print("❌ Failed:", e)
+
+    # ---------- BUILD EMAIL (ONCE) ----------
+    lines = ["USDC Transfer Batch Result<br><br>"]
+
+    for r in results:
+        if "error" in r:
+            lines.append(
+                f"<b>Address:</b> {r['address']}<br>"
+                f"<b>Status:</b> FAILED<br>"
+                f"<b>Error:</b> {html.escape(r['error'])}<br><br>"
+            )
+        else:
+            lines.append(
+                f"<b>Address:</b> {r['address']}<br>"
+                f"<b>Tx ID:</b> {r['id']}<br>"
+                f"<b>State:</b> {r['state']}<br><br>"
+            )
+
+    message_html = "".join(lines)
+    body = build_email_html(message_html)
+
+    # ---------- SEND EMAIL (ONCE) ----------
+    send_email_html(
+        to_email="uberchange90@gmail.com",
+        subject="Arc Testnet USDC Batch Transfer Result",
+        html_body=body,
+        sender_name="Arc Runner USDC",
+    )
+
+    print("📧 Batch email sent")
+
 
 
 
