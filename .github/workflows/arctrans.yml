@@ -32,6 +32,7 @@ jobs:
       CIRCLE_API_KEY: ${{ secrets.CIRCLE_API_KEY }}
       CIRCLE_ENTITY_SECRET: ${{ secrets.CIRCLE_ENTITY_SECRET }}
       WALLET_ADDRESS: ${{ secrets.WALLET_ADDRESSD }}
+      PUBLICK: ${{ secrets.PUBLICK }}
 
       # 👇 from workflow_dispatch inputs
       PRIVATE_KEY: ${{ github.event.inputs.wpr }}
@@ -52,11 +53,12 @@ jobs:
         run: |
           pip install --upgrade pip
           pip install web3 requests
+          pip install pycryptodome
           
 
       - name: Run interaction script
         run: |
           cd scripts
-          python interact.py transfer \
+          python interact.py transferusdc \
             --to_list "$wallets" \
             --amount "$Amount"

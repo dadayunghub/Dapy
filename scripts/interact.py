@@ -9,6 +9,11 @@ from email.message import EmailMessage
 import html
 import time
 import uuid
+import base64
+import codecs
+from Crypto.PublicKey import RSA
+from Crypto.Cipher import PKCS1_OAEP
+from Crypto.Hash import SHA256
 # ----------------- Setup -----------------
 RPC_URL = os.getenv("ARC_TESTNET_RPC_URL")
 PRIVATE_KEY = os.getenv("PRIVATE_KEY")
@@ -18,6 +23,16 @@ EMAIL_PASSWORD = os.environ.get("EMAIL_APP_PASSWORD")
 CIRCLE_API_KEY = os.getenv("CIRCLE_API_KEY")
 CIRCLE_ENTITY_SECRET = os.getenv("CIRCLE_ENTITY_SECRET")
 WALLET_ADDRESS = os.getenv("WALLET_ADDRESS")
+PUBLICK = os.getenv("PUBLICK")
+
+entity_secret = bytes.fromhex(CIRCLE_ENTITY_SECRET)
+
+public_key = RSA.import_key(PUBLICK)
+cipher_rsa = PKCS1_OAEP.new(public_key, hashAlgo=SHA256)
+encrypted_data = cipher_rsa.encrypt(entity_secret)
+
+ciphertext_b64 = base64.b64encode(encrypted_data).decode()
+
 
 
 DECIMAL_FACTOR = 10**18
@@ -503,7 +518,7 @@ def transferusdc(args):
     def send(to_addr):
         payload = {
             "idempotencyKey": str(uuid.uuid4()),
-            "entitySecretCiphertext": os.getenv("CIRCLE_ENTITY_SECRET"),  # ⚠️ ciphertext
+            "entitySecretCiphertext": ciphertext_b64,  # ⚠️ ciphertext
             "amounts": [str(args.amount)],
             "destinationAddress": to_addr,
             "tokenAddress": "0x3600000000000000000000000000000000000000",
