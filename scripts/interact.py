@@ -24,10 +24,11 @@ CIRCLE_API_KEY = os.getenv("CIRCLE_API_KEY")
 CIRCLE_ENTITY_SECRET = os.getenv("CIRCLE_ENTITY_SECRET")
 WALLET_ADDRESS = os.getenv("WALLET_ADDRESS")
 PUBLICK = os.getenv("PUBLICK")
+PUBLICY = PUBLICK.replace("\\n", "\n")
 
 entity_secret = bytes.fromhex(CIRCLE_ENTITY_SECRET)
 
-public_key = RSA.import_key(PUBLICK)
+public_key = RSA.import_key(PUBLICY)
 cipher_rsa = PKCS1_OAEP.new(public_key, hashAlgo=SHA256)
 encrypted_data = cipher_rsa.encrypt(entity_secret)
 
