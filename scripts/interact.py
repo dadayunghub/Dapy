@@ -23,19 +23,16 @@ EMAIL_PASSWORD = os.environ.get("EMAIL_APP_PASSWORD")
 CIRCLE_API_KEY = os.getenv("CIRCLE_API_KEY")
 CIRCLE_ENTITY_SECRET = os.getenv("CIRCLE_ENTITY_SECRET")
 WALLET_ADDRESS = os.getenv("WALLET_ADDRESS")
-PUBLICK = os.getenv("PUBLICK")
-PUBLICY = PUBLICK.replace("\\n", "\n")
 
-ent = os.urandom(32)
-entcode = codecs.encode(ent, 'hex').decode()
+def encrypt_entity_secret():
+    PUBLICK = os.getenv("PUBLICK").replace("\\n", "\n")
+    entity_secret = bytes.fromhex(os.getenv("CIRCLE_ENTITY_SECRET"))
 
-entity_secret = bytes.fromhex(entcode)
+    public_key = RSA.import_key(PUBLICK)
+    cipher_rsa = PKCS1_OAEP.new(public_key, hashAlgo=SHA256)
 
-public_key = RSA.import_key(PUBLICY)
-cipher_rsa = PKCS1_OAEP.new(public_key, hashAlgo=SHA256)
-encrypted_data = cipher_rsa.encrypt(entity_secret)
-
-ciphertext_b64 = base64.b64encode(encrypted_data).decode()
+    encrypted_data = cipher_rsa.encrypt(entity_secret)
+    return base64.b64encode(encrypted_data).decode()
 
 
 
@@ -522,7 +519,7 @@ def transferusdc(args):
     def send(to_addr):
         payload = {
             "idempotencyKey": str(uuid.uuid4()),
-            "entitySecretCiphertext": ciphertext_b64,  # ⚠️ ciphertext
+            "entitySecretCiphertext": encrypt_entity_secret(),  # ⚠️ ciphertext
             "amounts": [str(args.amount)],
             "destinationAddress": to_addr,
             "tokenAddress": "0x3600000000000000000000000000000000000000",
