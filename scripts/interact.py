@@ -26,7 +26,10 @@ WALLET_ADDRESS = os.getenv("WALLET_ADDRESS")
 PUBLICK = os.getenv("PUBLICK")
 PUBLICY = PUBLICK.replace("\\n", "\n")
 
-entity_secret = bytes.fromhex(CIRCLE_ENTITY_SECRET)
+ent = os.urandom(32)
+entcode = codecs.encode(ent, 'hex').decode()
+
+entity_secret = bytes.fromhex(entcode)
 
 public_key = RSA.import_key(PUBLICY)
 cipher_rsa = PKCS1_OAEP.new(public_key, hashAlgo=SHA256)
