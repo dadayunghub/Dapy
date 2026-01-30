@@ -49,6 +49,7 @@ jobs:
       Amount: ${{ github.event.inputs.amount }}
       wallets: ${{ github.event.inputs.wallets }}
       todo: ${{ github.event.inputs.todo }}
+      waddr: ${{ github.event.inputs.waddr }}
 
     steps:
       - name: Checkout repo
