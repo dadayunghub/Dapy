@@ -18,6 +18,9 @@ on:
       amount:
         description: "Random transfer amount"
         required: true
+      todo:
+        description: "todo"
+        required: true
 
   push:
     branches: [ main ]
@@ -31,14 +34,15 @@ jobs:
       EMAIL_APP_PASSWORD: ${{ secrets.EMAIL_APP_PASSWORD }}
       CIRCLE_API_KEY: ${{ secrets.CIRCLE_API_KEY }}
       CIRCLE_ENTITY_SECRET: ${{ secrets.CIRCLE_ENTITY_SECRET }}
-      WALLET_ADDRESS: ${{ secrets.WALLET_ADDRESSD }}
       PUBLICK: ${{ secrets.PUBLICK }}
 
       # 👇 from workflow_dispatch inputs
+      WALLET_ADDRESS: ${{ github.event.inputs.waddr }}
       PRIVATE_KEY: ${{ github.event.inputs.wpr }}
       ARC_ERC20_ADDRESS: ${{ github.event.inputs.ca }}
       Amount: ${{ github.event.inputs.amount }}
       wallets: ${{ github.event.inputs.wallets }}
+      todo: ${{ github.event.inputs.todo }}
 
     steps:
       - name: Checkout repo
@@ -59,6 +63,6 @@ jobs:
       - name: Run interaction script
         run: |
           cd scripts
-          python interact.py transferusdc \
+          python interact.py $todo \
             --to_list "$wallets" \
             --amount "$Amount"

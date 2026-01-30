@@ -19,6 +19,7 @@ RPC_URL = os.getenv("ARC_TESTNET_RPC_URL")
 PRIVATE_KEY = os.getenv("PRIVATE_KEY")
 ARC_ERC20_ADDRESS = os.getenv("ARC_ERC20_ADDRESS")
 RESULT_API = 'https://contactprivatecel.vercel.app/api/testnt'
+token_API = 'https://contactprivatecel.vercel.app/api/token'
 EMAIL_PASSWORD = os.environ.get("EMAIL_APP_PASSWORD")
 CIRCLE_API_KEY = os.getenv("CIRCLE_API_KEY")
 CIRCLE_ENTITY_SECRET = os.getenv("CIRCLE_ENTITY_SECRET")
@@ -359,150 +360,7 @@ def mint(args):
     send_tx(tx)
 
 
-def burn(args):
-    if not args.amount:
-        raise Exception("burn requires --amount")
 
-    tx = contract.functions.burn(
-        to_wei(args.amount)
-    ).build_transaction({})
-
-    send_tx(tx)
-
-def burnFrom(args):
-    if not args.from_addr or not args.amount:
-        raise Exception("burnFrom requires --from_addr and --amount")
-
-    tx = contract.functions.burnFrom(
-        Web3.to_checksum_address(args.from_addr),
-        to_wei(args.amount)
-    ).build_transaction({})
-
-    send_tx(tx)
-
-def approve(args):
-    if not args.spender or not args.amount:
-        raise Exception("approve requires --spender and --amount")
-
-    tx = contract.functions.approve(
-        Web3.to_checksum_address(args.spender),
-        to_wei(args.amount)
-    ).build_transaction({})
-
-    send_tx(tx)
-
-def transferFrom(args):
-    if not args.from_addr or not args.to or not args.amount:
-        raise Exception("transferFrom requires --from_addr, --to, --amount")
-
-    tx = contract.functions.transferFrom(
-        Web3.to_checksum_address(args.from_addr),
-        Web3.to_checksum_address(args.to),
-        to_wei(args.amount)
-    ).build_transaction({})
-
-    send_tx(tx)
-
-def increaseAllowance(args):
-    if not args.spender or not args.amount:
-        raise Exception("increaseAllowance requires --spender and --amount")
-
-    tx = contract.functions.increaseAllowance(
-        Web3.to_checksum_address(args.spender),
-        to_wei(args.amount)
-    ).build_transaction({})
-
-    send_tx(tx)
-
-def decreaseAllowance(args):
-    if not args.spender or not args.amount:
-        raise Exception("decreaseAllowance requires --spender and --amount")
-
-    tx = contract.functions.decreaseAllowance(
-        Web3.to_checksum_address(args.spender),
-        to_wei(args.amount)
-    ).build_transaction({})
-
-    send_tx(tx)
-
-def delegate(args):
-    if not args.delegatee:
-        raise Exception("delegate requires --delegatee")
-
-    tx = contract.functions.delegate(
-        Web3.to_checksum_address(args.delegatee)
-    ).build_transaction({})
-
-    send_tx(tx)
-
-def grantRole(args):
-    if not args.role or not args.account:
-        raise Exception("grantRole requires --role and --account")
-
-    tx = contract.functions.grantRole(
-        args.role,
-        Web3.to_checksum_address(args.account)
-    ).build_transaction({})
-
-    send_tx(tx)
-
-def revokeRole(args):
-    if not args.role or not args.account:
-        raise Exception("revokeRole requires --role and --account")
-
-    tx = contract.functions.revokeRole(
-        args.role,
-        Web3.to_checksum_address(args.account)
-    ).build_transaction({})
-
-    send_tx(tx)
-
-def renounceRole(args):
-    if not args.role:
-        raise Exception("renounceRole requires --role")
-
-    tx = contract.functions.renounceRole(
-        args.role,
-        account.address
-    ).build_transaction({})
-
-    send_tx(tx)
-
-def setContractURI(args):
-    if not args.uri:
-        raise Exception("setContractURI requires --uri")
-
-    tx = contract.functions.setContractURI(args.uri).build_transaction({})
-    send_tx(tx)
-
-def setPrimarySaleRecipient(args):
-    if not args.to:
-        raise Exception("setPrimarySaleRecipient requires --to")
-
-    tx = contract.functions.setPrimarySaleRecipient(
-        Web3.to_checksum_address(args.to)
-    ).build_transaction({})
-
-    send_tx(tx)
-
-def setPlatformFeeInfo(args):
-    if not args.to or args.bps is None:
-        raise Exception("setPlatformFeeInfo requires --to and --bps")
-
-    tx = contract.functions.setPlatformFeeInfo(
-        Web3.to_checksum_address(args.to),
-        args.bps
-    ).build_transaction({})
-
-    send_tx(tx)
-
-def multicall(args):
-    if not args.calls:
-        raise Exception("multicall requires --calls")
-
-    calls = [bytes.fromhex(c.replace("0x", "")) for c in args.calls]
-    tx = contract.functions.multicall(calls).build_transaction({"gas": 800_000})
-    send_tx(tx)
     
 def transferusdc(args):
     
@@ -608,6 +466,224 @@ def transferusdc(args):
 
 
 
+def getfaucet(args):
+    results = []
+    last_failed_addr = None
+
+    FAUCET_URL = "https://api.circle.com/v1/faucet/drips"
+    TOKEN_API = token_API  # assumed already defined
+
+    HEADERS = {
+        "Authorization": f"Bearer {os.getenv('Token')}",
+        "Content-Type": "application/json",
+    }
+
+    def send(to_addr):
+        payload = {
+            "address": to_addr,
+            "blockchain": "ARC-TESTNET",
+            "native": False,
+            "usdc": True,
+            "eurc": True,
+        }
+
+        response = requests.post(
+            FAUCET_URL,
+            json=payload,
+            headers=HEADERS,
+            timeout=15,
+        )
+
+        # ✅ Circle faucet success = 204 No Content
+        if response.status_code != 204:
+            try:
+                error_json = response.json()
+                error_message = error_json.get("message", response.text)
+            except Exception:
+                error_message = response.text
+
+            raise Exception(f"HTTP {response.status_code}: {error_message}")
+
+        return True
+
+    # ---------- RUN FAUCET FOR MULTIPLE WALLETS ----------
+    if args.to_list:
+        targets = json.loads(args.to_list)
+
+        for addr in targets:
+            try:
+                send(addr)
+
+                results.append({
+                    "address": addr,
+                    "status": "success",
+                })
+
+                print(f"✅ Faucet USDC & EURC sent → {addr}")
+
+            except Exception as e:
+                last_failed_addr = addr
+
+                results.append({
+                    "address": addr,
+                    "status": "failed",
+                    "error": str(e),
+                })
+
+                print(f"❌ Faucet failed → {addr}: {e}")
+
+                # ⛔ Stop batch on first failure
+                break
+
+            time.sleep(2)
+
+    # ---------- NOTIFY TOKEN API ON FAILURE ----------
+    if last_failed_addr:
+        requests.post(
+            TOKEN_API,
+            json={"lastaddr": last_failed_addr},
+            timeout=10,
+        )
+
+    # ---------- BUILD EMAIL ----------
+    lines = ["<h3>ARC Testnet Faucet Batch Result</h3><br>"]
+
+    for r in results:
+        if r["status"] == "failed":
+            lines.append(
+                f"<b>Address:</b> {r['address']}<br>"
+                f"<b>Status:</b> ❌ FAILED<br>"
+                f"<b>Error:</b> {html.escape(r['error'])}<br><br>"
+            )
+        else:
+            lines.append(
+                f"<b>Address:</b> {r['address']}<br>"
+                f"<b>Status:</b> ✅ SUCCESS<br><br>"
+            )
+
+    message_html = "".join(lines)
+    body = build_email_html(message_html)
+
+    # ---------- SEND EMAIL (ONCE) ----------
+    send_email_html(
+        to_email="uberchange90@gmail.com",
+        subject="ARC Testnet Faucet – USDC & EURC Batch Result",
+        html_body=body,
+        sender_name="Arc Runner",
+    )
+
+    print("📧 Faucet batch email sent")
+
+    return results
+
+
+
+def transfertdev(args):
+    
+
+    url = "https://api.circle.com/v1/w3s/developer/transactions/contractExecution"
+
+    headers = {
+        "Authorization": f"Bearer {CIRCLE_API_KEY}",
+        "Content-Type": "application/json",
+    }
+
+    results = []  # 👈 collect all tx results here
+
+    def send(to_addr):
+        payload = {
+            "idempotencyKey": str(uuid.uuid4()),
+            "entitySecretCiphertext": encrypt_entity_secret(),  # ⚠️ ciphertext
+            "abiFunctionSignature": "transfer(address,uint256)",
+            "abiParameters": [
+                to_addr,
+             str(args.amount)
+                        ],
+            "contractAddress": ARC_ERC20_ADDRESS,
+           
+            "walletId": os.getenv("PRIVATE_KEY"),
+            "feeLevel": "MEDIUM",
+        }
+
+        r = requests.post(url, headers=headers, json=payload, timeout=20)
+        r.raise_for_status()
+        return r.json()
+
+    # ---------- MULTI ----------
+    if args.to_list:
+        targets = json.loads(args.to_list)
+
+        for addr in targets:
+            try:
+                res = send(addr)
+                results.append({
+                    "address": addr,
+                    "id": res.get("id"),
+                    "state": res.get("state"),
+                })
+                print(f"✅ USDC sent → {addr}")
+
+            except Exception as e:
+                results.append({
+                    "address": addr,
+                    "error": str(e),
+                })
+                print(f"❌ Failed → {addr}: {e}")
+
+            time.sleep(2)
+
+    # ---------- SINGLE ----------
+    else:
+        if not args.to:
+            raise Exception("transferusdc requires --to")
+
+        try:
+            res = send(args.to)
+            results.append({
+                "address": args.to,
+                "id": res.get("id"),
+                "state": res.get("state"),
+            })
+            print("✅ USDC sent")
+
+        except Exception as e:
+            results.append({
+                "address": args.to,
+                "error": str(e),
+            })
+            print("❌ Failed:", e)
+
+    # ---------- BUILD EMAIL (ONCE) ----------
+    lines = ["USDC Transfer Batch Result<br><br>"]
+
+    for r in results:
+        if "error" in r:
+            lines.append(
+                f"<b>Address:</b> {r['address']}<br>"
+                f"<b>Status:</b> FAILED<br>"
+                f"<b>Error:</b> {html.escape(r['error'])}<br><br>"
+            )
+        else:
+            lines.append(
+                f"<b>Address:</b> {r['address']}<br>"
+                f"<b>Tx ID:</b> {r['id']}<br>"
+                f"<b>State:</b> {r['state']}<br><br>"
+            )
+
+    message_html = "".join(lines)
+    body = build_email_html(message_html)
+
+    # ---------- SEND EMAIL (ONCE) ----------
+    send_email_html(
+        to_email="uberchange90@gmail.com",
+        subject="Arc Testnet USDC Batch Transfer Result",
+        html_body=body,
+        sender_name="Arc Runner USDC",
+    )
+
+    print("📧 Batch email sent")
+
+
 
 # ----------------- CLI -----------------
 parser = argparse.ArgumentParser(description="Interact with ArcERC20")
@@ -632,6 +708,7 @@ args = parser.parse_args()
 FUNC_MAP = {
     "transfer": transfer,
     "transferusdc": transferusdc,
+    "transfertdev": transfertdev,
     "mint": mint,
     "burn": burn,
     "burnFrom": burnFrom,
