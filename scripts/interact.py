@@ -710,20 +710,7 @@ FUNC_MAP = {
     "transferusdc": transferusdc,
     "transfertdev": transfertdev,
     "mint": mint,
-    "burn": burn,
-    "burnFrom": burnFrom,
-    "approve": approve,
-    "transferFrom": transferFrom,
-    "increaseAllowance": increaseAllowance,
-    "decreaseAllowance": decreaseAllowance,
-    "delegate": delegate,
-    "grantRole": grantRole,
-    "revokeRole": revokeRole,
-    "renounceRole": renounceRole,
-    "setContractURI": setContractURI,
-    "setPrimarySaleRecipient": setPrimarySaleRecipient,
-    "setPlatformFeeInfo": setPlatformFeeInfo,
-    "multicall": multicall,
+    "getfaucet": getfaucet,
 }
 
 fn = FUNC_MAP.get(args.function)
