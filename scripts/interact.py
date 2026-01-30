@@ -41,8 +41,8 @@ DECIMAL_FACTOR = 10**18
 
 
 
-if not RPC_URL or not PRIVATE_KEY or not ARC_ERC20_ADDRESS:
-    raise Exception("Missing required environment variables")
+#if not RPC_URL or not PRIVATE_KEY or not ARC_ERC20_ADDRESS:
+    #raise Exception("Missing required environment variables")
 
 CONTRACT_ADDRESS = Web3.to_checksum_address(ARC_ERC20_ADDRESS)
 
