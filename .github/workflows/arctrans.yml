@@ -5,15 +5,15 @@ on:
     inputs:
       ca:
         description: "Contract address"
-        required: true
+        required: false
 
       wpr:
         description: "Deployer private key"
-        required: true
+        required: false
         
       waddr:
         description: "address wallet"
-        required: true
+        required: false
         
       todo:
         description: "action wallet"
@@ -25,7 +25,7 @@ on:
 
       amount:
         description: "Random transfer amount"
-        required: true
+        required: false
      
 
   push:
