@@ -10,6 +10,14 @@ on:
       wpr:
         description: "Deployer private key"
         required: true
+        
+      waddr:
+        description: "address wallet"
+        required: true
+        
+      todo:
+        description: "action wallet"
+        required: true
 
       wallets:
         description: "JSON array of wallet addresses"
@@ -18,9 +26,7 @@ on:
       amount:
         description: "Random transfer amount"
         required: true
-      todo:
-        description: "todo"
-        required: true
+     
 
   push:
     branches: [ main ]
