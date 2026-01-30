@@ -40,20 +40,27 @@ def encrypt_entity_secret():
 DECIMAL_FACTOR = 10**18
 
 
+def init_chain():
+    
 
-#if not RPC_URL or not PRIVATE_KEY or not ARC_ERC20_ADDRESS:
-    #raise Exception("Missing required environment variables")
+    if not RPC_URL or not PRIVATE_KEY or not ARC_ERC20_ADDRESS:
+        raise Exception("Missing blockchain environment variables")
 
-CONTRACT_ADDRESS = Web3.to_checksum_address(ARC_ERC20_ADDRESS)
+    with open("ArcERC20_ABI.json") as f:
+        abi = json.load(f)
 
-with open("ArcERC20_ABI.json") as f:
-    ABI = json.load(f)
+    w3 = Web3(Web3.HTTPProvider(RPC_URL))
+    if not w3.is_connected():
+        raise Exception("RPC connection failed")
 
-w3 = Web3(Web3.HTTPProvider(RPC_URL))
-assert w3.is_connected(), "RPC connection failed"
+    account = w3.eth.account.from_key(PRIVATE_KEY)
+    contract = w3.eth.contract(
+        address=Web3.to_checksum_address(ARC_ERC20_ADDRESS),
+        abi=abi
+    )
 
-account = w3.eth.account.from_key(PRIVATE_KEY)
-contract = w3.eth.contract(address=CONTRACT_ADDRESS, abi=ABI)
+    return w3, account, contract
+
 
 
 def build_email_html(message: str) -> str:
@@ -295,6 +302,8 @@ def run_many(tx_builder, targets, sleep_seconds=20):
 # ----------------- Contract Functions -----------------
 
 def transfer(args):
+    w3, account, contract = init_chain()
+
     if not args.amount:
         raise Exception("transfer requires --amount")
 
@@ -332,6 +341,8 @@ def transfer(args):
 
 
 def mint(args):
+    w3, account, contract = init_chain()
+
     if not args.amount:
         raise Exception("mint requires --amount")
 
