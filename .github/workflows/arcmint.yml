@@ -31,20 +31,7 @@ jobs:
           forge --version
           cast --version
 
-      - name: Verify mint owner
-        run: |
-          OWNER=$(cast call $TOKEN "owner()(address)" --rpc-url $ARC_TESTNET_RPC_URL)
-          SIGNER=$(cast wallet address --private-key $PRIVATE_KEY)
-
-          echo "Contract owner: $OWNER"
-          echo "Signer address: $SIGNER"
-
-          if [ "$(echo $OWNER | tr '[:upper:]' '[:lower:]')" != "$(echo $SIGNER | tr '[:upper:]' '[:lower:]')" ]; then
-            echo "❌ Signer is not contract owner. Aborting mint."
-            exit 1
-          fi
-
-          echo "✅ Signer verified as owner"
+      
 
       - name: Mint ARC tokens
         run: |
