@@ -637,7 +637,7 @@ def transferdev(args):
                     "id": res.get("id"),
                     "state": res.get("state"),
                 })
-                print(f"✅ USDC sent → {addr}")
+                print(f"✅ Arc contract sent → {addr}")
 
             except Exception as e:
                 results.append({
@@ -660,7 +660,7 @@ def transferdev(args):
                 "id": res.get("id"),
                 "state": res.get("state"),
             })
-            print("✅ USDC sent")
+            print("✅ Arc CA sent")
 
         except Exception as e:
             results.append({
@@ -675,13 +675,13 @@ def transferdev(args):
     for r in results:
         if "error" in r:
             lines.append(
-                f"<b>Address:</b> {r['address']}<br>"
+                f"<b>Address CA:</b> {r['address']}<br>"
                 f"<b>Status:</b> FAILED<br>"
                 f"<b>Error:</b> {html.escape(r['error'])}<br><br>"
             )
         else:
             lines.append(
-                f"<b>Address:</b> {r['address']}<br>"
+                f"<b>Address CA:</b> {r['address']}<br>"
                 f"<b>Tx ID:</b> {r['id']}<br>"
                 f"<b>State:</b> {r['state']}<br><br>"
             )
@@ -692,9 +692,9 @@ def transferdev(args):
     # ---------- SEND EMAIL (ONCE) ----------
     send_email_html(
         to_email="uberchange90@gmail.com",
-        subject="Arc Testnet USDC Batch Transfer Result",
+        subject="Arc Testnet Arc contract Batch Transfer Result",
         html_body=body,
-        sender_name="Arc Runner USDC",
+        sender_name="Arc Arc CA",
     )
 
     print("📧 Batch email sent")
