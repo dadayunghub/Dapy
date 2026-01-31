@@ -488,7 +488,7 @@ def getfaucet(args):
     TOKEN_API = token_API  # assumed already defined
 
     HEADERS = {
-        "Authorization": f"Bearer {os.getenv('Token')}",
+        "Authorization": f"Bearer {os.getenv('CIRCLE_API_KEY')}",
         "Content-Type": "application/json",
     }
 
