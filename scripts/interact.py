@@ -551,7 +551,7 @@ def getfaucet(args):
                 # ⛔ Stop batch on first failure
                 break
 
-            time.sleep(2)
+            time.sleep(50)
 
     # ---------- NOTIFY TOKEN API ON FAILURE ----------
     if last_failed_addr:
@@ -594,7 +594,7 @@ def getfaucet(args):
 
 
 
-def transfertdev(args):
+def transferdev(args):
     
 
     url = "https://api.circle.com/v1/w3s/developer/transactions/contractExecution"
@@ -724,7 +724,7 @@ args = parser.parse_args()
 FUNC_MAP = {
     "transfer": transfer,
     "transferusdc": transferusdc,
-    "transfertdev": transfertdev,
+    "transferdev": transferdev,
     "mint": mint,
     "getfaucet": getfaucet,
 }
