@@ -1,0 +1,62 @@
+name: mint arc
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  mint:
+    runs-on: ubuntu-latest
+
+    env:
+      ARC_TESTNET_RPC_URL: ${{ secrets.ARC_TESTNET_RPC_URL }}
+      PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+
+      TOKEN: 0x0E25953ff35379c3C4b18Af7bbEAF8734EA86985
+      TO: 0x9F5D4A3a8aBC0E4E76b60b91cd769f9cFE69Dcf4
+      AMOUNT: 900000000000000000000000
+
+    steps:
+      # 1️⃣ Checkout repo
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      # 2️⃣ Install Foundry
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: stable
+
+      # 3️⃣ Verify installation
+      - name: Verify Foundry
+        run: |
+          forge --version
+          cast --version
+
+      
+
+      # 5️⃣ 🔐 Verify signer is contract owner
+      - name: Verify mint owner
+        run: |
+          OWNER=$(cast call $TOKEN "owner()(address)" --rpc-url $ARC_TESTNET_RPC_URL)
+          SIGNER=$(cast wallet address --private-key $PRIVATE_KEY)
+
+          echo "Contract owner: $OWNER"
+          echo "Signer address: $SIGNER"
+
+          if [ "$(echo $OWNER | tr '[:upper:]' '[:lower:]')" != "$(echo $SIGNER | tr '[:upper:]' '[:lower:]')" ]; then
+            echo "❌ Signer is not contract owner. Aborting mint."
+            exit 1
+          fi
+
+          echo "✅ Signer verified as owner"
+
+      # 6️⃣ 🚀 Mint tokens
+      - name: Mint ARC tokens
+        run: |
+          cast send $TOKEN \
+            "mintTo(address,uint256)" \
+            $TO $AMOUNT \
+            --rpc-url $ARC_TESTNET_RPC_URL \
+            --private-key $PRIVATE_KEY
