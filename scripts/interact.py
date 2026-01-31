@@ -146,6 +146,7 @@ def from_wei(amount: int) -> str:
 
 def send_tx(tx, gas=300_000):
     # ---------- PRE-TX BALANCES ----------
+    w3, account, contract = init_chain()
     from_addr = account.address
     to_addr = tx.get("to")
 
@@ -258,6 +259,8 @@ def run_many(tx_builder, targets, sleep_seconds=20):
     targets: list of addresses
     sleep_seconds: delay between txs (IMPORTANT)
     """
+    
+    w3, account, contract = init_chain()
 
     base_nonce = w3.eth.get_transaction_count(account.address)
     results = []
