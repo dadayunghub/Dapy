@@ -254,17 +254,14 @@ def send_batch_tx_email(results, failed=None):
     
 
 def run_many(tx_builder, targets, sleep_seconds=20):
-    """
-    tx_builder: function(target, nonce) -> tx dict
-    targets: list of addresses
-    sleep_seconds: delay between txs (IMPORTANT)
-    """
-    
     w3, account, contract = init_chain()
 
-    base_nonce = w3.eth.get_transaction_count(account.address)
+    # IMPORTANT: use pending nonce
+    base_nonce = w3.eth.get_transaction_count(account.address, "pending")
+
     results = []
     failed = []
+    final_failed = []
 
     print(f"🚀 Starting batch: {len(targets)} txs")
 
@@ -276,28 +273,33 @@ def run_many(tx_builder, targets, sleep_seconds=20):
             results.append(send_tx(tx))
         except Exception as e:
             print(f"❌ Failed (1st pass) for {target}: {e}")
-            failed.append((target, nonce))
+            failed.append((target, nonce, str(e)))
 
-        # ⏱️ IMPORTANT: throttle RPC & mempool
         time.sleep(sleep_seconds)
 
     # ---------- RETRY FAILED (ONCE) ----------
     if failed:
         print(f"🔁 Retrying {len(failed)} failed tx(s)")
 
-    for target, nonce in failed:
+    for target, _, first_err in failed:
         try:
-            tx = tx_builder(target, nonce)
-            send_tx(tx)
+            # ALWAYS refresh nonce before retry
+            retry_nonce = w3.eth.get_transaction_count(
+                account.address, "pending"
+            )
+
+            tx = tx_builder(target, retry_nonce)
+            results.append(send_tx(tx))
+
         except Exception as e:
             print(f"⛔ Final failure for {target}: {e}")
+            final_failed.append((target, retry_nonce, str(e)))
 
-        # ⏱️ throttle retries too
         time.sleep(sleep_seconds)
 
     print("✅ Batch completed")
-    
-    return results, failed
+
+    return results, final_failed
 
 
 
