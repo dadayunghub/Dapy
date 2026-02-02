@@ -72,4 +72,5 @@ jobs:
           cd scripts
           python interact.py $todo \
             --to_list "$wallets" \
-            --amount "$Amount"
+            --amount "$Amount" \
+            --wpr "$PRIVATE_KEY" 

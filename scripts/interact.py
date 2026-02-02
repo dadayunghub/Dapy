@@ -485,6 +485,7 @@ def transferusdc(args):
 def getfaucet(args):
     results = []
     last_failed_addr = None
+    last_processed_addr = None
 
     FAUCET_URL = "https://api.circle.com/v1/faucet/drips"
     TOKEN_API = token_API  # assumed already defined
@@ -495,6 +496,8 @@ def getfaucet(args):
     }
 
     def send(to_addr):
+        last_processed_addr = to_addr
+        last_failed_addr = to_addr
         payload = {
             "address": to_addr,
             "blockchain": "ARC-TESTNET",
@@ -560,6 +563,18 @@ def getfaucet(args):
             json={"lastaddr": last_failed_addr},
             timeout=10,
         )
+        
+    # ---------- NOTIFY TOKEN API ----------
+    if last_processed_addr:
+        requests.post(
+            TOKEN_API,
+            json={
+            "lastaddr": last_processed_addr,
+            "failed": bool(last_failed_addr),
+        },
+        timeout=10,
+        )
+
 
     # ---------- BUILD EMAIL ----------
     lines = ["<h3>ARC Testnet Faucet Batch Result</h3><br>"]
@@ -711,6 +726,7 @@ parser.add_argument("function")
 parser.add_argument("--to")
 parser.add_argument("--from_addr")
 parser.add_argument("--amount")
+parser.add_argument("--wpr")
 parser.add_argument("--spender")
 parser.add_argument("--delegatee")
 parser.add_argument("--role")
