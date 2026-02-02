@@ -17,7 +17,7 @@ on:
         
       todo:
         description: "action wallet"
-        required: true
+        required: false
 
       wallets:
         description: "JSON array of wallet addresses"
@@ -28,8 +28,7 @@ on:
         required: false
      
 
-  push:
-    branches: [ main ]
+  
 
 jobs:
   interact:
