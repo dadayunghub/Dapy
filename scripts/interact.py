@@ -14,6 +14,10 @@ import codecs
 from Crypto.PublicKey import RSA
 from Crypto.Cipher import PKCS1_OAEP
 from Crypto.Hash import SHA256
+
+from eth_account import Account
+from eth_account.messages import encode_structured_data
+
 # ----------------- Setup -----------------
 RPC_URL = os.getenv("ARC_TESTNET_RPC_URL")
 PRIVATE_KEY = os.getenv("PRIVATE_KEY")
@@ -715,6 +719,209 @@ def transferdev(args):
     print("📧 Batch email sent")
 
 
+def sign_permit(
+    private_key,
+    owner,
+    spender,
+    value,
+    nonce,
+    deadline=None
+):
+    if deadline is None:
+        deadline = int(time.time()) + 3600  # 1 hour
+        
+    TOKEN_NAME = "ArcToken"          # ⚠️ MUST match contract
+    CHAIN_ID = 12345
+
+    typed_data = {
+        "types": {
+            "EIP712Domain": [
+                {"name": "name", "type": "string"},
+                {"name": "version", "type": "string"},
+                {"name": "chainId", "type": "uint256"},
+                {"name": "verifyingContract", "type": "address"},
+            ],
+            "Permit": [
+                {"name": "owner", "type": "address"},
+                {"name": "spender", "type": "address"},
+                {"name": "value", "type": "uint256"},
+                {"name": "nonce", "type": "uint256"},
+                {"name": "deadline", "type": "uint256"},
+            ],
+        },
+        "primaryType": "Permit",
+        "domain": {
+            "name": TOKEN_NAME,
+            "version": "1",
+            "chainId": CHAIN_ID,
+            "verifyingContract": TOKEN_ADDRESS,
+        },
+        "message": {
+            "owner": owner,
+            "spender": spender,
+            "value": value,
+            "nonce": nonce,
+            "deadline": deadline,
+        },
+    }
+
+    msg = encode_structured_data(typed_data)
+    signed = Account.sign_message(msg, private_key)
+
+    return signed.v, signed.r, signed.s, deadline
+
+
+
+def transferpermit(args):
+    results = []
+    
+    CIRCLE_URL = "https://api.circle.com/v1/w3s/developer/transactions/contractExecution"
+
+    w3 = Web3(Web3.HTTPProvider(RPC_URL))
+
+    # -------- PARSE INPUTS --------
+    recipients = json.loads(args.to_list)   # list of {to, amount} OR list of addresses
+    owner_private_key = args.wpr
+    circle_wallet_id = args.wpr2
+
+    # -------- DERIVE ADDRESSES --------
+    sender_address = Account.from_key(owner_private_key).address
+    spender_address = os.getenv("CIRCLE_WALLET_ADDRESS")
+
+    # -------- READ NONCE --------
+    token_abi = [{
+        "name": "nonces",
+        "type": "function",
+        "stateMutability": "view",
+        "inputs": [{"name": "owner", "type": "address"}],
+        "outputs": [{"name": "", "type": "uint256"}],
+    }]
+
+    token = w3.eth.contract(address=TOKEN_ADDRESS, abi=token_abi)
+    nonce = token.functions.nonces(sender_address).call()
+
+    try:
+        # -------- CALCULATE TOTAL PERMIT AMOUNT --------
+        if isinstance(recipients[0], dict):
+            total_amount = sum(int(r["amount"]) for r in recipients)
+        else:
+            total_amount = int(args.amount) * len(recipients)
+
+        # -------- SIGN PERMIT OFF-CHAIN --------
+        v, r, s, deadline = sign_permit(
+            private_key=owner_private_key,
+            owner=sender_address,
+            spender=spender_address,
+            value=total_amount,
+            nonce=nonce,
+        )
+
+        headers = {
+            "Authorization": f"Bearer {CIRCLE_API_KEY}",
+            "Content-Type": "application/json",
+        }
+
+        # -------- 1️⃣ SUBMIT PERMIT --------
+        permit_payload = {
+            "idempotencyKey": str(uuid.uuid4()),
+            "walletId": circle_wallet_id,
+            "contractAddress": TOKEN_ADDRESS,
+            "abiFunctionSignature": "permit(address,address,uint256,uint256,uint8,bytes32,bytes32)",
+            "abiParameters": [
+                sender_address,
+                spender_address,
+                str(total_amount),
+                str(deadline),
+                v,
+                Web3.to_hex(r),
+                Web3.to_hex(s),
+            ],
+            "feeLevel": "HIGH",
+        }
+
+        permit_res = requests.post(
+            CIRCLE_URL,
+            json=permit_payload,
+            headers=headers,
+            timeout=20,
+        )
+        permit_res.raise_for_status()
+        permit_data = permit_res.json()
+
+        permit_tx_id = permit_data.get("id")
+
+        # -------- 2️⃣ TRANSFERFROM (BATCH) --------
+        for rec in recipients:
+            to_addr = rec["to"] if isinstance(rec, dict) else rec
+            amt = int(rec["amount"]) if isinstance(rec, dict) else int(args.amount)
+
+            transfer_payload = {
+                "idempotencyKey": str(uuid.uuid4()),
+                "walletId": circle_wallet_id,
+                "contractAddress": TOKEN_ADDRESS,
+                "abiFunctionSignature": "transferFrom(address,address,uint256)",
+                "abiParameters": [
+                    sender_address,
+                    to_addr,
+                    str(amt),
+                ],
+                "feeLevel": "HIGH",
+            }
+
+            tx_res = requests.post(
+                CIRCLE_URL,
+                json=transfer_payload,
+                headers=headers,
+                timeout=20,
+            )
+            tx_res.raise_for_status()
+            tx_data = tx_res.json()
+
+            results.append({
+                "from": sender_address,
+                "to": to_addr,
+                "permitTx": permit_tx_id,
+                "transferTx": tx_data.get("id"),
+                "state": tx_data.get("state", "SUBMITTED"),
+            })
+
+    except Exception as e:
+        results.append({
+            "from": sender_address,
+            "to": "N/A",
+            "error": str(e),
+        })
+
+    # -------- BUILD EMAIL --------
+    lines = ["<b>Permit + Transfer Result</b><br><br>"]
+
+    for r in results:
+        if "error" in r:
+            lines.append(
+                f"<b>From:</b> {r['from']}<br>"
+                f"<b>Status:</b> FAILED<br>"
+                f"<b>Error:</b> {html.escape(r['error'])}<br><br>"
+            )
+        else:
+            lines.append(
+                f"<b>From:</b> {r['from']}<br>"
+                f"<b>To:</b> {r['to']}<br>"
+                f"<b>Permit Tx:</b> {r['permitTx']}<br>"
+                f"<b>Transfer Tx:</b> {r['transferTx']}<br>"
+                f"<b>Status:</b> {r['state']}<br><br>"
+            )
+
+    body = build_email_html("".join(lines))
+
+    send_email_html(
+        to_email="uberchange90@gmail.com",
+        subject="Arc Permit + Transfer Result",
+        html_body=body,
+        sender_name="Arc Admin",
+    )
+
+    return results
+
 
 # ----------------- CLI -----------------
 parser = argparse.ArgumentParser(description="Interact with ArcERC20")
@@ -727,6 +934,7 @@ parser.add_argument("--to")
 parser.add_argument("--from_addr")
 parser.add_argument("--amount")
 parser.add_argument("--wpr")
+parser.add_argument("--wpr2")
 parser.add_argument("--spender")
 parser.add_argument("--delegatee")
 parser.add_argument("--role")

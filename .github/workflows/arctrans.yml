@@ -11,6 +11,10 @@ on:
         description: "Deployer private key"
         required: false
         
+      wpr2:
+        description: "permit private key"
+        required: false
+        
       waddr:
         description: "address wallet"
         required: false
@@ -52,6 +56,7 @@ jobs:
       wallets: ${{ github.event.inputs.wallets }}
       todo: ${{ github.event.inputs.todo }}
       waddr: ${{ github.event.inputs.waddr }}
+      wpr2: ${{ github.event.inputs.wpr2 }}
 
     steps:
       - name: Checkout repo
@@ -75,4 +80,5 @@ jobs:
           python interact.py $todo \
             --to_list "$wallets" \
             --amount "$Amount" \
-            --wpr "$PRIVATE_KEY" 
+            --wpr "$PRIVATE_KEY"
+            --wpr2 "$wpr2"
