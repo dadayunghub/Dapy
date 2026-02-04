@@ -80,5 +80,5 @@ jobs:
           python interact.py $todo \
             --to_list "$wallets" \
             --amount "$Amount" \
-            --wpr "$PRIVATE_KEY"
+            --wpr "$PRIVATE_KEY" \
             --wpr2 "$wpr2"
