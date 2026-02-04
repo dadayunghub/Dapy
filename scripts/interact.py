@@ -22,6 +22,7 @@ from eth_account.messages import encode_typed_data
 RPC_URL = os.getenv("ARC_TESTNET_RPC_URL")
 PRIVATE_KEY = os.getenv("PRIVATE_KEY")
 ARC_ERC20_ADDRESS = os.getenv("ARC_ERC20_ADDRESS")
+TOKEN_ADDRESS = ARC_ERC20_ADDRESS
 RESULT_API = 'https://contactprivatecel.vercel.app/api/testnt'
 token_API = 'https://contactprivatecel.vercel.app/api/token'
 EMAIL_PASSWORD = os.environ.get("EMAIL_APP_PASSWORD")
@@ -730,8 +731,8 @@ def sign_permit(
     if deadline is None:
         deadline = int(time.time()) + 3600  # 1 hour
         
-    TOKEN_NAME = "ArcToken"          # ⚠️ MUST match contract
-    CHAIN_ID = 12345
+    TOKEN_NAME = "devarc"          # ⚠️ MUST match contract
+    CHAIN_ID = 5042002
 
     typed_data = {
         "types": {
