@@ -561,12 +561,12 @@ def getfaucet(args):
             time.sleep(50)
 
     # ---------- NOTIFY TOKEN API ON FAILURE ----------
-    if last_failed_addr:
-        requests.post(
-            TOKEN_API,
-            json={"lastaddr": last_failed_addr},
-            timeout=10,
-        )
+    #if last_failed_addr:
+        #requests.post(
+            #TOKEN_API,
+            #json={"failed": last_failed_addr},
+            #timeout=10,
+        #)
         
     # ---------- NOTIFY TOKEN API ----------
     if last_processed_addr:
@@ -574,7 +574,7 @@ def getfaucet(args):
             TOKEN_API,
             json={
             "lastaddr": last_processed_addr,
-            "failed": bool(last_failed_addr),
+            "failed": last_failed_addr,
         },
         timeout=10,
         )
