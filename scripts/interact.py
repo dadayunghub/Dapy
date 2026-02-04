@@ -947,6 +947,7 @@ args = parser.parse_args()
 
 FUNC_MAP = {
     "transfer": transfer,
+    "transferpermit": transferpermit,
     "transferusdc": transferusdc,
     "transferdev": transferdev,
     "mint": mint,
