@@ -70,7 +70,7 @@ jobs:
       - name: Install Python dependencies
         run: |
           pip install --upgrade pip
-          pip install web3 requests
+          pip install web3 eth-account requests
           pip install pycryptodome
           
 
