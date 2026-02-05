@@ -789,7 +789,7 @@ def transferpermit(args):
     sender_address = Account.from_key(owner_private_key).address
     spender_address = os.getenv("CIRCLE_WALLET_ADDRESS")
     
-    TOKEN_ADDRESSCk = Web3.to_checksum_address(TOKEN_ADDRESS)
+    TOKEN_ADDRESS = Web3.to_checksum_address(TOKEN_ADDRESS)
 
 
     # -------- READ NONCE --------
@@ -801,7 +801,7 @@ def transferpermit(args):
         "outputs": [{"name": "", "type": "uint256"}],
     }]
 
-    token = w3.eth.contract(address=TOKEN_ADDRESSCK, abi=token_abi)
+    token = w3.eth.contract(address=TOKEN_ADDRESS, abi=token_abi)
     nonce = token.functions.nonces(sender_address).call()
 
     try:
