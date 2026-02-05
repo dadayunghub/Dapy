@@ -772,8 +772,8 @@ def sign_permit(
     signed = Account.sign_typed_data(
     private_key=private_key,
     domain_data=domain_data,
-    message_types=message_types,
-    message_data=message_data,
+    message_types=permit_types,
+    message_data=permit_message,
     )
 
 
