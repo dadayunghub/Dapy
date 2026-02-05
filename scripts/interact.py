@@ -17,7 +17,7 @@ from Crypto.Cipher import PKCS1_OAEP
 from Crypto.Hash import SHA256
 
 from eth_account import Account
-from eth_account.messages import encode_structured_data
+from eth_account.messages import encode_typed_data
 
 # ----------------- Setup -----------------
 RPC_URL = os.getenv("ARC_TESTNET_RPC_URL")
@@ -734,44 +734,48 @@ def sign_permit(
 ):
     if deadline is None:
         deadline = int(time.time()) + 3600  # 1 hour
-        
-    TOKEN_NAME = "devarc"          # ⚠️ MUST match contract
+
+    TOKEN_NAME = "devarc"      # MUST match contract
     CHAIN_ID = 5042002
 
-    typed_data = {
-        "types": {
-            "EIP712Domain": [
-                {"name": "name", "type": "string"},
-                {"name": "version", "type": "string"},
-                {"name": "chainId", "type": "uint256"},
-                {"name": "verifyingContract", "type": "address"},
-            ],
-            "Permit": [
-                {"name": "owner", "type": "address"},
-                {"name": "spender", "type": "address"},
-                {"name": "value", "type": "uint256"},
-                {"name": "nonce", "type": "uint256"},
-                {"name": "deadline", "type": "uint256"},
-            ],
-        },
-        "primaryType": "Permit",
-        "domain": {
-            "name": TOKEN_NAME,
-            "version": "1",
-            "chainId": CHAIN_ID,
-            "verifyingContract": TOKEN_ADDRESS,
-        },
-        "message": {
-            "owner": owner,
-            "spender": spender,
-            "value": value,
-            "nonce": nonce,
-            "deadline": deadline,
-        },
+    domain = {
+        "name": TOKEN_NAME,
+        "version": "1",
+        "chainId": CHAIN_ID,
+        "verifyingContract": TOKEN_ADDRESS,
     }
 
-    #msg = encode_typed_data(typed_data)
-    msg = encode_structured_data(primitive=typed_data)
+    types = {
+        "EIP712Domain": [
+            {"name": "name", "type": "string"},
+            {"name": "version", "type": "string"},
+            {"name": "chainId", "type": "uint256"},
+            {"name": "verifyingContract", "type": "address"},
+        ],
+        "Permit": [
+            {"name": "owner", "type": "address"},
+            {"name": "spender", "type": "address"},
+            {"name": "value", "type": "uint256"},
+            {"name": "nonce", "type": "uint256"},
+            {"name": "deadline", "type": "uint256"},
+        ],
+    }
+
+    message = {
+        "owner": owner,
+        "spender": spender,
+        "value": value,
+        "nonce": nonce,
+        "deadline": deadline,
+    }
+
+    msg = encode_typed_data(
+        domain=domain,
+        types=types,
+        message=message,
+        primary_type="Permit",
+    )
+
     signed = Account.sign_message(msg, private_key)
 
     return signed.v, signed.r, signed.s, deadline
