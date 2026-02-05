@@ -38,7 +38,7 @@ jobs:
   interact:
     runs-on: ubuntu-latest
     concurrency:
-      group: arc-testnet-faucet
+      group: arc-${{ github.workflow }}-${{ github.event.inputs.todo }}
       cancel-in-progress: true
 
     env:
