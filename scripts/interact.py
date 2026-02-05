@@ -859,7 +859,7 @@ def debug_encode_typed_data(
         return msg
     except Exception as e:
         print("Encoding failed ❌:", e)
-        return None
+        #return None
 
 
 
