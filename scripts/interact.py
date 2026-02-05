@@ -23,6 +23,7 @@ RPC_URL = os.getenv("ARC_TESTNET_RPC_URL")
 PRIVATE_KEY = os.getenv("PRIVATE_KEY")
 ARC_ERC20_ADDRESS = os.getenv("ARC_ERC20_ADDRESS")
 TOKEN_ADDRESS = ARC_ERC20_ADDRESS
+TOKENCHECK = ""
 RESULT_API = 'https://contactprivatecel.vercel.app/api/testnt'
 token_API = 'https://contactprivatecel.vercel.app/api/token'
 EMAIL_PASSWORD = os.environ.get("EMAIL_APP_PASSWORD")
@@ -789,7 +790,7 @@ def transferpermit(args):
     sender_address = Account.from_key(owner_private_key).address
     spender_address = os.getenv("CIRCLE_WALLET_ADDRESS")
     
-    TOKEN_ADDRESS = Web3.to_checksum_address(TOKEN_ADDRESS)
+    TOKENCHECK = Web3.to_checksum_address(TOKEN_ADDRESS)
 
 
     # -------- READ NONCE --------
@@ -801,7 +802,7 @@ def transferpermit(args):
         "outputs": [{"name": "", "type": "uint256"}],
     }]
 
-    token = w3.eth.contract(address=TOKEN_ADDRESS, abi=token_abi)
+    token = w3.eth.contract(address=TOKENCHECK, abi=token_abi)
     nonce = token.functions.nonces(sender_address).call()
 
     try:
