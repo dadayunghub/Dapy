@@ -723,11 +723,6 @@ def transferdev(args):
 
     print("📧 Batch email sent")
 
-from eth_account import Account
-from eth_account.messages import encode_typed_data
-import time
-from web3 import Web3
-
 
 def sign_permit(
     private_key: str,
