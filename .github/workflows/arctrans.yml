@@ -70,9 +70,20 @@ jobs:
       - name: Install Python dependencies
         run: |
           pip install --upgrade pip
-          pip install web3 eth-account requests
+          pip install web3 requests
+          pip install eth-account
           pip install pycryptodome
           
+      - name: Verify installed versions
+        run: |
+          echo "Python version:"
+          python --version
+
+          echo "pip version:"
+          pip --version
+
+          echo "Installed packages and versions:"
+          pip show web3 eth-account requests pycryptodome
 
       - name: Run interaction script
         run: |
