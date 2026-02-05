@@ -769,12 +769,14 @@ def sign_permit(
         "deadline": deadline,
     }
 
-    signed = Account.sign_typed_data(
-    private_key=private_key,
-    domain_data=domain_data,
-    message_types=permit_types,
-    message_data=permit_message,
+    signable = encode_typed_data(
+        domain_data=domain_data,
+        message_types=message_types,
+        message_data=message_data,
     )
+
+    signed = Account.sign_message(signable, private_key)
+
 
 
     return signed.v, signed.r, signed.s, deadline
