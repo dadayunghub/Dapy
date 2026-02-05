@@ -770,11 +770,36 @@ def sign_permit(
     }
     
     signed = Account.sign_typed_data(
-    private_key=PRIVATE_KEY,
-    domain_data=domain_data,
-    message_types=permit_types,
-    message_data=permit_message,
+    private_key=private_key,
+    full_message={
+        "types": {
+            "EIP712Domain": [
+                {"name": "name", "type": "string"},
+                {"name": "version", "type": "string"},
+                {"name": "chainId", "type": "uint256"},
+                {"name": "verifyingContract", "type": "address"},
+            ],
+            "Permit": [
+                {"name": "owner", "type": "address"},
+                {"name": "spender", "type": "address"},
+                {"name": "value", "type": "uint256"},
+                {"name": "nonce", "type": "uint256"},
+                {"name": "deadline", "type": "uint256"},
+            ],
+        },
+        "primaryType": "Permit",
+        "domain": domain_data,
+        "message": permit_message,
+    },
     )
+
+    
+    #signed = Account.sign_typed_data(
+    #private_key=PRIVATE_KEY,
+    #domain_data=domain_data,
+    #message_types=permit_types,
+    #=permit_message,
+    #)
 
 
     return signed.v, signed.r, signed.s, deadline
