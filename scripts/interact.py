@@ -776,6 +776,9 @@ def sign_permit(
     return signed.v, signed.r, signed.s, deadline
 
 
+def to_token_units(amount, decimals=18):
+    return int(Decimal(str(amount)) * (10 ** decimals))
+
 
 def transferpermit(args):
     results = []
@@ -863,8 +866,7 @@ def transferpermit(args):
         # -------- 2️⃣ TRANSFERFROM (BATCH) --------
         for rec in recipients:
             to_addr = rec["to"] if isinstance(rec, dict) else rec
-            amt = to_token_units(rec["amount"], TOKEN_DECIMALS)
-                if isinstance(rec, dict) else int(args.amount)
+            amt = to_token_units(rec["amount"], TOKEN_DECIMALS) if isinstance(rec, dict) else int(args.amount)
 
             transfer_payload = {
                 "idempotencyKey": str(uuid.uuid4()),
