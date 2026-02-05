@@ -737,7 +737,7 @@ def sign_permit(
     TOKEN_NAME = "devarc"
     CHAIN_ID = 5042002
 
-    full_message = {
+    typed_data = {
         "types": {
             "EIP712Domain": [
                 {"name": "name", "type": "string"},
@@ -769,7 +769,9 @@ def sign_permit(
         },
     }
 
-    msg = encode_typed_data(full_message)
+    # 🔑 THIS is the fix
+    msg = encode_typed_data(primitive=typed_data)
+
     signed = Account.sign_message(msg, private_key)
 
     return signed.v, signed.r, signed.s, deadline
