@@ -723,58 +723,66 @@ def transferdev(args):
 
     print("📧 Batch email sent")
 
+from eth_account import Account
+from eth_account.messages import encode_typed_data
+import time
+from web3 import Web3
+
+
 def sign_permit(
-    private_key,
-    owner,
-    spender,
-    value,
-    nonce,
-    deadline=None
+    private_key: str,
+    owner: str,
+    spender: str,
+    value: int,
+    nonce: int,
+    token_name: str,
+    token_address: str,
+    chain_id: int,
+    deadline: int | None = None,
 ):
     if deadline is None:
-        deadline = int(time.time()) + 3600
+        deadline = int(time.time()) + 3600  # 1 hour
 
-    TOKEN_NAME = "devarc"
-    CHAIN_ID = 5042002
+    owner = Web3.to_checksum_address(owner)
+    spender = Web3.to_checksum_address(spender)
+    token_address = Web3.to_checksum_address(token_address)
 
-    typed_data = {
-        "types": {
-            "EIP712Domain": [
-                {"name": "name", "type": "string"},
-                {"name": "version", "type": "string"},
-                {"name": "chainId", "type": "uint256"},
-                {"name": "verifyingContract", "type": "address"},
-            ],
-            "Permit": [
-                {"name": "owner", "type": "address"},
-                {"name": "spender", "type": "address"},
-                {"name": "value", "type": "uint256"},
-                {"name": "nonce", "type": "uint256"},
-                {"name": "deadline", "type": "uint256"},
-            ],
-        },
-        "primaryType": "Permit",
-        "domain": {
-            "name": TOKEN_NAME,
-            "version": "1",
-            "chainId": CHAIN_ID,
-            "verifyingContract": TOKEN_ADDRESS,
-        },
-        "message": {
-            "owner": owner,
-            "spender": spender,
-            "value": value,
-            "nonce": nonce,
-            "deadline": deadline,
-        },
+    # ---- EIP-712 Domain ----
+    domain_data = {
+        "name": token_name,
+        "version": "1",
+        "chainId": chain_id,
+        "verifyingContract": token_address,
     }
 
-    # 🔑 THIS is the fix
-    msg = encode_typed_data(primitive=typed_data)
+    # ---- Permit struct ONLY ----
+    permit_types = {
+        "Permit": [
+            {"name": "owner", "type": "address"},
+            {"name": "spender", "type": "address"},
+            {"name": "value", "type": "uint256"},
+            {"name": "nonce", "type": "uint256"},
+            {"name": "deadline", "type": "uint256"},
+        ]
+    }
 
-    signed = Account.sign_message(msg, private_key)
+    permit_message = {
+        "owner": owner,
+        "spender": spender,
+        "value": value,
+        "nonce": nonce,
+        "deadline": deadline,
+    }
+
+    signed = Account.sign_typed_data(
+        private_key,
+        domain_data,
+        permit_types,
+        permit_message,
+    )
 
     return signed.v, signed.r, signed.s, deadline
+
 
 
 
@@ -829,6 +837,9 @@ def transferpermit(args):
             spender=spender_address,
             value=total_amount,
             nonce=nonce,
+            token_name="devarc",
+            token_address=TOKEN_ADDRESS,
+            chain_id=5042002,
         )
 
         headers = {
