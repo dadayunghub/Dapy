@@ -770,7 +770,7 @@ def sign_permit(
     }
     
     signed = Account.sign_typed_data(
-    private_key=private_key,
+    private_key=PRIVATE_KEY,
     domain_data=domain_data,
     message_types=permit_types,
     message_data=permit_message,
