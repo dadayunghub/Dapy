@@ -769,6 +769,29 @@ def sign_permit(
         "deadline": deadline,
     }
     
+    full_message = {
+        "types": {
+            "EIP712Domain": [
+                {"name": "name", "type": "string"},
+                {"name": "version", "type": "string"},
+                {"name": "chainId", "type": "uint256"},
+                {"name": "verifyingContract", "type": "address"},
+            ],
+            "Permit": [
+                {"name": "owner", "type": "address"},
+                {"name": "spender", "type": "address"},
+                {"name": "value", "type": "uint256"},
+                {"name": "nonce", "type": "uint256"},
+                {"name": "deadline", "type": "uint256"},
+            ],
+        },
+        "primaryType": "Permit",
+        "domain": domain_data,
+        "message": permit_message,
+    }
+    
+    debug_encode_typed_data(domain_data, permit_types, permit_message, full_message)
+    
     signed = Account.sign_typed_data(
     private_key=private_key,
     full_message={
@@ -804,6 +827,39 @@ def sign_permit(
 
     return signed.v, signed.r, signed.s, deadline
 
+
+def debug_encode_typed_data(
+    domain_data=None,
+    message_types=None,
+    message_data=None,
+    full_message=None
+):
+    # Check which arguments are considered "set"
+    set_args = []
+    if domain_data is not None:
+        set_args.append("domain_data")
+    if message_types is not None:
+        set_args.append("message_types")
+    if message_data is not None:
+        set_args.append("message_data")
+    if full_message is not None:
+        set_args.append("full_message")
+
+    print("Arguments considered 'set':", set_args)
+
+    # You can optionally still call encode_typed_data to see if it would fail
+    try:
+        msg = encode_typed_data(
+            domain_data=domain_data,
+            message_types=message_types,
+            message_data=message_data,
+            full_message=full_message
+        )
+        print("Encoding successful ✅")
+        return msg
+    except Exception as e:
+        print("Encoding failed ❌:", e)
+        return None
 
 
 
