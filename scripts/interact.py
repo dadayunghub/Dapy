@@ -11,6 +11,7 @@ import time
 import uuid
 import base64
 import codecs
+from decimal import Decimal
 from Crypto.PublicKey import RSA
 from Crypto.Cipher import PKCS1_OAEP
 from Crypto.Hash import SHA256
@@ -44,6 +45,8 @@ def encrypt_entity_secret():
 
 
 DECIMAL_FACTOR = 10**18
+TOKEN_DECIMALS = 18
+
 
 
 def init_chain():
@@ -808,7 +811,9 @@ def transferpermit(args):
     try:
         # -------- CALCULATE TOTAL PERMIT AMOUNT --------
         if isinstance(recipients[0], dict):
-            total_amount = sum(int(r["amount"]) for r in recipients)
+            total_amount = sum(
+                to_token_units(r["amount"], TOKEN_DECIMALS)
+                for r in recipients)
         else:
             total_amount = int(args.amount) * len(recipients)
 
@@ -858,7 +863,8 @@ def transferpermit(args):
         # -------- 2️⃣ TRANSFERFROM (BATCH) --------
         for rec in recipients:
             to_addr = rec["to"] if isinstance(rec, dict) else rec
-            amt = int(rec["amount"]) if isinstance(rec, dict) else int(args.amount)
+            amt = to_token_units(rec["amount"], TOKEN_DECIMALS)
+                if isinstance(rec, dict) else int(args.amount)
 
             transfer_payload = {
                 "idempotencyKey": str(uuid.uuid4()),
