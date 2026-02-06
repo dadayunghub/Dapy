@@ -32,7 +32,11 @@ on:
         required: false
      
 
-  
+on:
+  push:
+    branches:
+      - main
+    workflow_dispatch:
 
 jobs:
   interact:
