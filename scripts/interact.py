@@ -808,7 +808,7 @@ def transferpermit(args):
 
     # -------- DERIVE ADDRESSES --------
     sender_address = Account.from_key(owner_private_key).address
-    spender_address = os.getenv("CIRCLE_WALLET_ADDRESS")
+    spender_address = os.getenv("WALLET_ADDRESS")
     
     TOKENCHECK = Web3.to_checksum_address(TOKEN_ADDRESS)
 
