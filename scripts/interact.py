@@ -848,6 +848,16 @@ def transferpermit(args):
             token_address=TOKEN_ADDRESS,
             chain_id=5042002,
         )
+        
+        print("PERMIT DEBUG")
+        print("owner:", sender_address)
+        print("spender:", spender_address)
+        print("value:", total_amount)
+        print("deadline:", deadline)
+        print("v:", v)
+        print("r:", to_bytes32(r))
+        print("s:", to_bytes32(s))
+
 
         headers = {
             "Authorization": f"Bearer {CIRCLE_API_KEY}",
@@ -866,8 +876,8 @@ def transferpermit(args):
                 str(total_amount),
                 str(deadline),
                 v,
-                r,
-                s,
+                Web3.to_hex(r),
+                Web3.to_hex(s),
             ],
             "feeLevel": "HIGH",
         }
