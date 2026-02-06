@@ -875,7 +875,7 @@ def transferpermit(args):
                 spender_address,
                 str(total_amount),
                 str(deadline),
-                v,
+                str(v),
                 Web3.to_hex(r),
                 Web3.to_hex(s),
             ],
