@@ -865,9 +865,9 @@ def transferpermit(args):
                 spender_address,
                 str(total_amount),
                 str(deadline),
-                int(v),
-                to_bytes32(r),
-                to_bytes32(s),
+                v,
+                r,
+                s,
             ],
             "feeLevel": "HIGH",
         }
