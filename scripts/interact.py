@@ -873,7 +873,6 @@ def transferpermit(args):
             CIRCLE_URL,
             json=permit_payload,
             headers=headers,
-            timeout=20,
         )
         permit_res.raise_for_status()
         permit_data = permit_res.json()
@@ -902,7 +901,6 @@ def transferpermit(args):
                 CIRCLE_URL,
                 json=transfer_payload,
                 headers=headers,
-                timeout=20,
             )
             tx_res.raise_for_status()
             tx_data = tx_res.json()
