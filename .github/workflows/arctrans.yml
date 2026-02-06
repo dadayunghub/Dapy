@@ -86,17 +86,7 @@ jobs:
           echo "Installed packages and versions:"
           pip show web3 eth-account requests pycryptodome
           
-      - name: Debug eth-account version and sign_typed_data
-        run: |
-          python - << 'EOF'
-          import eth_account
-          import inspect
-          from eth_account import Account
-
-          print("eth-account version:", eth_account.__version__)
-          print("\n--- Account.sign_typed_data source ---\n")
-          print(inspect.getsource(Account.sign_typed_data))
-          EOF
+      
 
       - name: Run interaction script
         run: |
