@@ -792,6 +792,9 @@ def sign_permit(
 
 def to_token_units(amount, decimals=18):
     return int(Decimal(str(amount)) * (10 ** decimals))
+    
+def to_bytes32(val):
+    return "0x" + val.to_bytes(32, byteorder="big").hex()
 
 
 def transferpermit(args):
@@ -862,9 +865,9 @@ def transferpermit(args):
                 spender_address,
                 str(total_amount),
                 str(deadline),
-                v,
-                Web3.to_hex(r),
-                Web3.to_hex(s),
+                int(v),
+                to_bytes32(r),
+                to_bytes32(s),
             ],
             "feeLevel": "HIGH",
         }
