@@ -32,11 +32,6 @@ on:
         required: false
      
 
-on:
-  push:
-    branches: [ main ]
-  workflow_dispatch:
-
 jobs:
   interact:
     runs-on: ubuntu-latest
