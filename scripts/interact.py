@@ -17,7 +17,7 @@ from Crypto.Cipher import PKCS1_OAEP
 from Crypto.Hash import SHA256
 
 from eth_account import Account
-from eth_account.messages import encode_typed_data
+from eth_account.messages import encode_structured_data
 
 # ----------------- Setup -----------------
 RPC_URL = os.getenv("ARC_TESTNET_RPC_URL")
@@ -743,33 +743,24 @@ def sign_permit(
     token_address = Web3.to_checksum_address(token_address)
 
     # ---- EIP-712 Domain ----
-    domain_data = {
+    domain = {
         "name": token_name,
         "version": "1",
         "chainId": chain_id,
         "verifyingContract": token_address,
     }
 
-    # ---- Permit struct ONLY ----
-    permit_types = {
-        "Permit": [
-            {"name": "owner", "type": "address"},
-            {"name": "spender", "type": "address"},
-            {"name": "value", "type": "uint256"},
-            {"name": "nonce", "type": "uint256"},
-            {"name": "deadline", "type": "uint256"},
-        ]
-    }
-
-    permit_message = {
+    # ---- Permit message ----
+    message = {
         "owner": owner,
         "spender": spender,
         "value": value,
         "nonce": nonce,
         "deadline": deadline,
     }
-    
-    full_message = {
+
+    # ---- Full typed data ----
+    typed_data = {
         "types": {
             "EIP712Domain": [
                 {"name": "name", "type": "string"},
@@ -786,80 +777,16 @@ def sign_permit(
             ],
         },
         "primaryType": "Permit",
-        "domain": domain_data,
-        "message": permit_message,
+        "domain": domain,
+        "message": message,
     }
-    
-    debug_encode_typed_data(domain_data, permit_types, permit_message, full_message)
-    
-    signed = Account.sign_typed_data(
-    private_key=private_key,
-    full_message={
-        "types": {
-            "EIP712Domain": [
-                {"name": "name", "type": "string"},
-                {"name": "version", "type": "string"},
-                {"name": "chainId", "type": "uint256"},
-                {"name": "verifyingContract", "type": "address"},
-            ],
-            "Permit": [
-                {"name": "owner", "type": "address"},
-                {"name": "spender", "type": "address"},
-                {"name": "value", "type": "uint256"},
-                {"name": "nonce", "type": "uint256"},
-                {"name": "deadline", "type": "uint256"},
-            ],
-        },
-        "primaryType": "Permit",
-        "domain": domain_data,
-        "message": permit_message,
-    },
-    )
 
-    
-    #signed = Account.sign_typed_data(
-    #private_key=PRIVATE_KEY,
-    #domain_data=domain_data,
-    #message_types=permit_types,
-    #=permit_message,
-    #)
-
+    signable = encode_structured_data(typed_data)
+    signed = Account.sign_message(signable, private_key)
 
     return signed.v, signed.r, signed.s, deadline
 
 
-def debug_encode_typed_data(
-    domain_data=None,
-    message_types=None,
-    message_data=None,
-    full_message=None
-):
-    # Check which arguments are considered "set"
-    set_args = []
-    if domain_data is not None:
-        set_args.append("domain_data")
-    if message_types is not None:
-        set_args.append("message_types")
-    if message_data is not None:
-        set_args.append("message_data")
-    if full_message is not None:
-        set_args.append("full_message")
-
-    print("Arguments considered 'set':", set_args)
-
-    # You can optionally still call encode_typed_data to see if it would fail
-    try:
-        msg = encode_typed_data(
-            domain_data=domain_data,
-            message_types=message_types,
-            message_data=message_data,
-            full_message=full_message
-        )
-        print("Encoding successful ✅")
-        return msg
-    except Exception as e:
-        print("Encoding failed ❌:", e)
-        #return None
 
 
 
