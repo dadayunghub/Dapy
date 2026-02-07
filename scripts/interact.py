@@ -17,7 +17,7 @@ from Crypto.Cipher import PKCS1_OAEP
 from Crypto.Hash import SHA256
 
 from eth_account import Account
-from eth_account.messages import encode_structured_data
+from eth_account.messages import encode_typed_data
 
 # ----------------- Setup -----------------
 RPC_URL = os.getenv("ARC_TESTNET_RPC_URL")
@@ -758,6 +758,16 @@ def sign_permit(
         "nonce": nonce,
         "deadline": deadline,
     }
+    
+    message_types = {
+        "Permit": [
+            {"name": "owner", "type": "address"},
+            {"name": "spender", "type": "address"},
+            {"name": "value", "type": "uint256"},
+            {"name": "nonce", "type": "uint256"},
+            {"name": "deadline", "type": "uint256"},
+        ]
+    }
 
     # ---- Full typed data ----
     typed_data = {
@@ -780,9 +790,18 @@ def sign_permit(
         "domain": domain,
         "message": message,
     }
-
-    signable = encode_structured_data(typed_data)
+    
+    signable = encode_typed_data(
+        domain_data=domain,
+        message_types=message_types,
+        message_data=message,
+    )
+    
     signed = Account.sign_message(signable, private_key)
+
+
+    #signable = encode_structured_data(typed_data)
+    #signed = Account.sign_message(signable, private_key)
 
     return signed.v, signed.r, signed.s, deadline
 

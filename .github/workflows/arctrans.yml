@@ -68,9 +68,9 @@ jobs:
       - name: Install Python dependencies
         run: |
           pip install --upgrade pip
-          pip install web3==6.15.1
+          pip install web3
           pip install requests
-          pip install eth-account==0.9.0
+          pip install eth-account
           pip install pycryptodome
           
       - name: Verify installed versions
