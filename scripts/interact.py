@@ -920,7 +920,7 @@ def transferpermit(args):
             tx_res.raise_for_status()
             tx_data = tx_res.json()
             print("PERMIT DEBUG Circle t")
-        print("circle t:", tx_data)
+            print("circle t:", tx_data)
 
             results.append({
                 "from": sender_address,
