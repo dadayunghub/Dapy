@@ -806,12 +806,12 @@ def transferpermit(args):
 
     # -------- PARSE INPUTS --------
     recipients = json.loads(args.to_list)   # list of {to, amount} OR list of addresses
-    owner_private_key = args.wpr
+    owner_private_key = PRIVATE_KEY
     circle_wallet_id = args.wpr2
 
     # -------- DERIVE ADDRESSES --------
     sender_address = Account.from_key(owner_private_key).address
-    spender_address = "0xd0f289c197839855634c397Ef58bA33b3b5f25d3"
+    spender_address = WALLET_ADDRESS
     
     TOKENCHECK = Web3.to_checksum_address(TOKEN_ADDRESS)
 
@@ -889,6 +889,8 @@ def transferpermit(args):
         )
         permit_res.raise_for_status()
         permit_data = permit_res.json()
+        print("PERMIT DEBUG Circle")
+        print("circle p:", permit_data)
 
         permit_tx_id = permit_data.get("id")
 
@@ -917,6 +919,8 @@ def transferpermit(args):
             )
             tx_res.raise_for_status()
             tx_data = tx_res.json()
+            print("PERMIT DEBUG Circle t")
+        print("circle t:", tx_data)
 
             results.append({
                 "from": sender_address,
