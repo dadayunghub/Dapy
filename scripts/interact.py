@@ -768,28 +768,6 @@ def sign_permit(
             {"name": "deadline", "type": "uint256"},
         ]
     }
-
-    # ---- Full typed data ----
-    typed_data = {
-        "types": {
-            "EIP712Domain": [
-                {"name": "name", "type": "string"},
-                {"name": "version", "type": "string"},
-                {"name": "chainId", "type": "uint256"},
-                {"name": "verifyingContract", "type": "address"},
-            ],
-            "Permit": [
-                {"name": "owner", "type": "address"},
-                {"name": "spender", "type": "address"},
-                {"name": "value", "type": "uint256"},
-                {"name": "nonce", "type": "uint256"},
-                {"name": "deadline", "type": "uint256"},
-            ],
-        },
-        "primaryType": "Permit",
-        "domain": domain,
-        "message": message,
-    }
     
     signable = encode_typed_data(
         domain_data=domain,
@@ -798,10 +776,6 @@ def sign_permit(
     )
     
     signed = Account.sign_message(signable, private_key)
-
-
-    #signable = encode_structured_data(typed_data)
-    #signed = Account.sign_message(signable, private_key)
 
     return signed.v, signed.r, signed.s, deadline
 
@@ -863,6 +837,47 @@ def transferpermit(args):
                 for r in recipients)
         else:
             total_amount = int(args.amount) * len(recipients)
+            
+        
+        sender_balance = token.functions.balanceOf(sender_address).call()
+
+        print("Sender balance:", sender_balance)
+        print("Permit total amount:", total_amount)
+
+        if sender_balance < total_amount:
+    # mint a random amount higher than total_amount (10%–50% buffer)
+            buffer_multiplier = random.uniform(1.1, 1.5)
+            mint_amount = int(total_amount * buffer_multiplier)
+
+            print("Insufficient balance. Minting:", mint_amount)
+
+            mint_payload = {
+                "idempotencyKey": str(uuid.uuid4()),
+                "walletId": circle_wallet_id,
+                "contractAddress": TOKEN_ADDRESS,
+                "abiFunctionSignature": "mintTo(address,uint256)",
+                "abiParameters": [
+                sender_address,
+                str(mint_amount),
+                ],
+                 "entitySecretCiphertext": encrypt_entity_secret(),
+                "feeLevel": "HIGH",
+                }
+
+        mint_res = requests.post(
+            CIRCLE_URL,
+            json=mint_payload,
+            headers=headers,
+            )
+        mint_res.raise_for_status()
+        mint_data = mint_res.json()
+
+        print("MINT DEBUG Circle")
+        print("circle mint:", mint_data)
+
+    # optional small delay to allow state propagation
+        time.sleep(30)
+
 
         # -------- SIGN PERMIT OFF-CHAIN --------
         v, r, s, deadline = sign_permit(
@@ -876,14 +891,7 @@ def transferpermit(args):
             chain_id=5042002,
         )
         
-        print("Sender token balance:",
-        token.functions.balanceOf(sender_address).call())
-
-        print("Circle wallet token balance:",
-        token.functions.balanceOf(spender_address).call())
-
-
-
+        
         headers = {
             "Authorization": f"Bearer {CIRCLE_API_KEY}",
             "Content-Type": "application/json",
