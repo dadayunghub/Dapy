@@ -911,6 +911,7 @@ def transferpermit(args):
                     str(amt),
                 ],
                 "feeLevel": "HIGH",
+                "entitySecretCiphertext": encrypt_entity_secret(),
             }
 
             tx_res = requests.post(
