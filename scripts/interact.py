@@ -11,6 +11,7 @@ import time
 import uuid
 import base64
 import codecs
+import random
 from decimal import Decimal
 from Crypto.PublicKey import RSA
 from Crypto.Cipher import PKCS1_OAEP
@@ -803,7 +804,7 @@ def mint_tokens(wallet_id, to_address, amount):
     res.raise_for_status()
     data = res.json()
     print("MINT DEBUG Circle", data)
-    time.sleep()
+    time.sleep(20)
     return data
 
 
