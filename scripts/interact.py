@@ -790,7 +790,7 @@ def to_token_units(amount, decimals=18):
 def to_bytes32(val):
     return "0x" + val.to_bytes(32, byteorder="big").hex()
 
-def mint_tokens(wallet_id, to_address, amount, CIRCLE_URL):
+def mint_tokens(wallet_id, to_address, amount, CIRCLE_URL, headers):
     mint_payload = {
         "idempotencyKey": str(uuid.uuid4()),
         "walletId": wallet_id,
@@ -810,6 +810,11 @@ def mint_tokens(wallet_id, to_address, amount, CIRCLE_URL):
 
 def transferpermit(args):
     results = []
+    
+    headers = {
+            "Authorization": f"Bearer {CIRCLE_API_KEY}",
+            "Content-Type": "application/json",
+        }
     
     CIRCLE_URL = "https://api.circle.com/v1/w3s/developer/transactions/contractExecution"
 
@@ -865,7 +870,7 @@ def transferpermit(args):
             buffer_multiplier = random.uniform(1.1, 1.5)
             mint_amount = int(total_amount * buffer_multiplier)
             print("Insufficient balance. Minting:", mint_amount)
-            mint_tokens(circle_wallet_id, sender_address, mint_amount, CIRCLE_URL)
+            mint_tokens(circle_wallet_id, sender_address, mint_amount, CIRCLE_URL, headers)
 
         # -------- SIGN PERMIT OFF-CHAIN --------
         v, r, s, deadline = sign_permit(
@@ -878,12 +883,6 @@ def transferpermit(args):
             token_address=TOKEN_ADDRESS,
             chain_id=5042002,
         )
-        
-        
-        headers = {
-            "Authorization": f"Bearer {CIRCLE_API_KEY}",
-            "Content-Type": "application/json",
-        }
 
         # -------- 1️⃣ SUBMIT PERMIT --------
         permit_payload = {
