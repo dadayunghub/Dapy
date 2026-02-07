@@ -777,6 +777,7 @@ def sign_permit(
     )
     
     signed = Account.sign_message(signable, private_key)
+    time.sleep(20)
 
     return signed.v, signed.r, signed.s, deadline
 
