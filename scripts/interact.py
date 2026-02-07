@@ -869,6 +869,7 @@ def transferpermit(args):
         sender_balance = token.functions.balanceOf(sender_address).call()
 
         print("Sender balance:", sender_balance)
+        print("Sender:", sender_address)
         print("Permit total amount:", total_amount)
         if sender_balance < total_amount:
             buffer_multiplier = random.uniform(1.1, 1.5)
