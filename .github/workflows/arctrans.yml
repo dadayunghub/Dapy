@@ -84,10 +84,7 @@ jobs:
           echo "Installed packages and versions:"
           pip show web3 eth-account requests pycryptodome
           
-      - name: Mask sensitive workflow inputs
-        run: |
-          echo "::add-mask::${{ github.event.inputs.wpr }}"
-          echo "::add-mask::${{ github.event.inputs.wpr2 }}"
+      
           
       - name: Mask env private keys
         run: |
