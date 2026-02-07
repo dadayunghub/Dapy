@@ -642,7 +642,7 @@ def transferdev(args):
                         ],
             "contractAddress": ARC_ERC20_ADDRESS,
            
-            "walletId": os.getenv("PRIVATE_KEY"),
+            "walletId": "57732b92-a9b5-5786-9d93-ca45d6744b06",
             "feeLevel": "MEDIUM",
         }
 
