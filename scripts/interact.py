@@ -926,7 +926,7 @@ def transferpermit(args):
                 "contractAddress": TOKEN_ADDRESS,
                 "abiFunctionSignature": "transferFrom(address,address,uint256)",
                 "abiParameters": [
-                    sender_address,
+                    spender_address,
                     to_addr,
                     str(amt),
                 ],
