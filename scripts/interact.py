@@ -790,7 +790,7 @@ def to_token_units(amount, decimals=18):
 def to_bytes32(val):
     return "0x" + val.to_bytes(32, byteorder="big").hex()
 
-def mint_tokens(wallet_id, to_address, amount):
+def mint_tokens(wallet_id, to_address, amount, CIRCLE_URL):
     mint_payload = {
         "idempotencyKey": str(uuid.uuid4()),
         "walletId": wallet_id,
@@ -865,7 +865,7 @@ def transferpermit(args):
             buffer_multiplier = random.uniform(1.1, 1.5)
             mint_amount = int(total_amount * buffer_multiplier)
             print("Insufficient balance. Minting:", mint_amount)
-            mint_tokens(circle_wallet_id, sender_address, mint_amount)
+            mint_tokens(circle_wallet_id, sender_address, mint_amount, CIRCLE_URL)
 
         # -------- SIGN PERMIT OFF-CHAIN --------
         v, r, s, deadline = sign_permit(
