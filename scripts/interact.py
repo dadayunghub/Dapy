@@ -789,6 +789,23 @@ def to_token_units(amount, decimals=18):
 def to_bytes32(val):
     return "0x" + val.to_bytes(32, byteorder="big").hex()
 
+def mint_tokens(wallet_id, to_address, amount):
+    mint_payload = {
+        "idempotencyKey": str(uuid.uuid4()),
+        "walletId": wallet_id,
+        "contractAddress": TOKEN_ADDRESS,
+        "abiFunctionSignature": "mintTo(address,uint256)",
+        "abiParameters": [to_address, str(amount)],
+        "entitySecretCiphertext": encrypt_entity_secret(),
+        "feeLevel": "HIGH",
+    }
+    res = requests.post(CIRCLE_URL, json=mint_payload, headers=headers)
+    res.raise_for_status()
+    data = res.json()
+    print("MINT DEBUG Circle", data)
+    time.sleep()
+    return data
+
 
 def transferpermit(args):
     results = []
@@ -843,41 +860,11 @@ def transferpermit(args):
 
         print("Sender balance:", sender_balance)
         print("Permit total amount:", total_amount)
-
         if sender_balance < total_amount:
-    # mint a random amount higher than total_amount (10%–50% buffer)
             buffer_multiplier = random.uniform(1.1, 1.5)
             mint_amount = int(total_amount * buffer_multiplier)
-
             print("Insufficient balance. Minting:", mint_amount)
-
-            mint_payload = {
-                "idempotencyKey": str(uuid.uuid4()),
-                "walletId": circle_wallet_id,
-                "contractAddress": TOKEN_ADDRESS,
-                "abiFunctionSignature": "mintTo(address,uint256)",
-                "abiParameters": [
-                sender_address,
-                str(mint_amount),
-                ],
-                 "entitySecretCiphertext": encrypt_entity_secret(),
-                "feeLevel": "HIGH",
-                }
-
-            mint_res = requests.post(
-                CIRCLE_URL,
-                json=mint_payload,
-                headers=headers,
-                )
-            mint_res.raise_for_status()
-            mint_data = mint_res.json()
-
-            print("MINT DEBUG Circle")
-            print("circle mint:", mint_data)
-
-    # optional small delay to allow state propagation
-            time.sleep(30)
-
+            mint_tokens(circle_wallet_id, sender_address, mint_amount)
 
         # -------- SIGN PERMIT OFF-CHAIN --------
         v, r, s, deadline = sign_permit(
