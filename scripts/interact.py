@@ -864,19 +864,19 @@ def transferpermit(args):
                 "feeLevel": "HIGH",
                 }
 
-        mint_res = requests.post(
-            CIRCLE_URL,
-            json=mint_payload,
-            headers=headers,
-            )
-        mint_res.raise_for_status()
-        mint_data = mint_res.json()
+            mint_res = requests.post(
+                CIRCLE_URL,
+                json=mint_payload,
+                headers=headers,
+                )
+            mint_res.raise_for_status()
+            mint_data = mint_res.json()
 
-        print("MINT DEBUG Circle")
-        print("circle mint:", mint_data)
+            print("MINT DEBUG Circle")
+            print("circle mint:", mint_data)
 
     # optional small delay to allow state propagation
-        time.sleep(30)
+            time.sleep(30)
 
 
         # -------- SIGN PERMIT OFF-CHAIN --------
