@@ -623,6 +623,9 @@ def transferdev(args):
     
 
     url = "https://api.circle.com/v1/w3s/developer/transactions/contractExecution"
+    
+    amount = int(float(args.amount) * 10**6)
+
 
     headers = {
         "Authorization": f"Bearer {CIRCLE_API_KEY}",
@@ -638,11 +641,11 @@ def transferdev(args):
             "abiFunctionSignature": "transfer(address,uint256)",
             "abiParameters": [
                 to_addr,
-             str(args.amount)
+             str(amount)
                         ],
             "contractAddress": ARC_ERC20_ADDRESS,
            
-            "walletId": "64ca341e-31dd-5fe0-a43b-64887f28e1c6",
+            "walletId": PRIVATE_KEY,
             "feeLevel": "MEDIUM",
         }
 
