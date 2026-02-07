@@ -842,6 +842,14 @@ def transferpermit(args):
         "stateMutability": "view",
         "inputs": [{"name": "owner", "type": "address"}],
         "outputs": [{"name": "", "type": "uint256"}],
+    },
+    {
+        "name": "balanceOf",
+        "type": "function",
+        "stateMutability": "view",
+        "inputs": [{"name": "account", "type": "address"}],
+        "outputs": [{"name": "", "type": "uint256"}]
+
     }]
 
     token = w3.eth.contract(address=TOKENCHECK, abi=token_abi)
@@ -868,14 +876,12 @@ def transferpermit(args):
             chain_id=5042002,
         )
         
-        print("PERMIT DEBUGg")
-        print("owner:", sender_address)
-        print("spender:", spender_address)
-        print("value:", total_amount)
-        print("deadline:", deadline)
-        print("v:", v)
-        print("r:", to_bytes32(r))
-        print("s:", to_bytes32(s))
+        print("Sender token balance:",
+        token.functions.balanceOf(sender_address).call())
+
+        print("Circle wallet token balance:",
+        token.functions.balanceOf(spender_address).call())
+
 
 
         headers = {
