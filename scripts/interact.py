@@ -849,7 +849,7 @@ def transferpermit(args):
             chain_id=5042002,
         )
         
-        print("PERMIT DEBUG")
+        print("PERMIT DEBUGg")
         print("owner:", sender_address)
         print("spender:", spender_address)
         print("value:", total_amount)
@@ -879,6 +879,7 @@ def transferpermit(args):
                 Web3.to_hex(r),
                 Web3.to_hex(s),
             ],
+            "entitySecretCiphertext": encrypt_entity_secret(),
             "feeLevel": "HIGH",
         }
 
