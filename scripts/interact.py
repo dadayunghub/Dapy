@@ -978,6 +978,9 @@ def transferpermit(args):
         print("circle p:", permit_data)
 
         permit_tx_id = permit_data.get("id")
+        sender_balanceaft = token.functions.balanceOf(sender_address).call()
+
+        print("Sender balance after:", sender_balanceaft)
         #BUFFER = 100 * 10**TOKEN_DECIMALS
         #increase_allowance(
             #spender_address,
