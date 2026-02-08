@@ -1016,6 +1016,9 @@ def transferpermit(args):
             tx_data = tx_res.json()
             print("PERMIT DEBUG Circle t")
             print("circle t:", tx_data)
+            sender_balancef = token.functions.balanceOf(sender_address).call()
+
+            print("Sender balance final:", sender_balancef)
 
             results.append({
                 "from": sender_address,
