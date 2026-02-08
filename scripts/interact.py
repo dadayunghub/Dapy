@@ -920,6 +920,7 @@ def transferpermit(args):
             
             transfer_args = SimpleNamespace(
                 amount=mint_amount,
+                to_list=None,
                 to=sender_address)
             transferdev(transfer_args)
             time.sleep(20)
