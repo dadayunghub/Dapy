@@ -838,7 +838,7 @@ def to_bytes32(val):
 def mint_tokens(wallet_id, to_address, amount, CIRCLE_URL, headers):
     mint_payload = {
         "idempotencyKey": str(uuid.uuid4()),
-        "walletId": wallet_id,
+        "walletId": "64ca341e-31dd-5fe0-a43b-64887f28e1c6",
         "contractAddress": TOKEN_ADDRESS,
         "abiFunctionSignature": "mintTo(address,uint256)",
         "abiParameters": [to_address, str(amount)],
