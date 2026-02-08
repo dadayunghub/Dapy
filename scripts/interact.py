@@ -624,10 +624,10 @@ def transferdev(args):
     
 
     url = "https://api.circle.com/v1/w3s/developer/transactions/contractExecution"
-    if args.amount
+    if args.amount:
         amount = int(float(args.amount) * 10**6)
     else:
-        if args.amt
+        if args.amt:
             amount = args.amt
 
 
