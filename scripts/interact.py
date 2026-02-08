@@ -906,6 +906,7 @@ def transferpermit(args):
             BUFFER = max(
                 max(to_token_units(r["amount"], TOKEN_DECIMALS) for r in recipients),
                 10 * 10**TOKEN_DECIMALS)
+            permit_value = total_amount + BUFFER
         else:
             total_amount = int(args.amount) * len(recipients)
             
@@ -915,14 +916,14 @@ def transferpermit(args):
         print("Sender balance:", sender_balance)
         print("Sender:", sender_address)
         print("Permit total amount:", total_amount)
-        if sender_balance < total_amount:
+        if sender_balance < permit_value:
             buffer_multiplier = random.uniform(1.1, 1.5)
             mint_amount = int(total_amount * buffer_multiplier)
             print("Insufficient balance. Minting:", mint_amount)
-            mint_tokens(circle_wallet_id, sender_address, mint_amount, CIRCLE_URL, headers)
+            mint_tokens(circle_wallet_id, sender_address, permit_value, CIRCLE_URL, headers)
 
         # -------- SIGN PERMIT OFF-CHAIN --------
-        permit_value = total_amount + BUFFER
+        
         v, r, s, deadline = sign_permit(
             private_key=owner_private_key,
             owner=sender_address,
