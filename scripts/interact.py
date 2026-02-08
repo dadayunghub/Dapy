@@ -12,6 +12,7 @@ import uuid
 import base64
 import codecs
 import random
+from types import SimpleNamespace
 from decimal import Decimal
 from Crypto.PublicKey import RSA
 from Crypto.Cipher import PKCS1_OAEP
@@ -916,7 +917,12 @@ def transferpermit(args):
             buffer_multiplier = random.uniform(1.1, 1.5)
             mint_amount = int(total_amount * buffer_multiplier)
             print("Insufficient balance. Minting:", mint_amount)
-            mint_tokens(circle_wallet_id, sender_address, mint_amount, CIRCLE_URL, headers)
+            
+            transfer_args = SimpleNamespace(
+                amount=mint_amount,
+                to=sender_address)
+                transferdev(transfer_args)
+                time.sleep(20)
 
         # -------- SIGN PERMIT OFF-CHAIN --------
         v, r, s, deadline = sign_permit(
