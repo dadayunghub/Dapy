@@ -921,7 +921,7 @@ def transferpermit(args):
             transfer_args = SimpleNamespace(
                 amount=mint_amount,
                 to=sender_address)
-                transferdev(transfer_args)
+            transferdev(transfer_args)
                 time.sleep(20)
 
         # -------- SIGN PERMIT OFF-CHAIN --------
