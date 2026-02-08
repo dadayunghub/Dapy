@@ -624,8 +624,11 @@ def transferdev(args):
     
 
     url = "https://api.circle.com/v1/w3s/developer/transactions/contractExecution"
-    
-    amount = int(float(args.amount) * 10**6)
+    if args.amount
+        amount = int(float(args.amount) * 10**6)
+    else:
+        if args.amt
+            amount = args.amt
 
 
     headers = {
@@ -919,7 +922,8 @@ def transferpermit(args):
             print("Insufficient balance. Minting:", mint_amount)
             
             transfer_args = SimpleNamespace(
-                amount=mint_amount,
+                amt=mint_amount,
+                amount=None,
                 to_list=None,
                 to=sender_address)
             transferdev(transfer_args)
@@ -1063,6 +1067,7 @@ parser.add_argument("--from_addr")
 parser.add_argument("--amount")
 parser.add_argument("--wpr")
 parser.add_argument("--wpr2")
+parser.add_argument("--amt")
 parser.add_argument("--spender")
 parser.add_argument("--delegatee")
 parser.add_argument("--role")
