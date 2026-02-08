@@ -627,9 +627,11 @@ def transferdev(args):
     if args.amount is not None:
     # amount is HUMAN (e.g. 1.5 USDC)
         amount = int(Decimal(str(args.amount)) * (10 ** TOKEN_DECIMALS))
+        wall = PRIVATE_KEY
     elif args.amt is not None:
     # amt is ALREADY in base units
         amount = int(args.amt)
+        wall = args.walletid
     else:
         raise Exception("No amount provided")
 
@@ -653,7 +655,7 @@ def transferdev(args):
                         ],
             "contractAddress": ARC_ERC20_ADDRESS,
            
-            "walletId": PRIVATE_KEY,
+            "walletId": wall,
             "feeLevel": "MEDIUM",
         }
 
@@ -929,6 +931,7 @@ def transferpermit(args):
                 amt=mint_amount,
                 amount=None,
                 to_list=None,
+                walletid=circle_wallet_id,
                 to=sender_address)
             transferdev(transfer_args)
             time.sleep(20)
@@ -1070,6 +1073,7 @@ parser.add_argument("--to")
 parser.add_argument("--from_addr")
 parser.add_argument("--amount")
 parser.add_argument("--wpr")
+parser.add_argument("--walletid")
 parser.add_argument("--wpr2")
 parser.add_argument("--amt")
 parser.add_argument("--spender")
