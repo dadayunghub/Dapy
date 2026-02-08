@@ -624,11 +624,15 @@ def transferdev(args):
     
 
     url = "https://api.circle.com/v1/w3s/developer/transactions/contractExecution"
-    if args.amount:
-        amount = int(float(args.amount) * 10**6)
+    if args.amount is not None:
+    # amount is HUMAN (e.g. 1.5 USDC)
+        amount = int(Decimal(str(args.amount)) * (10 ** TOKEN_DECIMALS))
+    elif args.amt is not None:
+    # amt is ALREADY in base units
+        amount = int(args.amt)
     else:
-        if args.amt:
-            amount = args.amt
+        raise Exception("No amount provided")
+
 
 
     headers = {
