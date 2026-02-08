@@ -786,6 +786,47 @@ def sign_permit(
 
 
 
+CIRCLE_TX_URL = "https://api.circle.com/v1/w3s/developer/transactions/contractExecution"
+
+def increase_allowance(
+    spender_address: str,
+    amount: int,
+    wallet_id,
+    CIRCLE_URL,
+    headers
+):
+    """
+    Increase ERC20 allowance using Circle smart wallet
+    """
+
+    payload = {
+        "idempotencyKey": str(uuid.uuid4()),
+        "entitySecretCiphertext": encrypt_entity_secret(),
+        "abiFunctionSignature": "increaseAllowance(address,uint256)",
+        "abiParameters": [
+            spender_address,
+            str(amount),
+        ],
+        "contractAddress": TOKEN_ADDRESS,
+        "walletId": wallet_id,
+        "feeLevel": "HIGH",
+    }
+
+    r = requests.post(
+        CIRCLE_URL,
+        headers=headers,
+        json=payload,
+        timeout=20
+    )
+
+    r.raise_for_status()
+    
+    data = r.json()
+    print("allowance DEBUG Circle", data)
+    time.sleep(20)
+    return data
+    
+
 
 
 def to_token_units(amount, decimals=18):
@@ -862,6 +903,9 @@ def transferpermit(args):
             total_amount = sum(
                 to_token_units(r["amount"], TOKEN_DECIMALS)
                 for r in recipients)
+            BUFFER = max(
+                max(to_token_units(r["amount"], TOKEN_DECIMALS) for r in recipients),
+                10 * 10**TOKEN_DECIMALS)
         else:
             total_amount = int(args.amount) * len(recipients)
             
@@ -878,11 +922,12 @@ def transferpermit(args):
             mint_tokens(circle_wallet_id, sender_address, mint_amount, CIRCLE_URL, headers)
 
         # -------- SIGN PERMIT OFF-CHAIN --------
+        permit_value = total_amount + BUFFER
         v, r, s, deadline = sign_permit(
             private_key=owner_private_key,
             owner=sender_address,
             spender=spender_address,
-            value=total_amount,
+            value=permit_value,
             nonce=nonce,
             token_name="devarc",
             token_address=TOKEN_ADDRESS,
@@ -919,6 +964,14 @@ def transferpermit(args):
         print("circle p:", permit_data)
 
         permit_tx_id = permit_data.get("id")
+        #BUFFER = 100 * 10**TOKEN_DECIMALS
+        #increase_allowance(
+            #spender_address,
+            #amount=total_amount + BUFFER,
+            #circle_wallet_id, 
+            #CIRCLE_URL, headers
+            
+        #)
 
         # -------- 2️⃣ TRANSFERFROM (BATCH) --------
         for rec in recipients:
