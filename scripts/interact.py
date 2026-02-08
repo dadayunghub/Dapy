@@ -982,13 +982,13 @@ def transferpermit(args):
 
         print("Sender balance after:", sender_balanceaft)
         #BUFFER = 100 * 10**TOKEN_DECIMALS
-        #increase_allowance(
-            #spender_address,
-            #amount=total_amount + BUFFER,
-            #circle_wallet_id, 
-            #CIRCLE_URL, headers
+        increase_allowance(
+            spender_address,
+            amount=mint_amount,
+            circle_wallet_id, 
+            CIRCLE_URL, headers
             
-        #)
+        )
 
         # -------- 2️⃣ TRANSFERFROM (BATCH) --------
         for rec in recipients:
