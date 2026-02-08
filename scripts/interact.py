@@ -1016,10 +1016,7 @@ def transferpermit(args):
             tx_data = tx_res.json()
             print("PERMIT DEBUG Circle t")
             print("circle t:", tx_data)
-            sender_balancef = token.functions.balanceOf(sender_address).call()
-
-            print("Sender balance final:", sender_balancef)
-
+            
             results.append({
                 "from": sender_address,
                 "to": to_addr,
@@ -1037,6 +1034,10 @@ def transferpermit(args):
 
     # -------- BUILD EMAIL --------
     lines = ["<b>Permit + Transfer Result</b><br><br>"]
+    sender_balancef = token.functions.balanceOf(sender_address).call()
+
+    print("Sender balance final:", sender_balancef)
+
 
     for r in results:
         if "error" in r:
