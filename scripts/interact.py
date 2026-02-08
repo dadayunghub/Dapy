@@ -986,9 +986,7 @@ def transferpermit(args):
             spender_address,
             amount=mint_amount,
             circle_wallet_id, 
-            CIRCLE_URL, headers
-            
-        )
+            CIRCLE_URL, headers)
 
         # -------- 2️⃣ TRANSFERFROM (BATCH) --------
         for rec in recipients:
