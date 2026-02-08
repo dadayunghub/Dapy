@@ -999,7 +999,7 @@ def transferpermit(args):
                 "contractAddress": TOKEN_ADDRESS,
                 "abiFunctionSignature": "transferFrom(address,address,uint256)",
                 "abiParameters": [
-                    spender_address,
+                    sender_address,
                     to_addr,
                     str(amt),
                 ],
