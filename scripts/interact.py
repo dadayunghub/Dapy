@@ -802,8 +802,7 @@ def increase_allowance(
     spender_address: str,
     amount: int,
     wallet_id,
-    CIRCLE_URL,
-    headers
+    CIRCLE_URL
 ):
     """
     Increase ERC20 allowance using Circle smart wallet
@@ -821,6 +820,11 @@ def increase_allowance(
         "walletId": wallet_id,
         "feeLevel": "HIGH",
     }
+    
+    headers = {
+            "Authorization": f"Bearer {CIRCLE_API_KEY}",
+            "Content-Type": "application/json",
+        }
 
     r = requests.post(
         CIRCLE_URL,
@@ -986,7 +990,7 @@ def transferpermit(args):
             spender_address,
             amount=mint_amount,
             circle_wallet_id, 
-            CIRCLE_URL, headers)
+            CIRCLE_URL)
 
         # -------- 2️⃣ TRANSFERFROM (BATCH) --------
         for rec in recipients:
