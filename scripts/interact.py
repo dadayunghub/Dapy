@@ -33,6 +33,7 @@ EMAIL_PASSWORD = os.environ.get("EMAIL_APP_PASSWORD")
 CIRCLE_API_KEY = os.getenv("CIRCLE_API_KEY")
 CIRCLE_ENTITY_SECRET = os.getenv("CIRCLE_ENTITY_SECRET")
 WALLET_ADDRESS = os.getenv("WALLET_ADDRESS")
+dl = random.uniform(10, 60)
 
 def encrypt_entity_secret():
     PUBLICK = os.getenv("PUBLICK").replace("\\n", "\n")
@@ -286,7 +287,7 @@ def run_many(tx_builder, targets, sleep_seconds=20):
             print(f"❌ Failed (1st pass) for {target}: {e}")
             failed.append((target, nonce, str(e)))
 
-        time.sleep(sleep_seconds)
+        time.sleep(dl)
 
     # ---------- RETRY FAILED (ONCE) ----------
     if failed:
@@ -306,7 +307,7 @@ def run_many(tx_builder, targets, sleep_seconds=20):
             print(f"⛔ Final failure for {target}: {e}")
             final_failed.append((target, retry_nonce, str(e)))
 
-        time.sleep(sleep_seconds)
+        time.sleep(dl)
 
     print("✅ Batch completed")
 
@@ -438,7 +439,7 @@ def transferusdc(args):
                 })
                 print(f"❌ Failed → {addr}: {e}")
 
-            time.sleep(2)
+            time.sleep(dl)
 
     # ---------- SINGLE ----------
     else:
@@ -565,7 +566,7 @@ def getfaucet(args):
                 # ⛔ Stop batch on first failure
                 break
 
-            time.sleep(50)
+            time.sleep(dl)
 
     # ---------- NOTIFY TOKEN API ON FAILURE ----------
     #if last_failed_addr:
@@ -684,7 +685,7 @@ def transferdev(args):
                 })
                 print(f"❌ Failed → {addr}: {e}")
 
-            time.sleep(2)
+            time.sleep(dl)
 
     # ---------- SINGLE ----------
     else:
@@ -790,7 +791,7 @@ def sign_permit(
     )
     
     signed = Account.sign_message(signable, private_key)
-    time.sleep(20)
+    time.sleep(dl)
 
     return signed.v, signed.r, signed.s, deadline
 
@@ -833,7 +834,7 @@ def increase_allowance(
     
     data = r.json()
     print("allowance DEBUG Circle", data)
-    time.sleep(20)
+    time.sleep(dl)
     return data
     
 
@@ -859,7 +860,7 @@ def mint_tokens(wallet_id, to_address, amount, CIRCLE_URL, headers):
     res.raise_for_status()
     data = res.json()
     print("MINT DEBUG Circle", data)
-    time.sleep(20)
+    time.sleep(dl)
     return data
 
 
@@ -934,7 +935,7 @@ def transferpermit(args):
                 walletid=circle_wallet_id,
                 to=sender_address)
             transferdev(transfer_args)
-            time.sleep(20)
+            time.sleep(dl)
 
         # -------- SIGN PERMIT OFF-CHAIN --------
         v, r, s, deadline = sign_permit(
@@ -981,6 +982,7 @@ def transferpermit(args):
         sender_balanceaft = token.functions.balanceOf(sender_address).call()
 
         print("Sender balance after:", sender_balanceaft)
+        time.sleep(dl)
         #BUFFER = 100 * 10**TOKEN_DECIMALS
         increase_allowance(
             spender_address,
@@ -1016,6 +1018,7 @@ def transferpermit(args):
             tx_data = tx_res.json()
             print("PERMIT DEBUG Circle t")
             print("circle t:", tx_data)
+            time.sleep(dl)
             
             results.append({
                 "from": sender_address,
@@ -1065,6 +1068,117 @@ def transferpermit(args):
     )
 
     return results
+    
+def nftmint(args):
+    
+
+    url = "https://api.circle.com/v1/w3s/developer/transactions/contractExecution"
+    if args.uri is not None:
+    
+        uri = args.uri
+    
+
+
+
+    headers = {
+        "Authorization": f"Bearer {CIRCLE_API_KEY}",
+        "Content-Type": "application/json",
+    }
+
+    results = []  # 👈 collect all tx results here
+
+    def send(to_addr):
+        payload = {
+            "idempotencyKey": str(uuid.uuid4()),
+            "entitySecretCiphertext": encrypt_entity_secret(),  # ⚠️ ciphertext
+            "abiFunctionSignature": "mintTo(address,string)",
+            "abiParameters": [
+                to_addr,
+                uri
+                        ],
+            "contractAddress": ARC_ERC20_ADDRESS,
+           
+            "walletId": PRIVATE_KEY,
+            "feeLevel": "MEDIUM",
+        }
+
+        r = requests.post(url, headers=headers, json=payload, timeout=20)
+        r.raise_for_status()
+        return r.json()
+
+    # ---------- MULTI ----------
+    if args.to_list:
+        targets = json.loads(args.to_list)
+
+        for addr in targets:
+            try:
+                res = send(addr)
+                results.append({
+                    "address": addr,
+                    "id": res.get("id"),
+                    "state": res.get("state"),
+                })
+                print(f"✅ Arc nft contract sent → {addr}")
+
+            except Exception as e:
+                results.append({
+                    "address": addr,
+                    "error": str(e),
+                })
+                print(f"❌ Failed → {addr}: {e}")
+
+            time.sleep(dl)
+
+    # ---------- SINGLE ----------
+    else:
+        if not args.to:
+            raise Exception("transferusdc requires --to")
+
+        try:
+            res = send(args.to)
+            results.append({
+                "address": args.to,
+                "id": res.get("id"),
+                "state": res.get("state"),
+            })
+            print("✅ Arc CA sent")
+
+        except Exception as e:
+            results.append({
+                "address": args.to,
+                "error": str(e),
+            })
+            print("❌ Failed:", e)
+
+    # ---------- BUILD EMAIL (ONCE) ----------
+    lines = ["nft Transfer Batch Result<br><br>"]
+
+    for r in results:
+        if "error" in r:
+            lines.append(
+                f"<b>Address CA:</b> {r['address']}<br>"
+                f"<b>Status:</b> FAILED<br>"
+                f"<b>Error:</b> {html.escape(r['error'])}<br><br>"
+            )
+        else:
+            lines.append(
+                f"<b>Address CA:</b> {r['address']}<br>"
+                f"<b>Tx ID:</b> {r['id']}<br>"
+                f"<b>State:</b> {r['state']}<br><br>"
+            )
+
+    message_html = "".join(lines)
+    body = build_email_html(message_html)
+
+    # ---------- SEND EMAIL (ONCE) ----------
+    send_email_html(
+        to_email="uberchange90@gmail.com",
+        subject="Arc Testnet nft Arc contract Batch Transfer Result",
+        html_body=body,
+        sender_name="Arc nft CA",
+    )
+
+    print("📧 Batch email sent")
 
 
 # ----------------- CLI -----------------
@@ -1094,6 +1208,7 @@ args = parser.parse_args()
 FUNC_MAP = {
     "transfer": transfer,
     "transferpermit": transferpermit,
+    "nftmint": nftmint,
     "transferusdc": transferusdc,
     "transferdev": transferdev,
     "mint": mint,

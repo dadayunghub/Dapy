@@ -30,6 +30,9 @@ on:
       amount:
         description: "Random transfer amount"
         required: false
+      uri:
+        description: "uri"
+        required: false
      
 
 jobs:
@@ -55,6 +58,7 @@ jobs:
       todo: ${{ github.event.inputs.todo }}
       waddr: ${{ github.event.inputs.waddr }}
       wpr2: ${{ github.event.inputs.wpr2 }}
+      uri: ${{ github.event.inputs.uri }}
 
     steps:
       - name: Checkout repo
@@ -88,8 +92,13 @@ jobs:
           
       - name: Mask env private keys
         run: |
+          if [ -n "$PRIVATE_KEY" ]; then
           echo "::add-mask::$PRIVATE_KEY"
+          fi
+
+          if [ -n "$wpr2" ]; then
           echo "::add-mask::$wpr2"
+          fi
 
 
 
@@ -100,4 +109,5 @@ jobs:
             --to_list "$wallets" \
             --amount "$Amount" \
             --wpr "$PRIVATE_KEY" \
-            --wpr2 "$wpr2"
+            --wpr2 "$wpr2" \
+            --uri "$uri"
