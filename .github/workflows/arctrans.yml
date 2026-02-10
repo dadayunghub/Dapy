@@ -61,6 +61,16 @@ jobs:
       uri: ${{ github.event.inputs.uri }}
 
     steps:
+      - name: Mask env private keys
+        run: |
+          if [ -n "$PRIVATE_KEY" ]; then
+          echo "::add-mask::$PRIVATE_KEY"
+          fi
+
+          if [ -n "$wpr2" ]; then
+          echo "::add-mask::$wpr2"
+          fi
+          
       - name: Checkout repo
         uses: actions/checkout@v4
 
@@ -87,18 +97,6 @@ jobs:
 
           echo "Installed packages and versions:"
           pip show web3 eth-account requests pycryptodome
-          
-      
-          
-      - name: Mask env private keys
-        run: |
-          if [ -n "$PRIVATE_KEY" ]; then
-          echo "::add-mask::$PRIVATE_KEY"
-          fi
-
-          if [ -n "$wpr2" ]; then
-          echo "::add-mask::$wpr2"
-          fi
 
 
 
