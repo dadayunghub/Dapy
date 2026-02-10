@@ -62,14 +62,10 @@ jobs:
 
     steps:
       - name: Mask env private keys
+        shell: bash
         run: |
-          if [ -n "$PRIVATE_KEY" ]; then
-          echo "::add-mask::$PRIVATE_KEY"
-          fi
-
-          if [ -n "$wpr2" ]; then
-          echo "::add-mask::$wpr2"
-          fi
+          echo "::add-mask::${PRIVATE_KEY}"
+          echo "::add-mask::${wpr2}"
           
       - name: Checkout repo
         uses: actions/checkout@v4
