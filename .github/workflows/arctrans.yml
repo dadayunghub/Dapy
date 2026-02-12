@@ -7,11 +7,11 @@ on:
         description: "Contract address"
         required: false
 
-      wpr:
+      wpre:
         description: "Deployer private key"
         required: false
         
-      wpr2:
+      wpr2e:
         description: "permit private key"
         required: false
         
