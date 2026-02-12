@@ -48,6 +48,7 @@ jobs:
       CIRCLE_API_KEY: ${{ secrets.CIRCLE_API_KEY }}
       CIRCLE_ENTITY_SECRET: ${{ secrets.CIRCLE_ENTITY_SECRET }}
       PUBLICK: ${{ secrets.PUBLICK }}
+      secret: ${{ secrets.SECRET }}
 
       # 👇 from workflow_dispatch inputs
       WALLET_ADDRESS: ${{ github.event.inputs.waddr }}
@@ -61,12 +62,7 @@ jobs:
       uri: ${{ github.event.inputs.uri }}
 
     steps:
-      - name: Mask env private keys
-        shell: bash
-        run: |
-          echo "::add-mask::${PRIVATE_KEY}"
-          echo "::add-mask::${wpr2}"
-          
+      
       - name: Checkout repo
         uses: actions/checkout@v4
 

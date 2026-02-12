@@ -17,13 +17,19 @@ from decimal import Decimal
 from Crypto.PublicKey import RSA
 from Crypto.Cipher import PKCS1_OAEP
 from Crypto.Hash import SHA256
-
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import pad, unpad
 from eth_account import Account
 from eth_account.messages import encode_typed_data
 
 # ----------------- Setup -----------------
 RPC_URL = os.getenv("ARC_TESTNET_RPC_URL")
-PRIVATE_KEY = os.getenv("PRIVATE_KEY")
+encrypted_pk = os.getenv("PRIVATE_KEY")
+
+secret = os.getenv("secret")
+if encrypted_pk:
+    PRIVATE_KEY = decrypt_aes256(encrypted_pk, secret)
+
 ARC_ERC20_ADDRESS = os.getenv("ARC_ERC20_ADDRESS")
 TOKEN_ADDRESS = ARC_ERC20_ADDRESS
 TOKENCHECK = ""
@@ -49,6 +55,22 @@ def encrypt_entity_secret():
 
 DECIMAL_FACTOR = 10**18
 TOKEN_DECIMALS = 18
+
+def derive_key(secret: str) -> bytes:
+    return SHA256.new(secret.encode()).digest()  # 32 bytes
+
+def decrypt_aes256(encrypted_text: str, secret: str) -> str:
+    key = derive_key(secret)
+    raw = base64.b64decode(encrypted_text)
+    
+    iv = raw[:16]
+    ciphertext = raw[16:]
+    
+    cipher = AES.new(key, AES.MODE_CBC, iv)
+    decrypted = unpad(cipher.decrypt(ciphertext), AES.block_size)
+    
+    return decrypted.decode()
+
 
 
 
@@ -879,7 +901,7 @@ def transferpermit(args):
     # -------- PARSE INPUTS --------
     recipients = json.loads(args.to_list)   # list of {to, amount} OR list of addresses
     owner_private_key = PRIVATE_KEY
-    circle_wallet_id = args.wpr2
+    circle_wallet_id = decrypt_aes256(args.wpr2, secret)
 
     # -------- DERIVE ADDRESSES --------
     sender_address = Account.from_key(owner_private_key).address
