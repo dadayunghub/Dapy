@@ -27,9 +27,6 @@ RPC_URL = os.getenv("ARC_TESTNET_RPC_URL")
 encrypted_pk = os.getenv("PRIVATE_KEY")
 
 secret = os.getenv("secret")
-if encrypted_pk:
-    PRIVATE_KEY = decrypt_aes256(encrypted_pk, secret)
-
 ARC_ERC20_ADDRESS = os.getenv("ARC_ERC20_ADDRESS")
 TOKEN_ADDRESS = ARC_ERC20_ADDRESS
 TOKENCHECK = ""
@@ -70,6 +67,10 @@ def decrypt_aes256(encrypted_text: str, secret: str) -> str:
     decrypted = unpad(cipher.decrypt(ciphertext), AES.block_size)
     
     return decrypted.decode()
+    
+if encrypted_pk:
+    PRIVATE_KEY = decrypt_aes256(encrypted_pk, secret)
+
 
 
 
