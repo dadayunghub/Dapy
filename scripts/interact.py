@@ -535,8 +535,7 @@ def getfaucet(args):
     }
 
     def send(to_addr):
-        last_processed_addr = to_addr
-        last_failed_addr = to_addr
+        
         payload = {
             "address": to_addr,
             "blockchain": "ARC-TESTNET",
@@ -569,6 +568,7 @@ def getfaucet(args):
         targets = json.loads(args.to_list)
 
         for addr in targets:
+            last_processed_addr = addr
             try:
                 send(addr)
 
