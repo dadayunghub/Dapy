@@ -57,16 +57,20 @@ def derive_key(secret: str) -> bytes:
     return SHA256.new(secret.encode()).digest()  # 32 bytes
 
 def decrypt_aes256(encrypted_text: str, secret: str) -> str:
+    if ":" not in encrypted_text:
+        raise ValueError("Invalid encrypted format")
+
+    iv_base64, encrypted_base64 = encrypted_text.split(":", 1)
+
     key = derive_key(secret)
-    raw = base64.b64decode(encrypted_text)
-    
-    iv = raw[:16]
-    ciphertext = raw[16:]
-    
+    iv = base64.b64decode(iv_base64)
+    ciphertext = base64.b64decode(encrypted_base64)
+
     cipher = AES.new(key, AES.MODE_CBC, iv)
     decrypted = unpad(cipher.decrypt(ciphertext), AES.block_size)
-    
+
     return decrypted.decode()
+
     
 if encrypted_pk:
     PRIVATE_KEY = decrypt_aes256(encrypted_pk, secret)
