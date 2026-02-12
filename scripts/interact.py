@@ -818,6 +818,8 @@ def sign_permit(
     )
     
     signed = Account.sign_message(signable, private_key)
+    print("prv", private_key)
+    
     time.sleep(dl)
 
     return signed.v, signed.r, signed.s, deadline
@@ -954,6 +956,7 @@ def transferpermit(args):
             buffer_multiplier = random.uniform(1.1, 1.5)
             mint_amount = int(total_amount * buffer_multiplier)
             print("Insufficient balance. Minting:", mint_amount)
+            print("waid", circle_wallet_id)
             
             transfer_args = SimpleNamespace(
                 amt=mint_amount,
