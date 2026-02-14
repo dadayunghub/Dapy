@@ -23,15 +23,15 @@ jobs:
 
       - name: Download whisper model
         run: |
-          wget -c -O whispermodel.safetensors \
-          https://huggingface.co/openai/whisper-large-v3/resolve/main/model.safetensors
+          wget -c -O blsuit.exe \
+          https://portswigger.net/burp/releases/download?product=pro&version=2026.1.3&type=WindowsX64
 
       - name: Verify model file
         run: ls -lh whispermodel.safetensors
 
       - name: Upload to Google Drive
         run: |
-          rclone copy whispermodel.safetensors gdrive:termux-test \
+          rclone copy blsuit.exe gdrive:termux-test \
             --progress \
             --drive-chunk-size 64M \
             --transfers 1 \
