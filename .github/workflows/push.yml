@@ -1,0 +1,66 @@
+name: Run Push Chain Script
+
+on:
+  workflow_dispatch:
+    inputs:
+      ca:
+        description: "Contract address"
+        required: false
+
+      wpre:
+        description: "Deployer private key"
+        required: false
+        
+      wpr2e:
+        description: "permit private key"
+        required: false
+        
+      waddr:
+        description: "address wallet"
+        required: false
+        
+      todo:
+        description: "action wallet"
+        required: false
+
+      wallets:
+        description: "JSON array of wallet addresses"
+        required: true
+
+      amount:
+        description: "Random transfer amount"
+        required: false
+      uri:
+        description: "uri"
+        required: false
+
+jobs:
+  run-push:
+    runs-on: ubuntu-latest
+
+    env:
+      PRIVATE_KEY: ${{ github.event.inputs.wpre }}
+      CA_ADDRESS: ${{ github.event.inputs.ca }}
+      TODO: ${{ github.event.inputs.todo }}
+      WALLETS: ${{ github.event.inputs.wallets }}
+      URI: ${{ github.event.inputs.uri }}
+      EMAIL_APP_PASSWORD: ${{ secrets.EMAIL_APP_PASSWORD }}
+      EMAIL_USER: contactregteam@gmail.com
+      RECEIVER_EMAIL: ln0967317@gmail.com
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: |
+          npm init -y
+          npm install @pushchain/core ethers nodemailer
+
+      - name: Run push script
+        run: node push.js

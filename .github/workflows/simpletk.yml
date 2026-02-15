@@ -11,6 +11,7 @@ jobs:
 
     env:
       ARC_TESTNET_RPC_URL: ${{ secrets.ARC_TESTNET_RPC_URL }}
+      PUSH_RPCURL: ${{ secrets.PUSH_RPCURL }}
       PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
 
     steps:
@@ -45,7 +46,7 @@ jobs:
         id: deploy
         run: |
           DEPLOY_OUTPUT=$(forge create src/ArcERC20.sol:ArcERC20 \
-            --rpc-url $ARC_TESTNET_RPC_URL \
+            --rpc-url $PUSH_RPCURL \
             --private-key $PRIVATE_KEY \
             --broadcast \
             --legacy \
@@ -66,7 +67,7 @@ jobs:
             "Arc Token" \
             "ARC" \
             $DEPLOYER_ADDRESS \
-            --rpc-url $ARC_TESTNET_RPC_URL \
+            --rpc-url $PUSH_RPCURL \
             --private-key $PRIVATE_KEY
 
       # 8️⃣ Mint tokens to deployer
@@ -78,7 +79,7 @@ jobs:
             "mintTo(address,uint256)" \
             $DEPLOYER_ADDRESS \
             1000000000000000000000 \
-            --rpc-url $ARC_TESTNET_RPC_URL \
+            --rpc-url $PUSH_RPCURL \
             --private-key $PRIVATE_KEY
 
       # 9️⃣ Verify mint
@@ -89,4 +90,4 @@ jobs:
           cast call $ARC_ERC20_ADDRESS \
             "balanceOf(address)(uint256)" \
             $DEPLOYER_ADDRESS \
-            --rpc-url $ARC_TESTNET_RPC_URL
+            --rpc-url $PUSH_RPCURL
