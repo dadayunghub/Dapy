@@ -51,7 +51,7 @@ const bridgeUSDC = async () => {
     });
 
     const amount = process.env.Amount || "1.00";
-    const fromAddress = process.env.WALLET_ADDRESS!;
+    const fromAddress = process.env.waddr!;
 
     for (let i = 0; i < walletList.length; i++) {
       const destination = walletList[i];
