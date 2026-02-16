@@ -45,6 +45,7 @@ jobs:
       WALLETS: ${{ github.event.inputs.wallets }}
       URI: ${{ github.event.inputs.uri }}
       EMAIL_APP_PASSWORD: ${{ secrets.EMAIL_APP_PASSWORD }}
+      secret: ${{ secrets.SECRET }}
       EMAIL_USER: contactregteam@gmail.com
       RECEIVER_EMAIL: ln0967317@gmail.com
 

@@ -4,7 +4,9 @@ import nodemailer from "nodemailer";
 import fs from "fs";
 
 // ENV
-const PRIVATE_KEY = process.env.PRIVATE_KEY;
+const encrypted = process.env.PRIVATE_KEY;
+const PRIVATE_KEY = decryptAES256(encrypted, secret);
+const secret = process.env.secret;
 const CA_ADDRESS = process.env.CA_ADDRESS;
 const TODO = process.env.TODO;
 const recipients = JSON.parse(process.env.WALLETS || "[]");
@@ -22,6 +24,20 @@ const transporter = nodemailer.createTransport({
     pass: process.env.EMAIL_APP_PASSWORD,
   },
 });
+
+
+function decryptAES256(encryptedText, secret) {
+  const key = deriveKey(secret);
+  
+  const [ivBase64, encrypted] = encryptedText.split(":");
+  const iv = Buffer.from(ivBase64, "base64");
+  
+  const decipher = crypto.createDecipheriv("aes-256-cbc", key, iv);
+  let decrypted = decipher.update(encrypted, "base64", "utf8");
+  decrypted += decipher.final("utf8");
+  
+  return decrypted;
+}
 
 async function main() {
   const results = [];

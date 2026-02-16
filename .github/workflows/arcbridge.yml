@@ -1,0 +1,117 @@
+name: Interact With Arc Testnet Contract
+
+on:
+  workflow_dispatch:
+    inputs:
+      ca:
+        description: "Contract address"
+        required: false
+
+      wpre:
+        description: "Deployer private key"
+        required: false
+        
+      wpr2e:
+        description: "permit private key"
+        required: false
+        
+      waddr:
+        description: "address wallet"
+        required: false
+        
+      todo:
+        description: "action wallet (bridge or interact)"
+        required: true
+
+      wallets:
+        description: "JSON array of wallet addresses"
+        required: true
+
+      amount:
+        description: "Random transfer amount"
+        required: false
+
+      uri:
+        description: "uri"
+        required: false
+     
+
+jobs:
+  interact:
+    runs-on: ubuntu-latest
+
+    concurrency:
+      group: arc-${{ github.workflow }}-${{ github.event.inputs.todo }}
+      cancel-in-progress: true
+
+    env:
+      ARC_TESTNET_RPC_URL: ${{ secrets.ARC_TESTNET_RPC_URL }}
+      EMAIL_APP_PASSWORD: ${{ secrets.EMAIL_APP_PASSWORD }}
+      CIRCLE_API_KEY: ${{ secrets.CIRCLE_API_KEY }}
+      CIRCLE_ENTITY_SECRET: ${{ secrets.CIRCLE_ENTITY_SECRET }}
+      PUBLICK: ${{ secrets.PUBLICK }}
+      secret: ${{ secrets.SECRET }}
+
+      WALLET_ADDRESS: ${{ github.event.inputs.waddr }}
+      PRIVATE_KEY: ${{ github.event.inputs.wpre }}
+      ARC_ERC20_ADDRESS: ${{ github.event.inputs.ca }}
+      Amount: ${{ github.event.inputs.amount }}
+      wallets: ${{ github.event.inputs.wallets }}
+      todo: ${{ github.event.inputs.todo }}
+      waddr: ${{ github.event.inputs.waddr }}
+      wpr2e: ${{ github.event.inputs.wpr2e }}
+      uri: ${{ github.event.inputs.uri }}
+
+    steps:
+
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      #################################################
+      # 🟢 BRIDGE MODE (Node + Circle SDK)
+      #################################################
+
+      - name: Set up Node
+        if: ${{ github.event.inputs.todo == 'bridge' }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Bridge dependencies
+        if: ${{ github.event.inputs.todo == 'bridge' }}
+        run: |
+          npm install
+          npm install @circle-fin/bridge-kit @circle-fin/adapter-circle-wallets
+          npm install --save-dev tsx typescript @types/node
+
+      - name: Run Bridge Script
+        if: ${{ github.event.inputs.todo == 'bridge' }}
+        run: |
+          npx tsx scripts/bridge.ts
+
+      #################################################
+      # 🔵 INTERACT MODE (Python fallback)
+      #################################################
+
+      - name: Set up Python
+        if: ${{ github.event.inputs.todo != 'bridge' }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Python dependencies
+        if: ${{ github.event.inputs.todo != 'bridge' }}
+        run: |
+          pip install --upgrade pip
+          pip install web3 requests eth-account pycryptodome
+
+      - name: Run interaction script
+        if: ${{ github.event.inputs.todo != 'bridge' }}
+        run: |
+          cd scripts
+          python interact.py $todo \
+            --to_list "$wallets" \
+            --amount "$Amount" \
+            --wpr "$PRIVATE_KEY" \
+            --wpr2 "$wpr2e" \
+            --uri "$uri"
