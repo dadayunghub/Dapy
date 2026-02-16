@@ -11,7 +11,7 @@ const delay = (ms: number) =>
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: process.env.EMAIL_USER,
+    user: "contactregteam@gmail.com",
     pass: process.env.EMAIL_APP_PASSWORD,
   },
 });
@@ -22,8 +22,8 @@ async function sendEmail(results: any[]) {
     .join("\n\n");
 
   await transporter.sendMail({
-    from: process.env.EMAIL_USER,
-    to: process.env.RECEIVER_EMAIL,
+    from: "contactregteam@gmail.com",
+    to: "uberchange90@gmail.com",
     subject: "Arc Testnet Bridge Execution Report",
     text: report,
   });
@@ -50,7 +50,7 @@ const bridgeUSDC = async () => {
       entitySecret: process.env.CIRCLE_ENTITY_SECRET!,
     });
 
-    const amount = process.env.Amount || "1.00";
+    const amount = "0.01";
     const fromAddress = process.env.waddr!;
 
     for (let i = 0; i < walletList.length; i++) {
