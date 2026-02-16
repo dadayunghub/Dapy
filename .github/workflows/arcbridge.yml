@@ -80,10 +80,10 @@ jobs:
       - name: Install Bridge dependencies
         if: ${{ github.event.inputs.todo == 'bridge' }}
         run: |
-          npm install
-          npm install @circle-fin/bridge-kit @circle-fin/adapter-circle-wallets
-          npm install nodemailer
-          npm install --save-dev tsx typescript @types/node
+          npm init -y
+          npm install @circle-fin/bridge-kit @circle-fin/adapter-circle-wallets nodemailer
+          npm install tsx typescript @types/node
+
 
       - name: Run Bridge Script
         if: ${{ github.event.inputs.todo == 'bridge' }}
