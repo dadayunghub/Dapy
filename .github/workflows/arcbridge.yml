@@ -1,4 +1,4 @@
-name: Interact With Arc Testnet Contract
+name: Interact With Arc Testnet Contract bridge
 
 on:
   workflow_dispatch:
