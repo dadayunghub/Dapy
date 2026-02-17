@@ -578,7 +578,7 @@ def getfaucet(args):
         return True
         
     def send_for_all_blockchains(wallet_address):
-    chain_results = {}
+        chain_results = {}
 
         for chain in BLOCKCHAINS:
             try:
