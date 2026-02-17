@@ -535,6 +535,7 @@ def getfaucet(args):
     }
     
     BLOCKCHAINS = [
+    "ARC-TESTNET",   # 👈 always first
     "ETH-SEPOLIA",
     "AVAX-FUJI",
     "MATIC-AMOY",
@@ -544,7 +545,6 @@ def getfaucet(args):
     "BASE-SEPOLIA",
     "OP-SEPOLIA",
     "APTOS-TESTNET",
-    "ARC-TESTNET",
     "MONAD-TESTNET",
     ]
 
