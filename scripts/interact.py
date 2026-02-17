@@ -576,6 +576,7 @@ def getfaucet(args):
             raise Exception(f"HTTP {response.status_code}: {error_message}")
 
         return True
+        time.sleep(dl)
         
     def send_for_all_blockchains(wallet_address):
         chain_results = {}
