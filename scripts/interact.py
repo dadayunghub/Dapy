@@ -533,12 +533,26 @@ def getfaucet(args):
         "Authorization": f"Bearer {os.getenv('CIRCLE_API_KEY')}",
         "Content-Type": "application/json",
     }
+    
+    BLOCKCHAINS = [
+    "ETH-SEPOLIA",
+    "AVAX-FUJI",
+    "MATIC-AMOY",
+    "SOL-DEVNET",
+    "ARB-SEPOLIA",
+    "UNI-SEPOLIA",
+    "BASE-SEPOLIA",
+    "OP-SEPOLIA",
+    "APTOS-TESTNET",
+    "ARC-TESTNET",
+    "MONAD-TESTNET",
+    ]
 
-    def send(to_addr):
+    def send(to_addr, blockchain):
         
         payload = {
             "address": to_addr,
-            "blockchain": "ARC-TESTNET",
+            "blockchain": blockchain,
             "native": False,
             "usdc": True,
             "eurc": True,
@@ -562,6 +576,20 @@ def getfaucet(args):
             raise Exception(f"HTTP {response.status_code}: {error_message}")
 
         return True
+        
+    def send_for_all_blockchains(wallet_address):
+    chain_results = {}
+
+        for chain in BLOCKCHAINS:
+            try:
+                send(wallet_address, chain)
+                chain_results[chain] = "SUCCESS"
+            except Exception as e:
+                chain_results[chain] = f"FAILED: {str(e)}"
+
+        return chain_results
+
+
 
     # ---------- RUN FAUCET FOR MULTIPLE WALLETS ----------
     if args.to_list:
@@ -570,11 +598,12 @@ def getfaucet(args):
         for addr in targets:
             last_processed_addr = addr
             try:
-                send(addr)
+                chain_result = send_for_all_blockchains(addr)
 
                 results.append({
                     "address": addr,
                     "status": "success",
+                    "chains": chain_result,
                 })
 
                 print(f"✅ Faucet USDC & EURC sent → {addr}")
