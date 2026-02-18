@@ -581,6 +581,7 @@ def getfaucet(args):
                 chain_results[chain] = f"FAILED: {str(e)}"
 
         return chain_results
+        time.sleep(dl)
 
 
 
