@@ -56,7 +56,7 @@ const max = 20;
 const randomAmount: number = Number((Math.random() * (max - min) + min).toFixed(2));
 
 
-    const amount = randomAmount;
+    const amount = 10;
     const fromAddress = process.env.waddr!;
 
     for (let i = 0; i < walletList.length; i++) {
