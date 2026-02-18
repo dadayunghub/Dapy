@@ -537,15 +537,7 @@ def getfaucet(args):
     BLOCKCHAINS = [
     "ARC-TESTNET",   # 👈 always first
     "ETH-SEPOLIA",
-    "AVAX-FUJI",
-    "MATIC-AMOY",
-    "SOL-DEVNET",
-    "ARB-SEPOLIA",
-    "UNI-SEPOLIA",
-    "BASE-SEPOLIA",
-    "OP-SEPOLIA",
-    "APTOS-TESTNET",
-    "MONAD-TESTNET",
+    
     ]
 
     def send(to_addr, blockchain):
