@@ -49,8 +49,14 @@ const bridgeUSDC = async () => {
       apiKey: process.env.CIRCLE_API_KEY!,
       entitySecret: process.env.CIRCLE_ENTITY_SECRET!,
     });
+    
+    const min = 0.01;
+const max = 0.09;
+// Generate and fix to 2 decimals, then convert back to a number
+const randomAmount: number = Number((Math.random() * (max - min) + min).toFixed(2));
 
-    const amount = "0.01";
+
+    const amount = randomAmount;
     const fromAddress = process.env.waddr!;
 
     for (let i = 0; i < walletList.length; i++) {
