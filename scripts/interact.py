@@ -536,7 +536,7 @@ def getfaucet(args):
     
     BLOCKCHAINS = [
     "ARC-TESTNET",   # 👈 always first
-    "ETH-SEPOLIA",
+    #"ETH-SEPOLIA",
     
     ]
 
