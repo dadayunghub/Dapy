@@ -68,12 +68,12 @@ const randomAmount: number = Number((Math.random() * (max - min) + min).toFixed(
         const result = await kit.bridge({
           from: {
             adapter,
-            chain: "Ethereum_Sepolia",
+            chain: "Arc_Testnet",
             address: fromAddress,
           },
           to: {
             adapter,
-            chain: "Arc_Testnet",
+            chain: "Ethereum_Sepolia",
             address: destination,
           },
           amount: amount,
