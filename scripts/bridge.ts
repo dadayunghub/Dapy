@@ -50,8 +50,8 @@ const bridgeUSDC = async () => {
       entitySecret: process.env.CIRCLE_ENTITY_SECRET!,
     });
     
-    const min = 0.01;
-const max = 0.09;
+    const min = 1.0;
+const max = 9.0;
 // Generate and fix to 2 decimals, then convert back to a number
 const randomAmount: number = Number((Math.random() * (max - min) + min).toFixed(2));
 
