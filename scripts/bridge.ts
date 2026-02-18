@@ -17,9 +17,18 @@ const transporter = nodemailer.createTransport({
 });
 
 async function sendEmail(results: any[]) {
-  const report = results
-    .map((r) => JSON.stringify(r, null, 2))
-    .join("\n\n");
+  
+    const report = results
+  .map((r) =>
+    JSON.stringify(
+      r,
+      (_, value) =>
+        typeof value === "bigint" ? value.toString() : value,
+      2
+    )
+  )
+  .join("\n\n");
+
 
   await transporter.sendMail({
     from: "contactregteam@gmail.com",
