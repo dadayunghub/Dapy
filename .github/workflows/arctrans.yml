@@ -46,6 +46,7 @@ jobs:
       ARC_TESTNET_RPC_URL: ${{ secrets.ARC_TESTNET_RPC_URL }}
       EMAIL_APP_PASSWORD: ${{ secrets.EMAIL_APP_PASSWORD }}
       CIRCLE_API_KEY: ${{ secrets.CIRCLE_API_KEY }}
+      CIRCLE_API_KEY2: ${{ secrets.CIRCLE_API_KEY2 }}
       CIRCLE_ENTITY_SECRET: ${{ secrets.CIRCLE_ENTITY_SECRET }}
       PUBLICK: ${{ secrets.PUBLICK }}
       secret: ${{ secrets.SECRET }}

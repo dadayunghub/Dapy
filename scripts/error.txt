@@ -1,0 +1,1001 @@
+
+{
+  
+  "data": {
+    "state": "error",
+    "amount": "10.5",
+
+    "token": "USDC",
+    "source": {
+      "address": "0x758dca35b6d8158f8d1fa65c59a7c8f570dc7014",
+      "chain": {
+        "type": "evm",
+
+        "chain": "Arc_Testnet",
+        "name": "Arc Testnet",
+        "title": "ArcTestnet",
+        "nativeCurrency": {
+          "name": "USDC",
+          "symbol": "USDC",
+          "decimals": 18
+        },
+        "chainId": 5042002,
+        "isTestnet": true,
+        "explorerUrl": "https://testnet.arcscan.app/tx/{hash}",
+        "rpcEndpoints": [
+          "https://rpc.testnet.arc.network/"
+        ],
+        "eurcAddress": "0x89B50855Aa3bE2F677cD6303Cec089B5F319D72a",
+        "usdcAddress": "0x3600000000000000000000000000000000000000",
+        "cctp": {
+          "domain": 26,
+          "contracts": {
+            "v2": {
+              "type": "split",
+              "tokenMessenger": "0x8FE6B999Dc680CcFDD5Bf7EB0974218be2542DAA",
+              "messageTransmitter": "0xE737e5cEBEEBa77EFE34D4aa090756590b1CE275",
+              "confirmations": 1,
+              "fastConfirmations": 1
+            }
+          }
+        },
+        "kitContracts": {
+          "bridge": "0xC5567a5E3370d4DBfB0540025078e283e36A363d"
+        }
+      }
+    },
+    "destination": {
+      "address": "0xDc0AdeC8200fcd9c09bfe5036b010ACb19cF0317",
+Show quoted text
+    "steps": [
+      {
+        "name": "approve",
+        "state": "success",
+        "txHash": "0xa99da92ce790ce8dc9d03bf00922141d6439855bc223fffcc2e633002d072e72",
+        "data": {
+          "txHash": "0xa99da92ce790ce8dc9d03bf00922141d6439855bc223fffcc2e633002d072e72",
+          "status": "success",
+          "cumulativeGasUsed": "1341288",
+          "gasUsed": "165851",
+          "blockNumber": "27672721",
+          "blockHash": "0x12cd1617a631d4fafeb71aaafca8fd29193cd2c481f229b05d4e4b093df40517",
+          "transactionIndex": 4,
+          "effectiveGasPrice": "21000000000"
+        },
+        "explorerUrl": "https://testnet.arcscan.app/tx/0xa99da92ce790ce8dc9d03bf00922141d6439855bc223fffcc2e633002d072e72"
+      },
+      {
+        "name": "burn",
+        "state": "success",
+        "txHash": "0x2625a769c8a342556c8e5c09a578e11cdcb9f75d4a8acad4cc07130abd99a106",
+        "data": {
+          "txHash": "0x2625a769c8a342556c8e5c09a578e11cdcb9f75d4a8acad4cc07130abd99a106",
+          "status": "success",
+          "cumulativeGasUsed": "456198",
+          "gasUsed": "293354",
+          "blockNumber": "27672728",
+          "blockHash": "0xe4c46ada5a719bebb9658e46680703df88021e8fbaadeff478c01d1ff83211dd",
+          "transactionIndex": 4,
+          "effectiveGasPrice": "21000000000"
+        },
+        "explorerUrl": "https://testnet.arcscan.app/tx/0x2625a769c8a342556c8e5c09a578e11cdcb9f75d4a8acad4cc07130abd99a106"
+      },
+      {
+        "name": "fetchAttestation",
+        "state": "success",
+        "data": {
+          "attestation": "0xb1c7e20c4d0c4a320d5199fb9e763d9ab40c451ed530354b17c72a20576de4ec026f0f4c5835a4cf45423fb6b635c83de24f1cdc8e84e53abf848a9a51710aa61c80208444ed105de63c8be7a207fa744da560d89256d5a4f1f01a21a4d17b73c470dcc2aadb7b4124067858e1fdbef15b853b9f43fb23a496bffc47cfe62aadb01c",
+          "message": "0x000000010000001a0000000001a2f00bcab39b036682a6f2335070d6aecc6b3a8910a3bc5792a600f9ce798e0000000000000000000000008fe6b999dc680ccfdd5bf7eb0974218be2542daa0000000000000000000000008fe6b999dc680ccfdd5bf7eb0974218be2542daa0000000000000000000000000000000000000000000000000000000000000000000003e8000007d0000000010000000000000000000000003600000000000000000000000000000000000000000000000000000000000000dc0adec8200fcd9c09bfe5036b010acb19cf03170000000000000000000000000000000000000000000000000000000000a037a0000000000000000000000000c5567a5e3370d4dbfb0540025078e283e36a363d000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+          "eventNonce": "0x01a2f00bcab39b036682a6f2335070d6aecc6b3a8910a3bc5792a600f9ce798e",
+          "cctpVersion": 2,
+          "status": "complete",
+          "decodedMessage": {
+            "sourceDomain": "26",
+            "destinationDomain": "0",
+            "nonce": "0x01a2f00bcab39b036682a6f2335070d6aecc6b3a8910a3bc5792a600f9ce798e",
+            "sender": "0x8fe6b999dc680ccfdd5bf7eb0974218be2542daa",
+            "recipient": "0x8fe6b999dc680ccfdd5bf7eb0974218be2542daa",
+            "destinationCaller": "0x0000000000000000000000000000000000000000000000000000000000000000",
+            "minFinalityThreshold": "1000",
+            "finalityThresholdExecuted": "2000",
+            "messageBody": "0x000000010000000000000000000000003600000000000000000000000000000000000000000000000000000000000000dc0adec8200fcd9c09bfe5036b010acb19cf03170000000000000000000000000000000000000000000000000000000000a037a0000000000000000000000000c5567a5e3370d4dbfb0540025078e283e36a363d000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+            "decodedMessageBody": {
+              "burnToken": "0x3600000000000000000000000000000000000000",
+              "mintRecipient": "0xdc0adec8200fcd9c09bfe5036b010acb19cf0317",
+              "amount": "10500000",
+              "messageSender": "0xc5567a5e3370d4dbfb0540025078e283e36a363d",
+              "maxFee": "0",
+              "feeExecuted": "0",
+              "expirationBlock": "0",
+              "hookData": null
+            }
+          },
+          "delayReason": null
+        }
+      },
+      {
+        "name": "mint",
+
+        "state": "error",
+        "error": {},
+        "errorMessage": "mint step failed: RPC endpoint error on Ethereum Sepolia"
+
+      }
+    ],
+    "config": {
+      "transferSpeed": "FAST"
+    },
+    "provider": "CCTPV2BridgingProvider"
+  }
+}
+
+{
+  "wallet": "0xCeE34A8090356c877dDBE6Db8D94Db7CD8BfF2Bd",
+
+  "status": "SUCCESS",
+  "data": {
+    "state": "error",
+    "amount": "10.5",
+
+    "token": "USDC",
+    "source": {
+      "address": "0x758dca35b6d8158f8d1fa65c59a7c8f570dc7014",
+      "chain": {
+        "type": "evm",
+
+        "chain": "Arc_Testnet",
+        "name": "Arc Testnet",
+        "title": "ArcTestnet",
+        "nativeCurrency": {
+          "name": "USDC",
+          "symbol": "USDC",
+          "decimals": 18
+        },
+        "chainId": 5042002,
+        "isTestnet": true,
+        "explorerUrl": "https://testnet.arcscan.app/tx/{hash}",
+        "rpcEndpoints": [
+          "https://rpc.testnet.arc.network/"
+        ],
+        "eurcAddress": "0x89B50855Aa3bE2F677cD6303Cec089B5F319D72a",
+        "usdcAddress": "0x3600000000000000000000000000000000000000",
+        "cctp": {
+          "domain": 26,
+          "contracts": {
+            "v2": {
+              "type": "split",
+              "tokenMessenger": "0x8FE6B999Dc680CcFDD5Bf7EB0974218be2542DAA",
+              "messageTransmitter": "0xE737e5cEBEEBa77EFE34D4aa090756590b1CE275",
+              "confirmations": 1,
+              "fastConfirmations": 1
+            }
+          }
+        },
+        "kitContracts": {
+          "bridge": "0xC5567a5E3370d4DBfB0540025078e283e36A363d"
+        }
+      }
+    },
+    "destination": {
+      "address": "0xCeE34A8090356c877dDBE6Db8D94Db7CD8BfF2Bd",
+
+
+      "chain": {
+        "type": "evm",
+        "chain": "Ethereum_Sepolia",
+        "name": "Ethereum Sepolia",
+        "title": "Ethereum Sepolia Testnet",
+        "nativeCurrency": {
+          "name": "Sepolia Ether",
+          "symbol": "ETH",
+          "decimals": 18
+        },
+        "chainId": 11155111,
+        "isTestnet": true,
+        "explorerUrl": "https://sepolia.etherscan.io/tx/{hash}",
+        "rpcEndpoints": [
+          "https://sepolia.drpc.org"
+        ],
+        "eurcAddress": "0x08210F9170F89Ab7658F0B5E3fF39b0E03C594D4",
+        "usdcAddress": "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238",
+        "cctp": {
+          "domain": 0,
+          "contracts": {
+            "v1": {
+              "type": "split",
+              "tokenMessenger": "0x9f3B8679c73C2Fef8b59B4f3444d4e156fb70AA5",
+              "messageTransmitter": "0x7865fAfC2db2093669d92c0F33AeEF291086BEFD",
+              "confirmations": 65
+            },
+            "v2": {
+              "type": "split",
+              "tokenMessenger": "0x8fe6b999dc680ccfdd5bf7eb0974218be2542daa",
+              "messageTransmitter": "0xe737e5cebeeba77efe34d4aa090756590b1ce275",
+              "confirmations": 65,
+              "fastConfirmations": 2
+            }
+          }
+        },
+        "kitContracts": {
+          "bridge": "0xC5567a5E3370d4DBfB0540025078e283e36A363d"
+        }
+      }
+    },
+    "steps": [
+      {
+        "name": "approve",
+        "state": "success",
+        "txHash": "0x8ab93159d494a172e803ce66988aca7540c5157c6bce65ddf16a92d526136537",
+        "data": {
+          "txHash": "0x8ab93159d494a172e803ce66988aca7540c5157c6bce65ddf16a92d526136537",
+          "status": "success",
+          "cumulativeGasUsed": "1236478",
+          "gasUsed": "165899",
+          "blockNumber": "27672749",
+          "blockHash": "0xc4ba3a3b250299a979e82c2827a8cfe196ad9677679ef23dff233c89b2d410e6",
+          "transactionIndex": 5,
+          "effectiveGasPrice": "21000000000"
+        },
+        "explorerUrl": "https://testnet.arcscan.app/tx/0x8ab93159d494a172e803ce66988aca7540c5157c6bce65ddf16a92d526136537"
+      },
+      {
+        "name": "burn",
+        "state": "success",
+        "txHash": "0x895fec74c38152f192957336c4b6bb55bf54e5f01b30bfa60234fa99b3abf59d",
+        "data": {
+          "txHash": "0x895fec74c38152f192957336c4b6bb55bf54e5f01b30bfa60234fa99b3abf59d",
+          "status": "success",
+          "cumulativeGasUsed": "707584",
+          "gasUsed": "293378",
+          "blockNumber": "27672758",
+          "blockHash": "0x74c1205f607b57c5b4c9416428cedbd57056c7f9bfd9bea9711c99fd2b0a2fc4",
+          "transactionIndex": 3,
+          "effectiveGasPrice": "21000000000"
+        },
+        "explorerUrl": "https://testnet.arcscan.app/tx/0x895fec74c38152f192957336c4b6bb55bf54e5f01b30bfa60234fa99b3abf59d"
+      },
+      {
+        "name": "fetchAttestation",
+        "state": "success",
+        "data": {
+          "attestation": "0xe4222b0a2a03812f0fde5bd5800869096f94f9277e893c60810e02a15d82b3460980c263f05f45dcf6d9c5fb7420207eeceb2ad1122033402840f83756761e151b3e230c3bb2ed99574443164a09b07313762730ed990415836cc509d0687159eb4f94060cde2ef30f85de937296658a9e3525f10496bf9ea14d01a9fe9c86a9ef1c",
+          "message": "0x000000010000001a000000007a6b805b8bbbe43cf297dcf3bad921c1f1be435ac9ccf10652a6c44611e1a6c60000000000000000000000008fe6b999dc680ccfdd5bf7eb0974218be2542daa0000000000000000000000008fe6b999dc680ccfdd5bf7eb0974218be2542daa0000000000000000000000000000000000000000000000000000000000000000000003e8000007d0000000010000000000000000000000003600000000000000000000000000000000000000000000000000000000000000cee34a8090356c877ddbe6db8d94db7cd8bff2bd0000000000000000000000000000000000000000000000000000000000a037a0000000000000000000000000c5567a5e3370d4dbfb0540025078e283e36a363d000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+          "eventNonce": "0x7a6b805b8bbbe43cf297dcf3bad921c1f1be435ac9ccf10652a6c44611e1a6c6",
+          "cctpVersion": 2,
+          "status": "complete",
+          "decodedMessage": {
+            "sourceDomain": "26",
+            "destinationDomain": "0",
+            "nonce": "0x7a6b805b8bbbe43cf297dcf3bad921c1f1be435ac9ccf10652a6c44611e1a6c6",
+            "sender": "0x8fe6b999dc680ccfdd5bf7eb0974218be2542daa",
+            "recipient": "0x8fe6b999dc680ccfdd5bf7eb0974218be2542daa",
+            "destinationCaller": "0x0000000000000000000000000000000000000000000000000000000000000000",
+            "minFinalityThreshold": "1000",
+            "finalityThresholdExecuted": "2000",
+            "messageBody": "0x000000010000000000000000000000003600000000000000000000000000000000000000000000000000000000000000cee34a8090356c877ddbe6db8d94db7cd8bff2bd0000000000000000000000000000000000000000000000000000000000a037a0000000000000000000000000c5567a5e3370d4dbfb0540025078e283e36a363d000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+            "decodedMessageBody": {
+              "burnToken": "0x3600000000000000000000000000000000000000",
+              "mintRecipient": "0xcee34a8090356c877ddbe6db8d94db7cd8bff2bd",
+              "amount": "10500000",
+              "messageSender": "0xc5567a5e3370d4dbfb0540025078e283e36a363d",
+              "maxFee": "0",
+              "feeExecuted": "0",
+              "expirationBlock": "0",
+              "hookData": null
+            }
+          },
+          "delayReason": null
+        }
+      },
+      {
+        "name": "mint",
+
+        "state": "error",
+        "error": {},
+        "errorMessage": "mint step failed: RPC endpoint error on Ethereum Sepolia"
+
+      }
+    ],
+    "config": {
+      "transferSpeed": "FAST"
+    },
+    "provider": "CCTPV2BridgingProvider"
+  }
+}
+
+{
+  "wallet": "0xB8b084Ba393828d2539a9C7DFa5eE243De3Fc4Db",
+
+  "status": "SUCCESS",
+  "data": {
+    "state": "error",
+    "amount": "10.5",
+
+    "token": "USDC",
+    "source": {
+      "address": "0x758dca35b6d8158f8d1fa65c59a7c8f570dc7014",
+      "chain": {
+        "type": "evm",
+
+        "chain": "Arc_Testnet",
+        "name": "Arc Testnet",
+        "title": "ArcTestnet",
+        "nativeCurrency": {
+          "name": "USDC",
+          "symbol": "USDC",
+          "decimals": 18
+        },
+        "chainId": 5042002,
+        "isTestnet": true,
+        "explorerUrl": "https://testnet.arcscan.app/tx/{hash}",
+        "rpcEndpoints": [
+          "https://rpc.testnet.arc.network/"
+        ],
+        "eurcAddress": "0x89B50855Aa3bE2F677cD6303Cec089B5F319D72a",
+        "usdcAddress": "0x3600000000000000000000000000000000000000",
+        "cctp": {
+          "domain": 26,
+          "contracts": {
+            "v2": {
+              "type": "split",
+              "tokenMessenger": "0x8FE6B999Dc680CcFDD5Bf7EB0974218be2542DAA",
+              "messageTransmitter": "0xE737e5cEBEEBa77EFE34D4aa090756590b1CE275",
+              "confirmations": 1,
+              "fastConfirmations": 1
+            }
+          }
+        },
+        "kitContracts": {
+          "bridge": "0xC5567a5E3370d4DBfB0540025078e283e36A363d"
+        }
+      }
+    },
+    "destination": {
+      "address": "0xB8b084Ba393828d2539a9C7DFa5eE243De3Fc4Db",
+
+
+      "chain": {
+        "type": "evm",
+        "chain": "Ethereum_Sepolia",
+        "name": "Ethereum Sepolia",
+        "title": "Ethereum Sepolia Testnet",
+        "nativeCurrency": {
+          "name": "Sepolia Ether",
+          "symbol": "ETH",
+          "decimals": 18
+        },
+        "chainId": 11155111,
+        "isTestnet": true,
+        "explorerUrl": "https://sepolia.etherscan.io/tx/{hash}",
+        "rpcEndpoints": [
+          "https://sepolia.drpc.org"
+        ],
+        "eurcAddress": "0x08210F9170F89Ab7658F0B5E3fF39b0E03C594D4",
+        "usdcAddress": "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238",
+        "cctp": {
+          "domain": 0,
+          "contracts": {
+            "v1": {
+              "type": "split",
+              "tokenMessenger": "0x9f3B8679c73C2Fef8b59B4f3444d4e156fb70AA5",
+              "messageTransmitter": "0x7865fAfC2db2093669d92c0F33AeEF291086BEFD",
+              "confirmations": 65
+            },
+            "v2": {
+              "type": "split",
+              "tokenMessenger": "0x8fe6b999dc680ccfdd5bf7eb0974218be2542daa",
+              "messageTransmitter": "0xe737e5cebeeba77efe34d4aa090756590b1ce275",
+              "confirmations": 65,
+              "fastConfirmations": 2
+            }
+          }
+        },
+        "kitContracts": {
+          "bridge": "0xC5567a5E3370d4DBfB0540025078e283e36A363d"
+        }
+      }
+    },
+    "steps": [
+      {
+        "name": "approve",
+        "state": "success",
+        "txHash": "0x432d9ea4620398ba31ac065022fd6f9e258742b93a4994b33a16bf2f093ce9c7",
+        "data": {
+          "txHash": "0x432d9ea4620398ba31ac065022fd6f9e258742b93a4994b33a16bf2f093ce9c7",
+          "status": "success",
+          "cumulativeGasUsed": "782926",
+          "gasUsed": "165875",
+          "blockNumber": "27672782",
+          "blockHash": "0x0b7ecf79d780522e3381ef9c58eee64f05bb00f20804ed3c1e89734cec9511ce",
+          "transactionIndex": 6,
+          "effectiveGasPrice": "21000000000"
+        },
+        "explorerUrl": "https://testnet.arcscan.app/tx/0x432d9ea4620398ba31ac065022fd6f9e258742b93a4994b33a16bf2f093ce9c7"
+      },
+      {
+        "name": "burn",
+        "state": "success",
+        "txHash": "0x2d703a0390123c3c8e15aaef6bc86fc8a9536c8cb04980ed32fb1be780a24a67",
+        "data": {
+          "txHash": "0x2d703a0390123c3c8e15aaef6bc86fc8a9536c8cb04980ed32fb1be780a24a67",
+          "status": "success",
+          "cumulativeGasUsed": "462204",
+          "gasUsed": "293390",
+          "blockNumber": "27672791",
+          "blockHash": "0xcc05b5ebdc5147e48dfbe041a54e3ed6d1bbd2d22f9cdd129d47d9957611f8cf",
+          "transactionIndex": 3,
+          "effectiveGasPrice": "21000000000"
+        },
+        "explorerUrl": "https://testnet.arcscan.app/tx/0x2d703a0390123c3c8e15aaef6bc86fc8a9536c8cb04980ed32fb1be780a24a67"
+      },
+      {
+        "name": "fetchAttestation",
+        "state": "success",
+        "data": {
+          "attestation": "0xc4b3a3947f914315ec46ca8781757811416ef7c263ab5768874f544baca47d1c22992299f9785475015baadc20f784da22ed1ba66ccca3c21f29b59d87baae581c0adfacbcd13c7a6475d9716d6ef4a187a9d57c317d557d4109a69079ea58f84d550d8845b795f3caee551feb33e269f619705b6ff2c48e0f874b1af76acf1f7d1b",
+          "message": "0x000000010000001a0000000070f69faadff26f54d626d7d630aafc060b0c09b0fb7ca1df9c243739a30eea810000000000000000000000008fe6b999dc680ccfdd5bf7eb0974218be2542daa0000000000000000000000008fe6b999dc680ccfdd5bf7eb0974218be2542daa0000000000000000000000000000000000000000000000000000000000000000000003e8000007d0000000010000000000000000000000003600000000000000000000000000000000000000000000000000000000000000b8b084ba393828d2539a9c7dfa5ee243de3fc4db0000000000000000000000000000000000000000000000000000000000a037a0000000000000000000000000c5567a5e3370d4dbfb0540025078e283e36a363d000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+          "eventNonce": "0x70f69faadff26f54d626d7d630aafc060b0c09b0fb7ca1df9c243739a30eea81",
+          "cctpVersion": 2,
+          "status": "complete",
+          "decodedMessage": {
+            "sourceDomain": "26",
+            "destinationDomain": "0",
+            "nonce": "0x70f69faadff26f54d626d7d630aafc060b0c09b0fb7ca1df9c243739a30eea81",
+            "sender": "0x8fe6b999dc680ccfdd5bf7eb0974218be2542daa",
+            "recipient": "0x8fe6b999dc680ccfdd5bf7eb0974218be2542daa",
+            "destinationCaller": "0x0000000000000000000000000000000000000000000000000000000000000000",
+            "minFinalityThreshold": "1000",
+            "finalityThresholdExecuted": "2000",
+            "messageBody": "0x000000010000000000000000000000003600000000000000000000000000000000000000000000000000000000000000b8b084ba393828d2539a9c7dfa5ee243de3fc4db0000000000000000000000000000000000000000000000000000000000a037a0000000000000000000000000c5567a5e3370d4dbfb0540025078e283e36a363d000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+            "decodedMessageBody": {
+              "burnToken": "0x3600000000000000000000000000000000000000",
+              "mintRecipient": "0xb8b084ba393828d2539a9c7dfa5ee243de3fc4db",
+              "amount": "10500000",
+              "messageSender": "0xc5567a5e3370d4dbfb0540025078e283e36a363d",
+              "maxFee": "0",
+              "feeExecuted": "0",
+              "expirationBlock": "0",
+              "hookData": null
+            }
+          },
+          "delayReason": null
+        }
+      },
+      {
+        "name": "mint",
+
+        "state": "error",
+        "error": {},
+        "errorMessage": "mint step failed: RPC endpoint error on Ethereum Sepolia"
+
+      }
+    ],
+    "config": {
+      "transferSpeed": "FAST"
+    },
+    "provider": "CCTPV2BridgingProvider"
+  }
+}
+
+{
+  "wallet": "0x7D4d4a7C04e2779A0630a2F94a79a7791ecD7828",
+
+  "status": "SUCCESS",
+  "data": {
+    "state": "error",
+    "amount": "10.5",
+
+    "token": "USDC",
+    "source": {
+      "address": "0x758dca35b6d8158f8d1fa65c59a7c8f570dc7014",
+      "chain": {
+        "type": "evm",
+
+        "chain": "Arc_Testnet",
+        "name": "Arc Testnet",
+        "title": "ArcTestnet",
+        "nativeCurrency": {
+          "name": "USDC",
+          "symbol": "USDC",
+          "decimals": 18
+        },
+        "chainId": 5042002,
+        "isTestnet": true,
+        "explorerUrl": "https://testnet.arcscan.app/tx/{hash}",
+        "rpcEndpoints": [
+          "https://rpc.testnet.arc.network/"
+        ],
+        "eurcAddress": "0x89B50855Aa3bE2F677cD6303Cec089B5F319D72a",
+        "usdcAddress": "0x3600000000000000000000000000000000000000",
+        "cctp": {
+          "domain": 26,
+          "contracts": {
+            "v2": {
+              "type": "split",
+              "tokenMessenger": "0x8FE6B999Dc680CcFDD5Bf7EB0974218be2542DAA",
+              "messageTransmitter": "0xE737e5cEBEEBa77EFE34D4aa090756590b1CE275",
+              "confirmations": 1,
+              "fastConfirmations": 1
+            }
+          }
+        },
+        "kitContracts": {
+          "bridge": "0xC5567a5E3370d4DBfB0540025078e283e36A363d"
+        }
+      }
+    },
+    "destination": {
+      "address": "0x7D4d4a7C04e2779A0630a2F94a79a7791ecD7828",
+
+
+      "chain": {
+        "type": "evm",
+        "chain": "Ethereum_Sepolia",
+        "name": "Ethereum Sepolia",
+        "title": "Ethereum Sepolia Testnet",
+        "nativeCurrency": {
+          "name": "Sepolia Ether",
+          "symbol": "ETH",
+          "decimals": 18
+        },
+        "chainId": 11155111,
+        "isTestnet": true,
+        "explorerUrl": "https://sepolia.etherscan.io/tx/{hash}",
+        "rpcEndpoints": [
+          "https://sepolia.drpc.org"
+        ],
+        "eurcAddress": "0x08210F9170F89Ab7658F0B5E3fF39b0E03C594D4",
+        "usdcAddress": "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238",
+        "cctp": {
+          "domain": 0,
+          "contracts": {
+            "v1": {
+              "type": "split",
+              "tokenMessenger": "0x9f3B8679c73C2Fef8b59B4f3444d4e156fb70AA5",
+              "messageTransmitter": "0x7865fAfC2db2093669d92c0F33AeEF291086BEFD",
+              "confirmations": 65
+            },
+            "v2": {
+              "type": "split",
+              "tokenMessenger": "0x8fe6b999dc680ccfdd5bf7eb0974218be2542daa",
+              "messageTransmitter": "0xe737e5cebeeba77efe34d4aa090756590b1ce275",
+              "confirmations": 65,
+              "fastConfirmations": 2
+            }
+          }
+        },
+        "kitContracts": {
+          "bridge": "0xC5567a5E3370d4DBfB0540025078e283e36A363d"
+        }
+      }
+    },
+    "steps": [
+      {
+        "name": "approve",
+        "state": "success",
+        "txHash": "0x1d328cbf19291a4e9e09c147de6f0db7080cf66006be9c1bf97bc867204b0362",
+        "data": {
+          "txHash": "0x1d328cbf19291a4e9e09c147de6f0db7080cf66006be9c1bf97bc867204b0362",
+          "status": "success",
+          "cumulativeGasUsed": "400253",
+          "gasUsed": "165875",
+          "blockNumber": "27672819",
+          "blockHash": "0xbe32dd94a70ff42123da8fa9cfe0ef7158dd1bbdee5e14c88aa6a75042860ca6",
+          "transactionIndex": 2,
+          "effectiveGasPrice": "21000000000"
+        },
+        "explorerUrl": "https://testnet.arcscan.app/tx/0x1d328cbf19291a4e9e09c147de6f0db7080cf66006be9c1bf97bc867204b0362"
+      },
+      {
+        "name": "burn",
+        "state": "success",
+        "txHash": "0x6d74db25a1ba4b7c31861003253059434654ea3c995c62118903d6974b1fa0d5",
+        "data": {
+          "txHash": "0x6d74db25a1ba4b7c31861003253059434654ea3c995c62118903d6974b1fa0d5",
+          "status": "success",
+          "cumulativeGasUsed": "1764096",
+          "gasUsed": "293366",
+          "blockNumber": "27672826",
+          "blockHash": "0x066daaf49cbf3fd551286548b58e17e267632cbe847bbacd2b069a7b4e2d9dd5",
+          "transactionIndex": 6,
+          "effectiveGasPrice": "21000000000"
+        },
+        "explorerUrl": "https://testnet.arcscan.app/tx/0x6d74db25a1ba4b7c31861003253059434654ea3c995c62118903d6974b1fa0d5"
+      },
+      {
+        "name": "fetchAttestation",
+        "state": "success",
+        "data": {
+          "attestation": "0xb6c3d2cb9e577612586d5af40ff31c13773800a384d4a5995ddfac3acb79b50973f56d467fbac5540bed5f16dea04ffe3ce9e957988f95359cb506de6161dc231b63d2b7282e09c057937d8940446777b8d4c435946713703134b36ea4c796542909f2dd07052ea42395a51dccc0697fe355fc2997fdc04bccb1b017196e404a2c1b",
+          "message": "0x000000010000001a00000000f6c16a8f4de0d5e390533ddb7b01f10f118a5929e0e34923f8b114aacf355b4d0000000000000000000000008fe6b999dc680ccfdd5bf7eb0974218be2542daa0000000000000000000000008fe6b999dc680ccfdd5bf7eb0974218be2542daa0000000000000000000000000000000000000000000000000000000000000000000003e8000007d00000000100000000000000000000000036000000000000000000000000000000000000000000000000000000000000007d4d4a7c04e2779a0630a2f94a79a7791ecd78280000000000000000000000000000000000000000000000000000000000a037a0000000000000000000000000c5567a5e3370d4dbfb0540025078e283e36a363d000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+          "eventNonce": "0xf6c16a8f4de0d5e390533ddb7b01f10f118a5929e0e34923f8b114aacf355b4d",
+          "cctpVersion": 2,
+          "status": "complete",
+          "decodedMessage": {
+            "sourceDomain": "26",
+            "destinationDomain": "0",
+            "nonce": "0xf6c16a8f4de0d5e390533ddb7b01f10f118a5929e0e34923f8b114aacf355b4d",
+            "sender": "0x8fe6b999dc680ccfdd5bf7eb0974218be2542daa",
+            "recipient": "0x8fe6b999dc680ccfdd5bf7eb0974218be2542daa",
+            "destinationCaller": "0x0000000000000000000000000000000000000000000000000000000000000000",
+            "minFinalityThreshold": "1000",
+            "finalityThresholdExecuted": "2000",
+            "messageBody": "0x0000000100000000000000000000000036000000000000000000000000000000000000000000000000000000000000007d4d4a7c04e2779a0630a2f94a79a7791ecd78280000000000000000000000000000000000000000000000000000000000a037a0000000000000000000000000c5567a5e3370d4dbfb0540025078e283e36a363d000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+            "decodedMessageBody": {
+              "burnToken": "0x3600000000000000000000000000000000000000",
+              "mintRecipient": "0x7d4d4a7c04e2779a0630a2f94a79a7791ecd7828",
+              "amount": "10500000",
+              "messageSender": "0xc5567a5e3370d4dbfb0540025078e283e36a363d",
+              "maxFee": "0",
+              "feeExecuted": "0",
+              "expirationBlock": "0",
+              "hookData": null
+            }
+          },
+          "delayReason": null
+        }
+      },
+      {
+        "name": "mint",
+
+        "state": "error",
+        "error": {},
+        "errorMessage": "mint step failed: RPC endpoint error on Ethereum Sepolia"
+
+      }
+    ],
+    "config": {
+      "transferSpeed": "FAST"
+    },
+    "provider": "CCTPV2BridgingProvider"
+  }
+}
+
+{
+  "wallet": "0xe43Db81aca94d20CdD01ba85B29608a96E9f25EE",
+
+  "status": "SUCCESS",
+  "data": {
+    "state": "error",
+    "amount": "10.5",
+
+    "token": "USDC",
+    "source": {
+      "address": "0x758dca35b6d8158f8d1fa65c59a7c8f570dc7014",
+      "chain": {
+        "type": "evm",
+
+        "chain": "Arc_Testnet",
+        "name": "Arc Testnet",
+        "title": "ArcTestnet",
+        "nativeCurrency": {
+          "name": "USDC",
+          "symbol": "USDC",
+          "decimals": 18
+        },
+        "chainId": 5042002,
+        "isTestnet": true,
+        "explorerUrl": "https://testnet.arcscan.app/tx/{hash}",
+        "rpcEndpoints": [
+          "https://rpc.testnet.arc.network/"
+        ],
+        "eurcAddress": "0x89B50855Aa3bE2F677cD6303Cec089B5F319D72a",
+        "usdcAddress": "0x3600000000000000000000000000000000000000",
+        "cctp": {
+          "domain": 26,
+          "contracts": {
+            "v2": {
+              "type": "split",
+              "tokenMessenger": "0x8FE6B999Dc680CcFDD5Bf7EB0974218be2542DAA",
+              "messageTransmitter": "0xE737e5cEBEEBa77EFE34D4aa090756590b1CE275",
+              "confirmations": 1,
+              "fastConfirmations": 1
+            }
+          }
+        },
+        "kitContracts": {
+          "bridge": "0xC5567a5E3370d4DBfB0540025078e283e36A363d"
+        }
+      }
+    },
+    "destination": {
+      "address": "0xe43Db81aca94d20CdD01ba85B29608a96E9f25EE",
+
+
+      "chain": {
+        "type": "evm",
+        "chain": "Ethereum_Sepolia",
+        "name": "Ethereum Sepolia",
+        "title": "Ethereum Sepolia Testnet",
+        "nativeCurrency": {
+          "name": "Sepolia Ether",
+          "symbol": "ETH",
+          "decimals": 18
+        },
+        "chainId": 11155111,
+        "isTestnet": true,
+        "explorerUrl": "https://sepolia.etherscan.io/tx/{hash}",
+        "rpcEndpoints": [
+          "https://sepolia.drpc.org"
+        ],
+        "eurcAddress": "0x08210F9170F89Ab7658F0B5E3fF39b0E03C594D4",
+        "usdcAddress": "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238",
+        "cctp": {
+          "domain": 0,
+          "contracts": {
+            "v1": {
+              "type": "split",
+              "tokenMessenger": "0x9f3B8679c73C2Fef8b59B4f3444d4e156fb70AA5",
+              "messageTransmitter": "0x7865fAfC2db2093669d92c0F33AeEF291086BEFD",
+              "confirmations": 65
+            },
+            "v2": {
+              "type": "split",
+              "tokenMessenger": "0x8fe6b999dc680ccfdd5bf7eb0974218be2542daa",
+              "messageTransmitter": "0xe737e5cebeeba77efe34d4aa090756590b1ce275",
+              "confirmations": 65,
+              "fastConfirmations": 2
+            }
+          }
+        },
+        "kitContracts": {
+          "bridge": "0xC5567a5E3370d4DBfB0540025078e283e36A363d"
+        }
+      }
+    },
+    "steps": [
+      {
+        "name": "approve",
+        "state": "success",
+        "txHash": "0xf6d35d819b90a9d9cc900626842c107699c67ccc68644a62b3756868484950b8",
+        "data": {
+          "txHash": "0xf6d35d819b90a9d9cc900626842c107699c67ccc68644a62b3756868484950b8",
+          "status": "success",
+          "cumulativeGasUsed": "637577",
+          "gasUsed": "313734",
+          "blockNumber": "27672852",
+          "blockHash": "0xd75fa244c991c85c01b4f517335d48a1f0c5b60ccd5f89f90eb7bf39fce879f1",
+          "transactionIndex": 6,
+          "effectiveGasPrice": "21100000000"
+        },
+        "explorerUrl": "https://testnet.arcscan.app/tx/0xf6d35d819b90a9d9cc900626842c107699c67ccc68644a62b3756868484950b8"
+      },
+      {
+        "name": "burn",
+        "state": "success",
+        "txHash": "0x09620f59691715abe0053db4ae5354c94724d9060277be4c6ea74a432e728abc",
+        "data": {
+          "txHash": "0x09620f59691715abe0053db4ae5354c94724d9060277be4c6ea74a432e728abc",
+          "status": "success",
+          "cumulativeGasUsed": "1541485",
+          "gasUsed": "293390",
+          "blockNumber": "27672862",
+          "blockHash": "0x60e56b33ab09331f7f339fc27e0e37841ea833a85694bc2b937ce79afd873c22",
+          "transactionIndex": 6,
+          "effectiveGasPrice": "21000000000"
+        },
+        "explorerUrl": "https://testnet.arcscan.app/tx/0x09620f59691715abe0053db4ae5354c94724d9060277be4c6ea74a432e728abc"
+      },
+      {
+        "name": "fetchAttestation",
+        "state": "success",
+        "data": {
+          "attestation": "0x3d14d745d403cc6ea17349810fa6ede1559fc6f6c8325f73acd5a903054545a53eb2f5c030e70999cba6273dae11753fbb3df38b5851d419e5c5e00c045487f51ca4a16b1d483981477810c51d9cdaa4ba49b1e6118518fc50abbff67f734db86b7161c8021d3d5688745fcbbd0f59ed68d0a23b961d6ecc386fba78f2603e48b51c",
+          "message": "0x000000010000001a000000007658ed18eeeec158e4a08c3d6cb3fd1eff5d9669ebaae2dac1a6ac6cb1b4ed0b0000000000000000000000008fe6b999dc680ccfdd5bf7eb0974218be2542daa0000000000000000000000008fe6b999dc680ccfdd5bf7eb0974218be2542daa0000000000000000000000000000000000000000000000000000000000000000000003e8000007d0000000010000000000000000000000003600000000000000000000000000000000000000000000000000000000000000e43db81aca94d20cdd01ba85b29608a96e9f25ee0000000000000000000000000000000000000000000000000000000000a037a0000000000000000000000000c5567a5e3370d4dbfb0540025078e283e36a363d000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+          "eventNonce": "0x7658ed18eeeec158e4a08c3d6cb3fd1eff5d9669ebaae2dac1a6ac6cb1b4ed0b",
+          "cctpVersion": 2,
+          "status": "complete",
+          "decodedMessage": {
+            "sourceDomain": "26",
+            "destinationDomain": "0",
+            "nonce": "0x7658ed18eeeec158e4a08c3d6cb3fd1eff5d9669ebaae2dac1a6ac6cb1b4ed0b",
+            "sender": "0x8fe6b999dc680ccfdd5bf7eb0974218be2542daa",
+            "recipient": "0x8fe6b999dc680ccfdd5bf7eb0974218be2542daa",
+            "destinationCaller": "0x0000000000000000000000000000000000000000000000000000000000000000",
+            "minFinalityThreshold": "1000",
+            "finalityThresholdExecuted": "2000",
+            "messageBody": "0x000000010000000000000000000000003600000000000000000000000000000000000000000000000000000000000000e43db81aca94d20cdd01ba85b29608a96e9f25ee0000000000000000000000000000000000000000000000000000000000a037a0000000000000000000000000c5567a5e3370d4dbfb0540025078e283e36a363d000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+            "decodedMessageBody": {
+              "burnToken": "0x3600000000000000000000000000000000000000",
+              "mintRecipient": "0xe43db81aca94d20cdd01ba85b29608a96e9f25ee",
+              "amount": "10500000",
+              "messageSender": "0xc5567a5e3370d4dbfb0540025078e283e36a363d",
+              "maxFee": "0",
+              "feeExecuted": "0",
+              "expirationBlock": "0",
+              "hookData": null
+            }
+          },
+          "delayReason": null
+        }
+      },
+      {
+        "name": "mint",
+
+        "state": "error",
+        "error": {},
+        "errorMessage": "mint step failed: RPC endpoint error on Ethereum Sepolia"
+
+      }
+    ],
+    "config": {
+      "transferSpeed": "FAST"
+    },
+    "provider": "CCTPV2BridgingProvider"
+  }
+}
+
+{
+  "wallet": "0x4acE0745cb04B8C328d4b39105eE2D3beEE01b38",
+
+  "status": "SUCCESS",
+  "data": {
+    "state": "error",
+    "amount": "10.5",
+
+    "token": "USDC",
+    "source": {
+      "address": "0x758dca35b6d8158f8d1fa65c59a7c8f570dc7014",
+      "chain": {
+        "type": "evm",
+
+        "chain": "Arc_Testnet",
+        "name": "Arc Testnet",
+        "title": "ArcTestnet",
+        "nativeCurrency": {
+          "name": "USDC",
+          "symbol": "USDC",
+          "decimals": 18
+        },
+        "chainId": 5042002,
+        "isTestnet": true,
+        "explorerUrl": "https://testnet.arcscan.app/tx/{hash}",
+        "rpcEndpoints": [
+          "https://rpc.testnet.arc.network/"
+        ],
+        "eurcAddress": "0x89B50855Aa3bE2F677cD6303Cec089B5F319D72a",
+        "usdcAddress": "0x3600000000000000000000000000000000000000",
+        "cctp": {
+          "domain": 26,
+          "contracts": {
+            "v2": {
+              "type": "split",
+              "tokenMessenger": "0x8FE6B999Dc680CcFDD5Bf7EB0974218be2542DAA",
+              "messageTransmitter": "0xE737e5cEBEEBa77EFE34D4aa090756590b1CE275",
+              "confirmations": 1,
+              "fastConfirmations": 1
+            }
+          }
+        },
+        "kitContracts": {
+          "bridge": "0xC5567a5E3370d4DBfB0540025078e283e36A363d"
+        }
+      }
+    },
+    "destination": {
+      "address": "0x4acE0745cb04B8C328d4b39105eE2D3beEE01b38",
+
+
+      "chain": {
+        "type": "evm",
+        "chain": "Ethereum_Sepolia",
+        "name": "Ethereum Sepolia",
+        "title": "Ethereum Sepolia Testnet",
+        "nativeCurrency": {
+          "name": "Sepolia Ether",
+          "symbol": "ETH",
+          "decimals": 18
+        },
+        "chainId": 11155111,
+        "isTestnet": true,
+        "explorerUrl": "https://sepolia.etherscan.io/tx/{hash}",
+        "rpcEndpoints": [
+          "https://sepolia.drpc.org"
+        ],
+        "eurcAddress": "0x08210F9170F89Ab7658F0B5E3fF39b0E03C594D4",
+        "usdcAddress": "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238",
+        "cctp": {
+          "domain": 0,
+          "contracts": {
+            "v1": {
+              "type": "split",
+              "tokenMessenger": "0x9f3B8679c73C2Fef8b59B4f3444d4e156fb70AA5",
+              "messageTransmitter": "0x7865fAfC2db2093669d92c0F33AeEF291086BEFD",
+              "confirmations": 65
+            },
+            "v2": {
+              "type": "split",
+              "tokenMessenger": "0x8fe6b999dc680ccfdd5bf7eb0974218be2542daa",
+              "messageTransmitter": "0xe737e5cebeeba77efe34d4aa090756590b1ce275",
+              "confirmations": 65,
+              "fastConfirmations": 2
+            }
+          }
+        },
+        "kitContracts": {
+          "bridge": "0xC5567a5E3370d4DBfB0540025078e283e36A363d"
+        }
+      }
+    },
+    "steps": [
+      {
+        "name": "approve",
+        "state": "success",
+        "txHash": "0x410429104ef3b0c845bd24844ee0f2cf88c6a8854c45473dba21fc627051458b",
+        "data": {
+          "txHash": "0x410429104ef3b0c845bd24844ee0f2cf88c6a8854c45473dba21fc627051458b",
+          "status": "success",
+          "cumulativeGasUsed": "645033",
+          "gasUsed": "165887",
+          "blockNumber": "27672887",
+          "blockHash": "0x41885a981f19e6ae9710096d9544f098cb30a34986bbfc5a74b0862aa0f88953",
+          "transactionIndex": 5,
+          "effectiveGasPrice": "21000000000"
+        },
+        "explorerUrl": "https://testnet.arcscan.app/tx/0x410429104ef3b0c845bd24844ee0f2cf88c6a8854c45473dba21fc627051458b"
+      },
+      {
+        "name": "burn",
+        "state": "success",
+        "txHash": "0x82052eb422e614d700c625002e142103c121136598bbf3ba6d5c551b2f01ac28",
+        "data": {
+          "txHash": "0x82052eb422e614d700c625002e142103c121136598bbf3ba6d5c551b2f01ac28",
+          "status": "success",
+          "cumulativeGasUsed": "548271",
+          "gasUsed": "293390",
+          "blockNumber": "27672896",
+          "blockHash": "0x6cbf7dd8e0863862f96660e019cf99eb37392d5bac7944484686d47308d21ac3",
+          "transactionIndex": 2,
+          "effectiveGasPrice": "21000000000"
+        },
+        "explorerUrl": "https://testnet.arcscan.app/tx/0x82052eb422e614d700c625002e142103c121136598bbf3ba6d5c551b2f01ac28"
+      },
+      {
+        "name": "fetchAttestation",
+        "state": "success",
+        "data": {
+          "attestation": "0xe3e6464701c742e059384dd029f3f17d63a09835cfdc08f05f84b8b0519a45920cafe0c7908045aeddd1f418040f124d2e15418e842f976c83a9749728e96b3e1c5c5ef5523844cd34ca4335560a79cb260a5848fc09135a44e6828c4b6890f0681ec4f3405b0b06976cb4d9a55933fd53e90fd96c76fd0f2f40e6aa328103c7ec1c",
+          "message": "0x000000010000001a000000006abdf684a0c56520dc129d3edefba30a4fecdbeb0438e29450d2b9c90564ed020000000000000000000000008fe6b999dc680ccfdd5bf7eb0974218be2542daa0000000000000000000000008fe6b999dc680ccfdd5bf7eb0974218be2542daa0000000000000000000000000000000000000000000000000000000000000000000003e8000007d00000000100000000000000000000000036000000000000000000000000000000000000000000000000000000000000004ace0745cb04b8c328d4b39105ee2d3beee01b380000000000000000000000000000000000000000000000000000000000a037a0000000000000000000000000c5567a5e3370d4dbfb0540025078e283e36a363d000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+          "eventNonce": "0x6abdf684a0c56520dc129d3edefba30a4fecdbeb0438e29450d2b9c90564ed02",
+          "cctpVersion": 2,
+          "status": "complete",
+          "decodedMessage": {
+            "sourceDomain": "26",
+            "destinationDomain": "0",
+            "nonce": "0x6abdf684a0c56520dc129d3edefba30a4fecdbeb0438e29450d2b9c90564ed02",
+            "sender": "0x8fe6b999dc680ccfdd5bf7eb0974218be2542daa",
+            "recipient": "0x8fe6b999dc680ccfdd5bf7eb0974218be2542daa",
+            "destinationCaller": "0x0000000000000000000000000000000000000000000000000000000000000000",
+            "minFinalityThreshold": "1000",
+            "finalityThresholdExecuted": "2000",
+            "messageBody": "0x0000000100000000000000000000000036000000000000000000000000000000000000000000000000000000000000004ace0745cb04b8c328d4b39105ee2d3beee01b380000000000000000000000000000000000000000000000000000000000a037a0000000000000000000000000c5567a5e3370d4dbfb0540025078e283e36a363d000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+            "decodedMessageBody": {
+              "burnToken": "0x3600000000000000000000000000000000000000",
+              "mintRecipient": "0x4ace0745cb04b8c328d4b39105ee2d3beee01b38",
+              "amount": "10500000",
+              "messageSender": "0xc5567a5e3370d4dbfb0540025078e283e36a363d",
+              "maxFee": "0",
+              "feeExecuted": "0",
+              "expirationBlock": "0",
+              "hookData": null
+            }
+          },
+          "delayReason": null
+        }
+      },
+      {
+        "name": "mint",
+
+        "state": "error",
+        "error": {},
+        "errorMessage": "mint step failed: RPC endpoint error on Ethereum Sepolia"
+
+
+      }
+    ],
+    "config": {
+      "transferSpeed": "FAST"
+    },
+    "provider": "CCTPV2BridgingProvider"
+  }
+}

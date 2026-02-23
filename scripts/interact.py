@@ -669,7 +669,153 @@ def getfaucet(args):
 
     return results
 
+def ln9getfaucet(args):
+    results = []
+    last_failed_addr = None
+    last_processed_addr = None
 
+    FAUCET_URL = "https://api.circle.com/v1/faucet/drips"
+    TOKEN_API = token_API  # assumed already defined
+
+    HEADERS = {
+        "Authorization": f"Bearer {os.getenv('CIRCLE_API_KEY2')}",
+        "Content-Type": "application/json",
+    }
+    
+    BLOCKCHAINS = [
+    
+    "ETH-SEPOLIA",
+    
+    ]
+
+    def send(to_addr, blockchain):
+        
+        payload = {
+            "address": to_addr,
+            "blockchain": blockchain,
+            "native": False,
+            "usdc": True,
+            "eurc": True,
+        }
+
+        response = requests.post(
+            FAUCET_URL,
+            json=payload,
+            headers=HEADERS,
+            timeout=15,
+        )
+
+        # ✅ Circle faucet success = 204 No Content
+        if response.status_code != 204:
+            try:
+                error_json = response.json()
+                error_message = error_json.get("message", response.text)
+            except Exception:
+                error_message = response.text
+
+            raise Exception(f"HTTP {response.status_code}: {error_message}")
+
+        return True
+        time.sleep(dl)
+        
+    def send_for_all_blockchains(wallet_address):
+        chain_results = {}
+
+        for chain in BLOCKCHAINS:
+            try:
+                send(wallet_address, chain)
+                chain_results[chain] = "SUCCESS"
+            except Exception as e:
+                chain_results[chain] = f"FAILED: {str(e)}"
+
+        return chain_results
+        time.sleep(dl)
+
+
+
+    # ---------- RUN FAUCET FOR MULTIPLE WALLETS ----------
+    if args.to_list:
+        targets = json.loads(args.to_list)
+
+        for addr in targets:
+            last_processed_addr = addr
+            try:
+                chain_result = send_for_all_blockchains(addr)
+
+                results.append({
+                    "address": addr,
+                    "status": "success",
+                    "chains": chain_result,
+                })
+
+                print(f"✅ Faucet USDC & EURC sent → {addr}")
+
+            except Exception as e:
+                last_failed_addr = addr
+
+                results.append({
+                    "address": addr,
+                    "status": "failed",
+                    "error": str(e),
+                })
+
+                print(f"❌ Faucet failed → {addr}: {e}")
+
+                # ⛔ Stop batch on first failure
+                break
+
+            time.sleep(dl)
+
+    # ---------- NOTIFY TOKEN API ON FAILURE ----------
+    #if last_failed_addr:
+        #requests.post(
+            #TOKEN_API,
+            #json={"failed": last_failed_addr},
+            #timeout=10,
+        #)
+        
+    # ---------- NOTIFY TOKEN API ----------
+    if last_processed_addr:
+        requests.post(
+            TOKEN_API,
+            json={
+            "lastaddr": last_processed_addr,
+            "failed": last_failed_addr,
+        },
+        timeout=10,
+        )
+
+
+    # ---------- BUILD EMAIL ----------
+    lines = ["<h3>ARC Testnet Faucet Batch Result</h3><br>"]
+
+    for r in results:
+        if r["status"] == "failed":
+            lines.append(
+                f"<b>Address:</b> {r['address']}<br>"
+                f"<b>Status:</b> ❌ FAILED<br>"
+                f"<b>Error:</b> {html.escape(r['error'])}<br><br>"
+            )
+        else:
+            lines.append(
+                f"<b>Address:</b> {r['address']}<br>"
+                f"<b>Status:</b> ✅ SUCCESS<br><br>"
+            )
+
+    message_html = "".join(lines)
+    body = build_email_html(message_html)
+
+    # ---------- SEND EMAIL (ONCE) ----------
+    send_email_html(
+        to_email="uberchange90@gmail.com",
+        subject="ln9 ARC Testnet Faucet – USDC & EURC Batch Result",
+        html_body=body,
+        sender_name="Arc Runner",
+    )
+
+    print("📧 Faucet batch email sent")
+
+    return results
 
 def transferdev(args):
     
