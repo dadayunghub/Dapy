@@ -13,6 +13,7 @@ jobs:
       ARC_TESTNET_RPC_URL: ${{ secrets.ARC_TESTNET_RPC_URL }}
       PUSH_RPCURL: ${{ secrets.PUSH_RPCURL }}
       NEURAL_RPC: ${{ secrets.NEURAL_RPC }}
+      RH_RPC: ${{ secrets.RH_RPC }}
       PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
 
     steps:
