@@ -47,7 +47,7 @@ jobs:
       - name: Deploy ArcERC20
         id: deploy
         run: |
-          DEPLOY_OUTPUT=$(forge create test/Multically.sol:Multically \
+          DEPLOY_OUTPUT=$(forge create src/Multicall.sol:Multicall \
             --rpc-url $ARC_TESTNET_RPC_URL \
             --private-key $PRIVATE_KEY \
             --broadcast \
