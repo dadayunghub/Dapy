@@ -38,6 +38,20 @@ async function sendEmail(results: any[]) {
   });
 }
 
+async function safeBridge(params: any, retries = 3) {
+  try {
+    return await kit.bridge(params);
+  } catch (err) {
+    if (retries > 0) {
+      console.log("⚠️ RPC error, retrying...");
+      await delay(3000);
+      return safeBridge(params, retries - 1);
+    }
+    throw err;
+  }
+}
+
+
 const bridgeUSDC = async () => {
   const results: any[] = [];
 
@@ -65,7 +79,9 @@ const max = 20;
 const randomAmount: number = Number((Math.random() * (max - min) + min).toFixed(2));
 
 
-    const amount = "10.5";
+    //const amount = "10.5";
+    const amount = randomAmount.toString();
+
     const fromAddress = process.env.waddr!;
 
     for (let i = 0; i < walletList.length; i++) {
@@ -74,7 +90,9 @@ const randomAmount: number = Number((Math.random() * (max - min) + min).toFixed(
       console.log(`\n➡️  Bridging to ${destination} (${i + 1}/${walletList.length})`);
 
       try {
-        const result = await kit.bridge({
+        //const result = await kit.bridge({
+          const result = await safeBridge({
+
           from: {
             adapter,
             chain: "Arc_Testnet",
@@ -96,7 +114,7 @@ const randomAmount: number = Number((Math.random() * (max - min) + min).toFixed(
           data: result,
         });
 
-        await delay(4000);
+        
 
       } catch (err) {
         console.log("❌ FAILED:", inspect(err, false, null, true));
@@ -107,7 +125,13 @@ const randomAmount: number = Number((Math.random() * (max - min) + min).toFixed(
           error: inspect(err, false, null, true),
         });
       }
+      await delay(9000);
     }
+    
+    console.log("Amount:", amount);
+console.log("From:", fromAddress);
+console.log("To:", destination);
+
 
     console.log("\n---------------Batch Bridging Complete---------------");
 
