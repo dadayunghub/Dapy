@@ -88,7 +88,7 @@ jobs:
       - name: Run Bridge Script
         if: ${{ github.event.inputs.todo == 'bridge' }}
         run: |
-          npx tsx scripts/bridge.ts
+          npx tsx scripts/bridgesingle.ts
 
       #################################################
       # 🔵 INTERACT MODE (Python fallback)
