@@ -62,8 +62,9 @@ const bridgeUSDC = async () => {
       (Math.random() * (max - min) + min).toFixed(2)
     ).toString();
 
-    const fromAddress = "0x758dca35b6d8158f8d1fa65c59a7c8f570dc7014";
-    const destination = "0xCFC4dc7AE2C095f4da8B6D4c8c88Bed2303FB459"; // 👈 single wallet here
+    const fromAddress = "0xCFC4dc7AE2C095f4da8B6D4c8c88Bed2303FB459";
+    const destination = "0x758dca35b6d8158f8d1fa65c59a7c8f570dc7014"; 
+    // 👈 single wallet here
 
     if (!destination) {
       throw new Error("Destination wallet is missing");
